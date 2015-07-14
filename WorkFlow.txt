@@ -1,0 +1,38 @@
+# first export all NCCA ASCII data
+
+# set the working directory
+
+# import the stringr library
+
+# check and fix the file names for problem characters
+
+# Make a vector of all charts in a folder
+
+# Make a vector of unique exams and load each exam individually
+
+# For each exam, load each chart and separate the data and header info
+
+# Parse the time-series data to csv and data frame
+
+# Parse the header information
+# Exam header data to csv and data frame
+# Stimulus events to csv and data frame
+# Stimulus text statement to csv and data frame
+
+############
+
+# make a vector of all events.csv files
+# make another vector of unique exams
+# load each exam and make a matrix of all charts and stimulus events
+# make an event matrix for each exam including the names of charts with RQs and CQs
+
+############
+
+# remove charts without both RQs and CQs 
+
+# Make a vector of individual exams consisting of 3 or more charts with RQs and CQs
+# Keep the vector of exams
+# Work with the exams one at a time while loading each chart
+# Separate the header info from the time series data for each exam
+# Process the time series data
+# Extract the measurement segments for 10 prestimulus and 25 post-stimulus seconds

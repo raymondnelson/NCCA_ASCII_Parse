@@ -1,0 +1,2 @@
+01 Stimulus text not available. It is assumed that all stimulus text statement are identical for all charts.
+02 Stimulus text is not identical for some charts of PF110411_1.

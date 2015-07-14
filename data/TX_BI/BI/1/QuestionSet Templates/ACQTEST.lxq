@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LXQuestionDocument version="3.1">
+<QuestionList name="" type="Rank Acquaintance">
+    <Question>
+        <Number>1</Number>
+        <ID>X</ID>
+        <Type>Start of Chart</Type>
+        <Text>This test is about to begin.  Please remain still. </Text>
+    </Question>
+    <Question>
+        <Number>2</Number>
+        <ID>1</ID>
+        <Text>Did you write the number 1?</Text>
+        <ExpectedResponse>No</ExpectedResponse>
+    </Question>
+    <Question>
+        <Number>3</Number>
+        <ID>2</ID>
+        <Text>Did you write the number 2?</Text>
+        <ExpectedResponse>No</ExpectedResponse>
+    </Question>
+    <Question>
+        <Number>4</Number>
+        <ID>3</ID>
+        <Text>Did you write the number 3?</Text>
+        <ExpectedResponse>No</ExpectedResponse>
+    </Question>
+    <Question>
+        <Number>5</Number>
+        <ID>4</ID>
+        <Text>Did you write the number 4?</Text>
+        <ExpectedResponse>No</ExpectedResponse>
+    </Question>
+    <Question>
+        <Number>6</Number>
+        <ID>5</ID>
+        <Text>Did you write the number 5?</Text>
+        <ExpectedResponse>No</ExpectedResponse>
+    </Question>
+    <Question>
+        <Number>7</Number>
+        <ID>XX</ID>
+        <Type>End of Chart</Type>
+        <Text>This test is now complete.  Please remain still.</Text>
+    </Question>
+</QuestionList>
+</LXQuestionDocument>

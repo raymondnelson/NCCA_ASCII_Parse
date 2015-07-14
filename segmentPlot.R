@@ -1,0 +1,337 @@
+# R script to plot a chart segment using ggplot2
+#
+# will iterate over a vector of names of lists that contain
+# the data frames for the time series segment for each stimulus question
+#
+# all information for the plot is contained in the data frame
+# 
+# cps is a scalar in the global environment because ggplot executes in the global environment
+# ROWEnd is also a scalar in the global env
+# EDAlatency is also a scalar
+# prestimSeg is also a scalar
+# ROWEnd is a scalar
+#
+#################################
+
+
+library(ggplot2) # need to load grid library for arrows
+library(grid) # for ggplot2 arrows
+
+
+cps <- 30
+prestimSeg <- 5
+EDALat <- .5
+cardioLat <- .5
+ROWEnd <- 5
+measuredSeg <- 15
+
+
+##############
+
+# iterate and make polots over a list 
+# of exams, series, charts, and stimulus segments
+
+mySegmentLists <- ls(pattern="*_dataSegmentList$")
+
+mySegmentLists <- mySegmentLists[c(1)]
+
+
+####
+
+printPlot <- FALSE
+
+if(printPlot == TRUE) pdf("Chart_1K_10-11-2015.pdf", height=4, width=6)  
+  
+# iterate over the names of data segment lists
+# i<-1
+for (i in 1:length(mySegmentLists)) {
+  
+  # get the name of the segment list
+  segmentListName <- mySegmentLists[i]
+  
+  # get the data segment list
+  segmentList <- get(segmentListName, pos=1)
+  
+  # save the names of the stimulus segments
+  segmentNames <- names(segmentList)
+  
+  # make an empty output list
+  outputList <- list()
+  
+  # iterate over the data frames in each data segment list
+  # j<-1
+  for (j in 1:length(segmentList)) {  
+    
+    stimSegmentDF <- segmentList[[j]]
+    
+    ##########################
+    
+    # make the plot using ggplot2
+    
+    # assign the stim segment to the global environment so that ggplot can find it
+    # assign("stimSegmentDF", stimSegmentDF, pos=1)
+    
+    examName <- unique(as.character(stimSegmentDF$examName))[1]
+    seriesName <- unique(as.character(stimSegmentDF$seriesName))[1]
+    chartName <- unique(as.character(stimSegmentDF$chartName))[1]
+    stimulusName <- stimSegmentDF$Label[stimSegmentDF$Events=="onsetRow"][1]
+    
+    # will get the wrong lable if started within 5 seconds of the previous stimulus
+    # stimSegmentDF$Label[which(stimSegmentDF$Events=="offsetRow")]
+    
+    plotTitle <- paste(examName, chartName, stimulusName)
+    
+    ###
+    
+    # scale the cardio - not used yet but may be able to auto size the cardio data
+    cardio1Scale <- 30 / (max(stimSegmentDF$Cardio1[1:150]) - min(stimSegmentDF$Cardio1[1:150]))
+    
+    
+    
+    
+    # scale the data for plotting
+    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS * 1
+    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS * 1
+    stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA * 1
+    stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 * 20
+    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA * 20
+    stimSegmentDF$CardioDiastolic <- stimSegmentDF$CardioDiastolic * 20
+    stimSegmentDF$CardioSystolic <- stimSegmentDF$CardioSystolic * 20
+    
+    # offset the data for plotting
+    yOffset <- c(125, 50, 0, -75)
+    UPneumoOffset <- stimSegmentDF$UPneumoS[1]
+    LPneumoOffset <- stimSegmentDF$LPneumoS[1]
+    AutoEDAOffset <- stimSegmentDF$AutoEDA[1]
+    CardioMAOffset <- stimSegmentDF$CardioMA[1]
+    CardioDiastolicOffset <- stimSegmentDF$CardioDiastolicOffset[1]
+    Cardio1Offset <- stimSegmentDF$Cardio1[1]
+    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS - UPneumoOffset + yOffset[1]
+    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS - LPneumoOffset + yOffset[2]
+    stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA - AutoEDAOffset + yOffset[3]
+    stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 - Cardio1Offset + yOffset[4]
+    # use the Cardio1Offset to center the CardioMA data on the Cardio1 data
+    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA - Cardio1Offset + yOffset[4]
+    stimSegmentDF$CardioDiastolic <- stimSegmentDF$CardioDiastolic - Cardio1Offset + yOffset[4]
+    stimSegmentDF$CardioSystolic <- stimSegmentDF$CardioSystolic - Cardio1Offset + yOffset[4]
+    
+    
+    # remove NA rows if necessary for XX segments using times series data columns
+    stimSegmentDF <- stimSegmentDF[complete.cases(stimSegmentDF[,7:10]),]
+    
+    # make the plot
+    g <- ggplot()
+    # ggplot normally executes in the global environment
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=AutoEDA), color="green4", size=.75) + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=Cardio1), color="red") + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=UPneumoS), color="blue1") + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=LPneumoS), color="blue4") + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=CardioMA), color="black") + coord_cartesian(ylim=c(-175, 175))
+#    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=CardioDiastolic), color="grey50") + coord_cartesian(ylim=c(-175, 175))
+#    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=CardioSystolic), color="grey50") + coord_cartesian(ylim=c(-175, 175))
+    
+    # g <- g + geom_line(data=stimSegmentDF, aes(x=(1:nrow(stimSegmentDF)), y=Move1), color="grey20")
+    # g <- g + geom_line(data=stimSegmentDF, aes(x=(1:nrow(stimSegmentDF)), y=Aux02), color="grey20")
+    
+    ### vertical lines 
+    # onset line
+    onsetRow <- which(stimSegmentDF$Events=="onsetRow")
+    # assign("onsetRow", onsetRow, pos=1)
+    g <- g + geom_vline(aes(xintercept=as.numeric(onsetRow)))
+    # EDA latency
+    EDALatRow <- which(stimSegmentDF$Events=="onsetRow")+(EDALat*cps)
+    # assign("EDALatRow", EDALatRow, pos=1)
+    g <- g + geom_vline(aes(xintercept=as.numeric(EDALatRow)), color="grey80")
+    # offset line
+    offsetRow <- which(stimSegmentDF$Events=="offsetRow")
+    # assign("offsetRow", offsetRow, pos=1)
+    g <- g + geom_vline(aes(xintercept=as.numeric(offsetRow)))
+    # answer line
+    answerRow <- which(stimSegmentDF$Events=="answerRow")
+    # assign("answerRow", answerRow, pos=1)
+    g <- g + geom_vline(aes(xintercept=as.numeric(answerRow)), color="grey40")
+    # end of response onset window
+    ROWEndRow <- which(stimSegmentDF$Events=="answerRow")+(ROWEnd*cps)
+    # assign("ROWEndRow", ROWEndRow, pos=1)
+    g <- g + geom_vline(aes(xintercept=as.numeric(ROWEndRow)), color="grey80")
+    # end of scoring window
+    endRow <- which(stimSegmentDF$Events=="onsetRow")+(measuredSeg*cps)
+    if(endRow > nrow(stimSegmentDF)) endRow <- (nrow(stimSegmentDF))
+    # assign("endRow", endRow, pos=1)
+    g <- g + geom_vline(aes(xintercept=as.numeric(endRow)), color="grey70")
+    
+    ### shaded areas
+    # scoring window shaded area
+    g <- g + annotate("rect", 
+                      xmin=as.numeric(onsetRow), 
+                      xmax=as.numeric(endRow), 
+                      ymin=-150, 
+                      ymax=150, 
+                      alpha=.1, 
+                      fill="blue")
+    # stimulus question shaded area
+    g <- g + annotate("rect", 
+                      xmin=as.numeric(onsetRow), 
+                      xmax=as.numeric(offsetRow), 
+                      ymin=-135, 
+                      ymax=135, 
+                      alpha=.3, 
+                      fill="grey20")
+    
+    # Pneumo measurement lines
+    
+    g <- g + geom_line(data=stimSegmentDF[onsetRow:endRow,], aes(x=onsetRow:endRow, y=UPneumoS), color="blue1", size=1.25)
+    g <- g + geom_line(data=stimSegmentDF[onsetRow:endRow,], aes(x=onsetRow:endRow, y=LPneumoS), color="blue3", size=1.25)
+    # buffer around the verbal response is not included in the measurement
+    # upper pneumo answer buffer
+    aBuffXOnU <- which(stimSegmentDF$UPneumoExtract=="aBuffOn")
+    aBuffXOffU <- which(stimSegmentDF$UPneumoExtract=="aBuffOff")
+    aBuffYOnU <- stimSegmentDF$UPneumoS[aBuffXOnU]
+    aBuffYOffU <- stimSegmentDF$UPneumoS[aBuffXOffU] 
+    g <- g + annotate("segment",
+                      x=aBuffXOnU,
+                      xend=aBuffXOffU,
+                      y=aBuffYOnU,
+                      yend=aBuffYOffU,
+                      color="black",
+                      linetype="dashed",
+                      size=1.1)
+    # lower pneumo answer buffer
+    aBuffXOnL <- which(stimSegmentDF$LPneumoExtract=="aBuffOn")
+    aBuffXOffL <- which(stimSegmentDF$LPneumoExtract=="aBuffOff")
+    aBuffYOnL <- stimSegmentDF$LPneumoS[aBuffXOnU]
+    aBuffYOffL <- stimSegmentDF$LPneumoS[aBuffXOffU] 
+    g <- g + annotate("segment",
+                      x=aBuffXOnL,
+                      xend=aBuffXOffL,
+                      y=aBuffYOnL,
+                      yend=aBuffYOffL,
+                      color="black",
+                      linetype="dashed",
+                      size=1.1)
+
+
+    ### EDA measurement lines
+    
+    # EDA offset
+     #yOffset <- stimSegmentDF$AutoEDA[1]
+    
+    EDAxOn <- which(stimSegmentDF$AutoEDAExtract=="responseOnsetRow")
+    EDAxOff <- which(stimSegmentDF$AutoEDAExtract=="responseEndRow")
+    EDAyOn <- stimSegmentDF$AutoEDA[EDAxOn]
+    EDAyOff <- stimSegmentDF$AutoEDA[EDAxOff]
+
+    # if(EDAxOn <= ROWEndRow) {
+    # horzontal EDA segment measurement
+    g <- g + annotate("segment",
+                      x=EDAxOff,
+                      xend=EDAxOn,
+                      y=EDAyOn,
+                      yend=EDAyOn,
+                      color="purple",
+                      size=.6,
+                      arrow=arrow(length=unit(0.4, "cm")))
+    
+    # vertical EDA segment
+    # geom_segment and annotate are two different ways of adding the lines
+    # annotate is probably better
+    g <- g + annotate("segment",
+                      x=EDAxOff,
+                      xend=EDAxOff,
+                      y=EDAyOn,
+                      yend=EDAyOff,
+                      color="purple",
+                      size=.6,
+                      arrow=arrow(length=unit(0.4, "cm")))
+    # } 
+
+    # using geomsegment() is more difficult
+    #   g <- g + geom_segment(aes(x=autoEDA["responsePeakRow"], 
+    #                             xend=autoEDA["responsePeakRow"], 
+    #                             y=autoEDA["responseOnsetValue"], 
+    #                             yend=autoEDA["responsePeakValue"]), 
+    #                         color="purple", 
+    #                         size=.5, 
+    #                         arrow=arrow(length=unit(0.4, "cm")))
+    
+#     ### Cardio measurement Lines
+    
+    cardioXOn <- which(stimSegmentDF$CardioExtract=="responseOnsetRow")
+    cardioXOff <- which(stimSegmentDF$CardioExtract=="responseEndRow")
+    cardioYOn <- stimSegmentDF$CardioMA[cardioXOn]
+    cardioYOff <- stimSegmentDF$CardioMA[cardioXOff]
+    
+    # if(cardioXOn <= ROWEndRow) {
+    # horzontal Cardio segment measurement
+    g <- g + annotate("segment",
+                      x=cardioXOff,
+                      xend=cardioXOn,
+                      y=cardioYOn,
+                      yend=cardioYOn,
+                      color="blue",
+                      size=.7,
+                      arrow=arrow(length=unit(0.4, "cm")))
+
+    # vertical Cardio segment
+    # geom_segment and annotate are two different ways of adding the lines
+    # annotate is probably better
+    g <- g + annotate("segment",
+                      x=cardioXOff,
+                      xend=cardioXOff,
+                      y=cardioYOn,
+                      yend=cardioYOff,
+                      color="blue",
+                      size=.7,
+                      arrow=arrow(length=unit(0.4, "cm")))
+    # }
+    
+    ### plot appearance
+
+    g <- g + ylab("y-change")
+    g <- g + xlab("x-time")
+    
+    g <- g + ggtitle(plotTitle)
+    
+    g <- g + theme_bw()
+    
+    # save the chart to a list
+    # outputList[[j]] <- g
+    
+    # print the chart to the graphics device
+    print(g)
+
+    
+    
+    # dev.off()
+    
+    ###########################
+    
+  } # end iteration over data frames in the segment list
+  
+  # names(outputList) <- segmentNames
+  
+} # end iteration over names of data segment lists
+
+if(printPlot == TRUE) { dev.off(); dev.new() }
+
+
+########
+
+
+# # print the ouput to a pdf
+# library(gridExtra)
+# 
+# pdf("plots.pdf", onefile = TRUE)
+# for (i in seq(length(outputList))) {
+#   do.call("print", outputList[[i]])  
+# }
+# dev.off()
+# 
+# 
+# print(outputList)
+
+####
+
+# to print a list of ggplot objects from a list onto a page 
+# require(gridExtra); do.call("grid.arrange",p[[i]])
+
