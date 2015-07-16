@@ -56,6 +56,7 @@ applyFilter <- function(x=uniqueExams,
   source('~/Documents/R_programming/NCCA_ASCII_Parse/lowPass.886.R', echo=TRUE)
   source('~/Documents/R_programming/NCCA_ASCII_Parse/lowPass.2.R', echo=TRUE)
   source('~/Documents/R_programming/NCCA_ASCII_Parse/highPass.03.R', echo=TRUE)
+  source('~/Documents/R_programming/NCCA_ASCII_Parse/MASmooth.R', echo=TRUE)
   
   ###
   
@@ -91,6 +92,8 @@ applyFilter <- function(x=uniqueExams,
         chartData$LPneumoS <- lowPass.886(x=chartData$LPneumo)
         chartData$AutoEDA <- lowPass.2(x=chartData$EDA1)
         chartData$AutoEDA <- highPass.03(data=chartData$AutoEDA)
+        #chartData$AutoEDA <- lowPass.886(x=chartData$AutoEDA)
+        chartData$AutoEDA <- MASmooth(x==MASmooth(x=chartData$AutoEDA, y=7, times=2), y=7, times=2)
         # plot.ts()  
         
         # save the result to the list

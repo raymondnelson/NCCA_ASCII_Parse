@@ -60,6 +60,7 @@ myEventLists <- ls(pattern="*_eventList$")
 # myEventLists <- myEventLists[6]
 
 
+
 ###############
 
 
@@ -113,21 +114,21 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       # get the segment start row
       startRow <- segmentDF$Sample[1]
       
-      begin <- eventDF$Begin[1]
-      end <- eventDF$End[1]
-      answer <- eventDF$Answer[1]
-      
+      begin <- eventDF$Begin[1] - startRow + 1
+      end <- eventDF$End[1] - startRow + 1
+      answer <- eventDF$Answer[1] - startRow + 1
+      if(answer == end) answer <- answer + 1
       
       # get the responseOnsetRow and responseEndRow
-      responseOnsetRow <- begin - (startRow - 1)
-      responseEndRow <- responseOnsetRow + (measuredSeg * cps)
+      responseOnsetRow <- begin + 1 
+      responseEndRow <- responseOnsetRow + (measuredSeg * cps) 
       
       aBuffOn <- eventDF$Answer - (startRow - 1) - (1 * cps)
       aBuffOff <- eventDF$Answer - (startRow - 1) + (1 * cps)
       
       # correct for segments shorter than the measurement segment
-      if(responseEndRow > nrow(segmentDF)) {
-        responseEndRow <- nrow(segmentDF)
+      if(responseEndRow >= nrow(segmentDF)) {
+        responseEndRow <- nrow(segmentDF) -1
       }
       
       # add the UPneumoExtract and LPneumoExtract columns to the data frame
@@ -135,12 +136,20 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       segmentDF$LPneumoExtract <- rep("", times=nrow(segmentDF))
       
       # add the response onset and response end data to the 2 pneumo columns
+      segmentDF$UPneumoExtract[1] <- "prestimRow"
+      segmentDF$LPneumoExtract[1] <- "prestimRow"
+      segmentDF$UPneumoExtract[begin] <- "onsetRow"
+      segmentDF$LPneumoExtract[begin] <- "onsetRow"
+      segmentDF$UPneumoExtract[end] <- "offsetRow"
+      segmentDF$LPneumoExtract[end] <- "offsetRow"
       segmentDF$UPneumoExtract[responseOnsetRow] <- "responseOnsetRow"
       segmentDF$LPneumoExtract[responseOnsetRow] <- "responseOnsetRow"
       segmentDF$UPneumoExtract[responseEndRow] <- "responseEndRow"
       segmentDF$LPneumoExtract[responseEndRow] <- "responseEndRow"
       
       # add the answer distortion buffer 
+      segmentDF$UPneumoExtract[answer] <- "answerRow"
+      segmentDF$LPneumoExtract[answer] <- "answerRow"
       segmentDF$UPneumoExtract[aBuffOn] <- "aBuffOn"
       segmentDF$UPneumoExtract[aBuffOff] <- "aBuffOff"
       segmentDF$LPneumoExtract[aBuffOn] <- "aBuffOn"

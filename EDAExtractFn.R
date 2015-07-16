@@ -52,8 +52,8 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/amplitudeExtract.R', echo=TRU
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 myEventLists <- ls(pattern="*_eventList$")
 
-mySegmentLists <- mySegmentLists[1]
-myEventLists <- myEventLists[1]
+# mySegmentLists <- mySegmentLists[1:3]
+# myEventLists <- myEventLists[1:3]
 
 
 #################### 
@@ -133,21 +133,56 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
                                               eventDF$Label,
                                               sep="_"))
       
-      responseOnsetRow <- z[1]
-      responseEndRow <- z[2]
+      responseOnsetRow <- as.numeric(z[1])
+      responseEndRow <- as.numeric(z[2])
       
       # add the AutoEDAExtract column to the data frame
       segmentDF$AutoEDAExtract <- rep("", times=nrow(segmentDF))
       
-      # add the resonse onset and response end data to the measurement column
-      segmentDF$AutoEDAExtract[responseOnsetRow] <- "responseOnsetRow"
-      segmentDF$AutoEDAExtract[responseEndRow] <- "responseEndRow"
-      segmentDF$AutoEDAExtract[eventDF$Begin - segmentDF$Sample[1] + 1] <- "onsetRow"
-      segmentDF$AutoEDAExtract[eventDF$End - segmentDF$Sample[1] + 1] <- "offsetRow"
-      segmentDF$AutoEDAExtract[eventDF$Answer - segmentDF$Sample[1] + 1] <- "answerRow"
-      segmentDF$AutoEDAExtract[eventDF$Answer - segmentDF$Sample[1] + 1 + (ROWEnd * cps)] <- "ROWEndRow"
-      segmentDF$AutoEDAExtract[eventDF$Begin - segmentDF$Sample[1] + 1 + (EDALat * cps)] <- "latencyRow"
-      segmentDF$AutoEDAExtract[eventDF$Begin - segmentDF$Sample[1] + 1 + (measuredSeg * cps)] <- "endRow"
+      # make sure that events are on distinct rows
+      prestimRow <- 1
+      onsetRow <- eventDF$Begin - segmentDF$Sample[1] + 1 
+      offsetRow <- eventDF$End - segmentDF$Sample[1] + 1 
+      answerRow <- eventDF$Answer - segmentDF$Sample[1] + 1 
+      latencyRow <- eventDF$Begin - segmentDF$Sample[1] + 1 + EDALat * cps
+      ROWEndRow <- eventDF$Answer - segmentDF$Sample[1] + 1 + (ROWEnd * cps)
+      # reponseOnsetRow 
+      # responseEndRow
+      endRow <- eventDF$Begin - segmentDF$Sample[1] + 1 + (measuredSeg * cps)
+      #
+      events <- as.numeric(c(prestimRow, 
+                             onsetRow, 
+                             offsetRow, 
+                             answerRow, 
+                             latencyRow, 
+                             ROWEndRow,
+                             responseOnsetRow, 
+                             responseEndRow,
+                             endRow))
+      names(events) <- c("prestimRow", 
+                         "onsetRow", 
+                         "offsetRow", 
+                         "answerRow", 
+                         "latencyRow", 
+                         "ROWEndRow", 
+                         "responseOnsetRow",
+                         "responseEndRow",
+                         "endRow")
+      ##
+      for(i in 9:5) {if(events[i-1] == events[i]) events[i-1] <- events[i-1] - 1}
+      for(i in 1:3) {if(events[i+1] == events[i]) events[i+1] <- events[i+1] + 1}
+      ##
+      segmentDF$AutoEDAExtract[events["prestimRow"]] <- "prestimRow"
+      segmentDF$AutoEDAExtract[events["onsetRow"]] <- "onsetRow"
+      segmentDF$AutoEDAExtract[events["offsetRow"]] <- "offsetRow"
+      segmentDF$AutoEDAExtract[events["answerRow"]] <- "answerRow"
+      segmentDF$AutoEDAExtract[events["latencyRow"]] <- "latencyRow"
+      segmentDF$AutoEDAExtract[events["ROWEndRow"]] <- "ROWEndRow"
+      segmentDF$AutoEDAExtract[events["responseOnsetRow"]] <- "responseOnsetRow"
+      segmentDF$AutoEDAExtract[events["responseEndRow"]] <- "responseEndRow"
+      segmentDF$AutoEDAExtract[events["endRow"]] <- "endRow"
+      
+      ###
       
       segmentList[[j]] <- segmentDF
       

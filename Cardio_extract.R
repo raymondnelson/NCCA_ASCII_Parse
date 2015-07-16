@@ -22,21 +22,20 @@ measuredSeg <- 15
 
 
 
-
 library(stringr)
-
 
 
 
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 myEventLists <- ls(pattern="*_eventList$")
 
-mySegmentLists <- mySegmentLists[1]
-myEventLists <- myEventLists[1]
+# mySegmentLists <- mySegmentLists[7]
+# myEventLists <- myEventLists[7]
 
 
 
 #####
+
 
 
 cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
@@ -67,7 +66,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
     segmentNames <- names(segmentList)
     
     # iterate over the data frames in each list
-    # j<-1
+    # j<-4
     for (j in 1:length(segmentNames)) {  
       
       segmentDF <- segmentList[[j]]
@@ -113,56 +112,52 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
                                                    eventDF$Label,
                                                    sep="_"))
       
-      responseOnsetRow <- ampExt[1]
-      responseEndRow <- ampExt[2]
+      responseOnsetRow <- as.numeric(ampExt[1])
+      responseEndRow <- as.numeric(ampExt[2])
       
       ###
       
       # make sure that events are on distinct rows
       prestimRow <- 1
-      onsetRow <- eventDF$Begin
-      latencyRow <- CardioLat * cps
+      onsetRow <- eventDF$Begin - segmentDF$Sample[1] + 1 
+      offsetRow <- eventDF$End - segmentDF$Sample[1] + 1 
+      answerRow <- eventDF$Answer - segmentDF$Sample[1] + 1 
+      latencyRow <- eventDF$Begin - segmentDF$Sample[1] + 1 + CardioLat * cps
       # reponseOnsetRow 
-      offsetRow <- eventDF$End
-      answerRow <- eventDF$Answer
-      ROWEndRow <- eventDF$Answer - segmentDF$Sample[1] + 1 + (ROWEnd * cps)
       # responseEndRow
+      ROWEndRow <- eventDF$Answer - segmentDF$Sample[1] + 1 + (ROWEnd * cps)
       endRow <- eventDF$Begin - segmentDF$Sample[1] + 1 + (measuredSeg * cps)
-      events <- c(prestimRow, 
+      #
+      events <- as.numeric(c(prestimRow, 
                     onsetRow, 
-                    latencyRow, 
-                    responseOnsetRow, 
                     offsetRow, 
                     answerRow, 
+                    latencyRow, 
                     ROWEndRow,
+                    responseOnsetRow, 
                     responseEndRow,
-                    endRow)
+                    endRow))
       names(events) <- c("prestimRow", 
                            "onsetRow", 
-                           "latencyRow", 
-                           "responseOnsetRow",
                            "offsetRow", 
                            "answerRow", 
+                           "latencyRow", 
                            "ROWEndRow", 
+                           "responseOnsetRow",
                            "responseEndRow",
                            "endRow")
       ##
-      for(i in 9:6) {if(events[i-1] == events[i]) events[i-1] <- events[i-1] - 1}
+      for(i in 9:5) {if(events[i-1] == events[i]) events[i-1] <- events[i-1] - 1}
       for(i in 1:3) {if(events[i+1] == events[i]) events[i+1] <- events[i+1] + 1}
       ##
+      segmentDF$CardioExtract[events["prestimRow"]] <- "prestimRow"
+      segmentDF$CardioExtract[events["onsetRow"]] <- "onsetRow"
+      segmentDF$CardioExtract[events["offsetRow"]] <- "offsetRow"
+      segmentDF$CardioExtract[events["answerRow"]] <- "answerRow"
+      segmentDF$CardioExtract[events["ROWEndRow"]] <- "ROWEndRow"
+      segmentDF$CardioExtract[events["latencyRow"]] <- "latencyRow"
       segmentDF$CardioExtract[events["responseOnsetRow"]] <- "responseOnsetRow"
       segmentDF$CardioExtract[events["responseEndRow"]] <- "responseEndRow"
-#       segmentDF$CardioExtract[eventDF$Begin - segmentDF$Sample[1] + 1] <- "onsetRow"
-      segmentDF$CardioExtract[events["onsetRow"]] <- "onsetRow"
-#       segmentDF$CardioExtract[eventDF$End - segmentDF$Sample[1] + 1] <- "offsetRow"
-      segmentDF$CardioExtract[events["offsetRow"]] <- "offsetRow"
-#       segmentDF$CardioExtract[eventDF$Answer - segmentDF$Sample[1] + 1] <- "answerRow"
-      segmentDF$CardioExtract[events["answerRow"]] <- "answerRow"
-#       segmentDF$CardioExtract[eventDF$Answer - segmentDF$Sample[1] + 1 + (ROWEnd * cps)] <- "ROWEndRow"
-      segmentDF$CardioExtract[events["ROWEndRow"]] <- "ROWEndRow"
-#       segmentDF$CardioExtract[eventDF$Begin - segmentDF$Sample[1] + 1 + (EDALat * cps)] <- "latencyRow"
-      segmentDF$CardioExtract[events["latencyRow"]] <- "latencyRow"
-#       segmentDF$CardioExtract[eventDF$Begin - segmentDF$Sample[1] + 1 + (measuredSeg * cps)] <- "endRow"
       segmentDF$CardioExtract[events["endRow"]] <- "endRow"
 
       ####

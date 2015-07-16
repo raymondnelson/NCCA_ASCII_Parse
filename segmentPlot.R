@@ -33,7 +33,7 @@ measuredSeg <- 15
 
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 
-mySegmentLists <- mySegmentLists[c(1)]
+mySegmentLists <- mySegmentLists[8:13]
 
 
 ####
@@ -59,7 +59,7 @@ for (i in 1:length(mySegmentLists)) {
   outputList <- list()
   
   # iterate over the data frames in each data segment list
-  # j<-1
+  # j<-8
   for (j in 1:length(segmentList)) {  
     
     stimSegmentDF <- segmentList[[j]]
@@ -84,19 +84,29 @@ for (i in 1:length(mySegmentLists)) {
     ###
     
     # scale the cardio - not used yet but may be able to auto size the cardio data
-    cardio1Scale <- 30 / (max(stimSegmentDF$Cardio1[1:150]) - min(stimSegmentDF$Cardio1[1:150]))
-    
-    
+    UPneumoScale <- 40 / (max(stimSegmentDF$UPneumoS[1:300]) - min(stimSegmentDF$UPneumoS[1:150]))
+    LPneumoScale <- 40 / (max(stimSegmentDF$LPneumoS[1:300]) - min(stimSegmentDF$LPneumoS[1:150]))
+    EDAScale <- 80 / (max(na.omit(stimSegmentDF$AutoEDA)) - min(na.omit(stimSegmentDF$AutoEDA)))
+    outDiff <- NULL
+    for (i in 1:121) {
+      outDiff <- c(outDiff, diff(range(stimSegmentDF$Cardio1[i:(i+29)])))
+    }
+    cardioScale <- 50 / mean(outDiff)
     
     
     # scale the data for plotting
-    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS * 1
-    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS * 1
-    stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA * 1
-    stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 * 20
-    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA * 20
-    stimSegmentDF$CardioDiastolic <- stimSegmentDF$CardioDiastolic * 20
-    stimSegmentDF$CardioSystolic <- stimSegmentDF$CardioSystolic * 20
+#    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS * 1
+    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS * UPneumoScale
+#    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS * 1
+    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS * LPneumoScale
+#     stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA * 1
+    stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA * EDAScale
+#     stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 * 20
+    stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 * cardioScale
+#    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA * 20
+    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA * cardioScale
+    stimSegmentDF$CardioDiastolic <- stimSegmentDF$CardioDiastolic * cardioScale
+    stimSegmentDF$CardioSystolic <- stimSegmentDF$CardioSystolic * cardioScale
     
     # offset the data for plotting
     yOffset <- c(125, 50, 0, -75)
@@ -136,28 +146,22 @@ for (i in 1:length(mySegmentLists)) {
     ### vertical lines 
     # onset line
     onsetRow <- which(stimSegmentDF$Events=="onsetRow")
-    # assign("onsetRow", onsetRow, pos=1)
     g <- g + geom_vline(aes(xintercept=as.numeric(onsetRow)))
     # EDA latency
     EDALatRow <- which(stimSegmentDF$Events=="onsetRow")+(EDALat*cps)
-    # assign("EDALatRow", EDALatRow, pos=1)
     g <- g + geom_vline(aes(xintercept=as.numeric(EDALatRow)), color="grey80")
     # offset line
     offsetRow <- which(stimSegmentDF$Events=="offsetRow")
-    # assign("offsetRow", offsetRow, pos=1)
     g <- g + geom_vline(aes(xintercept=as.numeric(offsetRow)))
     # answer line
     answerRow <- which(stimSegmentDF$Events=="answerRow")
-    # assign("answerRow", answerRow, pos=1)
     g <- g + geom_vline(aes(xintercept=as.numeric(answerRow)), color="grey40")
     # end of response onset window
     ROWEndRow <- which(stimSegmentDF$Events=="answerRow")+(ROWEnd*cps)
-    # assign("ROWEndRow", ROWEndRow, pos=1)
     g <- g + geom_vline(aes(xintercept=as.numeric(ROWEndRow)), color="grey80")
     # end of scoring window
     endRow <- which(stimSegmentDF$Events=="onsetRow")+(measuredSeg*cps)
     if(endRow > nrow(stimSegmentDF)) endRow <- (nrow(stimSegmentDF))
-    # assign("endRow", endRow, pos=1)
     g <- g + geom_vline(aes(xintercept=as.numeric(endRow)), color="grey70")
     
     ### shaded areas
@@ -194,8 +198,8 @@ for (i in 1:length(mySegmentLists)) {
                       y=aBuffYOnU,
                       yend=aBuffYOffU,
                       color="black",
-                      linetype="dashed",
-                      size=1.1)
+                      linetype="solid",
+                      size=1.25)
     # lower pneumo answer buffer
     aBuffXOnL <- which(stimSegmentDF$LPneumoExtract=="aBuffOn")
     aBuffXOffL <- which(stimSegmentDF$LPneumoExtract=="aBuffOff")
@@ -207,8 +211,8 @@ for (i in 1:length(mySegmentLists)) {
                       y=aBuffYOnL,
                       yend=aBuffYOffL,
                       color="black",
-                      linetype="dashed",
-                      size=1.1)
+                      linetype="solid",
+                      size=1.25)
 
 
     ### EDA measurement lines

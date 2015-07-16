@@ -21,8 +21,8 @@ myEventLists <- ls(pattern="*_eventList$")
 mySegmentLists <- mySegmentLists[1]
 myEventLists <- myEventLists[1]
 
-mySegmentDF <- get(mySegmentLists)[[1]]
-myEventDF <- get(myEventLists)[[1]]
+mySegmentDF <- get(mySegmentLists)[[3]]
+myEventDF <- get(myEventLists)[[3]]
 
 # myData <- mySegmentDF$AutoEDA
 myData <- mySegmentDF$CardioMA
@@ -231,7 +231,7 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   # private function to find a change or increase in upward slope energy
   #i<-1
   slopeChange <- function(x=myData, N=4) {
-    # compare the 4 seconds with the next 1 seconc
+    # compare the 3 seconds with the next 1 second
     # y is the number of second to evaluate
     y <- rep(0, times=length(myData))
     for (i in 1:(length(y)-(N*cps))) {
@@ -239,7 +239,7 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
       postLen <- (cps*N)-1
       preDiff <- diff(x[i:(i+preLen)])
       postDiff <- c(diff(x[(i+preLen):(i+postLen)]))
-      if(mean(postDiff) >= qnorm(.99, mean=mean(preDiff), sd=sd(preDiff))) { 
+      if(mean(postDiff) >= qnorm(.9986501, mean=mean(preDiff), sd=sd(preDiff))) { 
         y[(i+(N*cps)-1)] <- sign(mean(postDiff))
       }
     } # end for loop
@@ -298,25 +298,10 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   xOnsetVal <- myData[xOnset]
   xPeakVal <- myData[xPeak]
 
-  #################
+
+  # deleted some unused stuff 7-16-2015
   
-#   ### save the onset rows after ROWEndRow
-#   
-#   # save xOnset rows after the ROWEndRow
-#   save_xOnset <- na.omit(xOnset[which(xOnset > ROWEndRow)])
-#   save_xOnsetVal <- na.omit(xOnsetVal[which(xOnset > ROWEndRow)])
-#   
-#   # keep only those save_xOnset rows that are less than endRow 
-#   save_xOnset <- save_xOnset[which(save_xOnset <= endRow)]
-#   save_xOnsetVal <- save_xOnsetVal[which(save_xOnset <= endRow)]
-
-  ### 
-
-#   keep only save_xOnset rows for which the y-value is >= max xOnset y-value during ROW
-#   if(length(save_xOnset) > 0) {
-#   save_xOnset <- which(save_xOnset[1:which(myData[save_xOnset] >= max(myData[xOnset]))])
-#   }
-#   
+  
   ################
   
   # keep onset rows after the required response latency period
@@ -382,51 +367,14 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
     xPeakVal <- myData[xPeak]
   }
   
-#   # fix condition where xPeak is >= number rows in the data frame
-#   if(xPeak[1] >= nrow(segmentDF)) xPeak[1] <- (nrow(segmentDF))
   
-  # keep a  number of subsequent peak rows equal to the number of onset values
-  # xPeak <- xPeak[1:length(xOnset)]
-
-  ### THIS IS THE PROBLEM WITH ASCENDING SEGMENTS WHERE THERE IS NO ONSET
-#   # fix condition where the last xPeak row is > endRow
-#   if(xPeak[length(xPeak)] > endRow) xPeak[length(xPeak)] <- endRow # was endRow
-
-#   ##################
-#   
-#   # keep a number of save_xPeak rows after the ROWEndRow and before endRow
-# #  # equal to the number of save_xOnset values after the ROWEndRow
-#   if(length( save_xPeak)
-#   if(length(save_xOnset) > 0) save_xPeak <- save_xPeak[1:length(save_xOnset)]
-
-  ###################
-
-#   # concat the rows after ROWEndRow to the rows before ROWEndRow
-#   xOnset <- c(xOnset, save_xOnset)
-#   xPeak <- c(xPeak, save_xPeak)
-
-  #### keep the max Peak after ROWEnd and before end Row 
   
-  # add extra xPeak values after ROWEndRow only if the value is greater
-  # than the last positive slope onset
-  # if(save_xPeak != NULL) {
-  #   save_xPeakValue <- myData[save_xPeak]
-  #   save_xPeak <- save_xPeak[max(save_xPeakValue)]
-  # }    
+  # more deleted unused stuff 7-16-2015
   
-  ################
   
-  # fix NAs in the vectors positive slope onset and positive slope peak values
-#   xOnset <- as.integer(na.omit(xOnset))
-#   xPeak <- as.integer(na.omit(xPeak))
   
-  # fix condition when vector of peak values is length zero
-  # if(length(xPeak) == 0) xPeak <- xOnset[1]
   
-  #     # keep one additional peak if the slope is positive at the ROWEndRow
-  #     ifelse(mySlope[ROWEndRow] == 1, 
-  #            xPeak <- xPeak[1:(length(xPeak[xPeak <= ROWEndRow])+1)],
-  #            xPeak <- xPeak[xPeak <= ROWEndRow])
+  
   
   ###############################
   
@@ -457,15 +405,15 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   # get the onset value
   yChangeOnsetValue <- myData[yChangeOnset]
 
-  ###
+  #####################
+
   
-  #   # get the peak row by indexing the xPeak vector
-  #   yChangePeak <- xPeak[which.max(yChange):length(xPeak)][which.max(myData[xPeak[which.max(yChange):length(xPeak)]] - 
-  #                                                                      myData[xOnset[which.max(yChange)]])]
-  #   
-  #   #same
-  #   yChangePeak <- xPeak[which.max(yChange):length(xPeak)][which.max(abs(myData[xPeak[yChangeMaxIndex:length(xPeak)]] - 
-  #                                                          yChangeOnsetValue  ))]
+
+  
+  # even more deleted unused stuff 7-16-2015
+  
+  
+  
   
   print(xOnset)
   print(xPeak)
@@ -474,25 +422,61 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   
   ##########################
 
-  ### index the peak row (this is simpler than indexing the onset row)
   
-  # first remove all xOnset and xPeak rows for which the value is less than the xOnsetVal
-  # xOnset <- xOnset[-c(which(myData[xOnset] < yChangeOnsetValue)[1]:length(xOnset))]
-  # xPeak <- xPeak[xPeak < xOnset[which(myData[xOnset] < yChangeOnsetValue)[1]]]
-
-  ###
+  
+  
+  # 4th section with deleted unused stuff 7-16-2015
+  
+  
+    
+  
+  #########################
 
   # make a short vector of the xPeak row >=  xOnset
   xPeakShort <- xPeak[xPeak >= yChangeOnset] # could use which() but it makes no difference
   
+  #############################
+  
+  
+  
+  # 7-16-15 remove all ascending onset and peak segments 
+  # after the data descend below the yChangeOnsetValue
+  
+  # do this by monitoring the yAxis difference after the yChangeValue
+  # and remove all peaks after the first row where the diff is negative 
+  
+  negDiff <- function(x=yChangeOnset, y=yChangeOnsetValue, z=myData) {
+    # function to remove all peak segments after the data descend below the yChangeOnset
+    yChangeOnset <- x
+    yChangeOnsetValue <- y
+    myData <- z
+    #
+    myValues <- myData[(yChangeOnset+1):length(myData)]
+    myDiffs <- myValues - yChangeOnsetValue
+    stopRow <- yChangeOnset + which(myDiffs < 0)[1]
+    #
+    return(stopRow)
+  } # end negDiff function
+  
+  stopRow <- negDiff(x=yChangeOnset, y=yChangeOnsetValue, z=myData)
+  
+  # remove peaks if and after the data descend below the reposnse onset
+  if(is.na(stopRow) == FALSE) xPeakShort <- xPeakShort[xPeakShort <= stopRow]
+  
+  #########################
+ 
+  
+  
+  
+  
+  ####################### 
+
   # make a short vector of the peak values
   xPeakShortValues <- myData[xPeakShort] 
   
   # make a vector of the differences between xPeakShortValues and yChangeOnsetValue
   xPeakShortDifferences <- xPeakShortValues - yChangeOnsetValue
   
-  ### 
-
   # use xOnset to xPeak differences to remove measurements after data descend below the xOnsetVal
   if(length(which(xPeakShortDifferences < 0)) > 0) {  
     # remove differences after the first negative difference
@@ -510,6 +494,13 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
 
   # fix empty value
   if(length(yChangePeak) == 0) yChangePeak <- yChangeOnset # added 7-12-15
+  
+  
+  
+  
+  
+  
+  ############################
   
   # fix condition where yChangeOnset == yChangePeak
   if(yChangeOnset == yChangePeak) { 
@@ -536,12 +527,14 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
                     yChangePeak, 
                     yChangeOnsetValue, 
                     yChangePeakValue, 
-                    yChangeValue)
+                    yChangeValue,
+                    segmentName)
   names(outputVector) <- c("responseOnsetRow",
                            "responsePeakRow",
                            "responseOnsetValue",
                            "responsePeakValue",
-                           "responseChangevalue")
+                           "responseChangevalue",
+                           "segmentName")
   
   return(outputVector)  
   
