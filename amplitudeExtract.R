@@ -465,9 +465,53 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   
   #########################
  
+  # remove upward slope segments after the ROW and in the measurement window
+  # if the data descend more than 50% from the previous highest peak
   
+  descentRule <- function(x=yChangeOnset, y=xPeakShort, z=myData, p=.5) {
+    # function to remove positive slope segments that begin after the ROW
+    # if the data descend more than a proportion p
+    yChangeOnset <- x
+    xPeakShort <- y
+    myData <- z
+    prop <- p
+    #
+    xPeakShortValues <- myData[xPeakShort]
+    xPeakShortDiffs <- xPeakValues - myData[yChangeOnset]
+    cutValues <- prop * xPeakShortDiffs
+    myValues <- myData[(yChangeOnset):length(myData)]
+    myDiffs <- myValues - myData[yChangeOnset]
+    mySlope <- c(0, ifelse(diff(myValues)>0, 1, ifelse(diff(myValues)<0, -1, 0)))
+
+    # now look for descending myValues that are less than descCut for previous peaks
+    
+    # empty vector
+    cutVector <- numeric(length=length(myDiffs))
+    # populate the cut vector
+    for (i in 1:length(myDiffs)) {
+      # make a vector myCut for the vector myDiffs
+      
+      # myCutValue needs to be 1/2 the diff of the preceeding max peak
+      ifelse(length(which(xPeakShort <= i + yChangeOnset - 1)) > 0,
+             myCutValue <- max(cutValues[which(xPeakShort <= i + yChangeOnset - 1)]),
+             myCutValue <- 0)
+      
+      # use i to check the max preceeding diff
+      # if(myDiffs[i] <  myCutValue) { cutVector[i] <- myCutValue }
+      cutVector[i] <- myCutValue
+    }
+    # print(cutVector)
+    
+    # use only descending slope segments
+    descRows <- which(mySlope == -1)
+    cutRows <- descRows[myDiffs[descRows] < cutVector[descRows]]
+    stopRow2 <- cutRows[1]
+        
+    return(stopRow2)
+    
+  }
   
-  
+  stopRow2 <- descentRule(x=yChangeOnset, y=xPeakShort, z=myData, p=.5)
   
   ####################### 
 
