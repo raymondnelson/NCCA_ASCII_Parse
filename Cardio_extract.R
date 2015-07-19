@@ -114,6 +114,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
       
       responseOnsetRow <- as.numeric(ampExt[1])
       responseEndRow <- as.numeric(ampExt[2])
+      stopRow <- as.numeric(ampExt["stopRow"])
       
       ###
       
@@ -136,7 +137,8 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
                     ROWEndRow,
                     responseOnsetRow, 
                     responseEndRow,
-                    endRow))
+                    endRow,
+                    stopRow))
       names(events) <- c("prestimRow", 
                            "onsetRow", 
                            "offsetRow", 
@@ -145,7 +147,8 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
                            "ROWEndRow", 
                            "responseOnsetRow",
                            "responseEndRow",
-                           "endRow")
+                           "endRow",
+                         "stopRow")
       ##
       for(i in 9:5) {if(events[i-1] == events[i]) events[i-1] <- events[i-1] - 1}
       for(i in 1:3) {if(events[i+1] == events[i]) events[i+1] <- events[i+1] + 1}
@@ -159,6 +162,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
       segmentDF$CardioExtract[events["responseOnsetRow"]] <- "responseOnsetRow"
       segmentDF$CardioExtract[events["responseEndRow"]] <- "responseEndRow"
       segmentDF$CardioExtract[events["endRow"]] <- "endRow"
+      segmentDF$CardioExtract[events["stopRow"]] <- "stopRow"
 
       ####
       

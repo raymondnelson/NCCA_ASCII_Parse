@@ -46,8 +46,8 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/getEventLists.R', echo=TRUE)
 source('~/Documents/R_programming/NCCA_ASCII_Parse/getSegmentLists.R', echo=TRUE)
 
 # save the environment in the present state
-save.image(file="NCCAworking3.Rda")
-load("NCCAworking3.Rda")
+# save.image(file="NCCAworking3.Rda")
+# load("NCCAworking3.Rda")
 
 
 #####
@@ -70,23 +70,23 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/Cardio_extract.R', echo=TRUE)
 
 # look at a data frame
 
-mySegmentLists <- ls(pattern="*_dataSegmentList$")
-myEventLists <- ls(pattern="*_eventList$")
-
-mySegmentLists <- mySegmentLists[1]
-myEventLists <- myEventLists[1]
-
-mySegmentDF <- get(mySegmentLists)[[1]]
-myEventDF <- get(myEventLists)[[1]]
-
-myData <- mySegmentDF$AutoEDA
-#myData <- mySegmentDF$CardioMA
-
-begin <- myEventDF$Begin
-end <- myEventDF$End
-answer <- myEventDF$Answer
-start <- mySegmentDF$Sample[1]
-lat <- .5
+# mySegmentLists <- ls(pattern="*_dataSegmentList$")
+# myEventLists <- ls(pattern="*_eventList$")
+# 
+# mySegmentLists <- mySegmentLists[1]
+# myEventLists <- myEventLists[1]
+# 
+# mySegmentDF <- get(mySegmentLists)[[1]]
+# myEventDF <- get(myEventLists)[[1]]
+# 
+# myData <- mySegmentDF$AutoEDA
+# #myData <- mySegmentDF$CardioMA
+# 
+# begin <- myEventDF$Begin
+# end <- myEventDF$End
+# answer <- myEventDF$Answer
+# start <- mySegmentDF$Sample[1]
+# lat <- .5
 
 
 # plot the segments

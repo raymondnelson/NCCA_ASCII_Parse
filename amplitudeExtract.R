@@ -21,8 +21,8 @@ myEventLists <- ls(pattern="*_eventList$")
 mySegmentLists <- mySegmentLists[1]
 myEventLists <- myEventLists[1]
 
-mySegmentDF <- get(mySegmentLists)[[3]]
-myEventDF <- get(myEventLists)[[3]]
+mySegmentDF <- get(mySegmentLists)[[10]]
+myEventDF <- get(myEventLists)[[10]]
 
 # myData <- mySegmentDF$AutoEDA
 myData <- mySegmentDF$CardioMA
@@ -70,6 +70,8 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   strictROW <- FALSE # TRUE to ignore positive slope segments starting after ROW
   
   longResponse <- TRUE # TRUE to score responses to peak outside the scoring window
+  
+  descentStop <- TRUE # will not score reactions after the data descend a specified proportion
    
   # a time series vector including 
   # 5 seconds before and 15 seconds after stimulus onset
@@ -239,8 +241,8 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
       postLen <- (cps*N)-1
       preDiff <- diff(x[i:(i+preLen)])
       postDiff <- c(diff(x[(i+preLen):(i+postLen)]))
-      if(mean(postDiff) >= qnorm(.9986501, mean=mean(preDiff), sd=sd(preDiff))) { 
-        y[(i+(N*cps)-1)] <- sign(mean(postDiff))
+      if(mean(postDiff) >= qnorm(.999, mean=mean(preDiff), sd=sd(preDiff))) { 
+        y[(i+(N*cps)-1)-(.5*cps)] <- sign(mean(postDiff))
       }
     } # end for loop
     # get the onset
@@ -251,8 +253,6 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   sChange <- slopeChange(x=myData, N=3) # not yet used for anything
   
   print(segmentName)
-  print(which(sChange==1))
-  print(which(xOnset1==1))
   
   ### 
   
@@ -299,7 +299,11 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   xPeakVal <- myData[xPeak]
 
 
+  
+  
   # deleted some unused stuff 7-16-2015
+  
+  
   
   
   ################
@@ -369,9 +373,8 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   
   
   
+  
   # more deleted unused stuff 7-16-2015
-  
-  
   
   
   
@@ -379,28 +382,39 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   ###############################
   
   # compute a vector of max amplitudes for each onset and all subsequent Peaks
-  # yChange is a vector of xPeak rows for the max increase following each xOnset
+
+  # make a loop output vector
   yChange <- rep("", times=length(xOnset)) 
   # i <- 1
-  for (i in 1:length(yChange)) {
+  for (i in 1:length(xOnset)) {
     # this has to be in a loop to iteratively shorten the comparison
-    # yChange[i] <- max(myData[xPeak[i:length(xPeak)]] - myData[xOnset[i]])
-    print(myData[xPeak[xPeak >= xOnset[i]]])
-    print(myData[xOnset[i]])
     yChange[i] <- max(myData[xPeak[xPeak >= xOnset[i]]] - myData[xOnset[i]])
+    # yChange is a vector of xPeak rows for the max increase following each xOnset
   } # end for loop
 
   # remove NAs that may result from different vector lengths
   yChange <- as.numeric(na.omit(yChange))
+  
+  
+  ### get the response onset
+  
+  ### need a loop to select the next onset 
   
   # get the max change value from the vector. this is the response onset row 
   yChangeMaxIndex <- which.max(as.numeric(yChange))
   
   # use the first if the index fails or is null
   if(length(yChangeMaxIndex) == 0) yChangeMaxIndex <- 1
+  
+  
+  ##### now make a loop to use subsequent onset points if necessary
+  
+  for (i in yChangeMaxIndex:length(yChange)) { 
+    # added loop 7-18-2015 to select a subsequent xOnset if the data descend 1/2 way
 
   # get the onset row by indexing the max change value
   yChangeOnset <- xOnset[yChangeMaxIndex]
+  print(yChangeOnset)
 
   # get the onset value
   yChangeOnsetValue <- myData[yChangeOnset]
@@ -414,11 +428,6 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   
   
   
-  
-  print(xOnset)
-  print(xPeak)
-  print(yChangeMaxIndex)
-  print(yChangeOnset)
   
   ##########################
 
@@ -434,10 +443,9 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
 
   # make a short vector of the xPeak row >=  xOnset
   xPeakShort <- xPeak[xPeak >= yChangeOnset] # could use which() but it makes no difference
+  print(xPeakShort)
   
   #############################
-  
-  
   
   # 7-16-15 remove all ascending onset and peak segments 
   # after the data descend below the yChangeOnsetValue
@@ -460,8 +468,8 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   
   stopRow <- negDiff(x=yChangeOnset, y=yChangeOnsetValue, z=myData)
   
-  # remove peaks if and after the data descend below the reposnse onset
-  if(is.na(stopRow) == FALSE) xPeakShort <- xPeakShort[xPeakShort <= stopRow]
+  # remove peaks if and after the data descend below the reposnse onset value
+  if(!is.na(stopRow)) xPeakShort <- xPeakShort[xPeakShort <= stopRow]
   
   #########################
  
@@ -469,7 +477,7 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   # if the data descend more than 50% from the previous highest peak
   
   descentRule <- function(x=yChangeOnset, y=xPeakShort, z=myData, p=.5) {
-    # function to remove positive slope segments that begin after the ROW
+    # function to remove positive slope segments 
     # if the data descend more than a proportion p
     yChangeOnset <- x
     xPeakShort <- y
@@ -477,41 +485,57 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
     prop <- p
     #
     xPeakShortValues <- myData[xPeakShort]
-    xPeakShortDiffs <- xPeakValues - myData[yChangeOnset]
+    xPeakShortDiffs <- xPeakShortValues - myData[yChangeOnset]
     cutValues <- prop * xPeakShortDiffs
-    myValues <- myData[(yChangeOnset):length(myData)]
+    myValues <- myData[(yChangeOnset+1):length(myData)]
     myDiffs <- myValues - myData[yChangeOnset]
     mySlope <- c(0, ifelse(diff(myValues)>0, 1, ifelse(diff(myValues)<0, -1, 0)))
-
+    #
     # now look for descending myValues that are less than descCut for previous peaks
-    
-    # empty vector
+    #
+    # make an empty vector
     cutVector <- numeric(length=length(myDiffs))
     # populate the cut vector
     for (i in 1:length(myDiffs)) {
-      # make a vector myCut for the vector myDiffs
-      
-      # myCutValue needs to be 1/2 the diff of the preceeding max peak
-      ifelse(length(which(xPeakShort <= i + yChangeOnset - 1)) > 0,
-             myCutValue <- max(cutValues[which(xPeakShort <= i + yChangeOnset - 1)]),
+      # make a vector myCutValues for the vector myDiffs
+      # myCutValues needs to be 1/2 the diff of the preceeding max peak
+      currentRow <- i + yChangeOnset - 1
+      ifelse(length(which(xPeakShort <= currentRow)) > 0,
+             myCutValue <- max(cutValues[which(xPeakShort <= currentRow)]),
              myCutValue <- 0)
-      
+      #
       # use i to check the max preceeding diff
       # if(myDiffs[i] <  myCutValue) { cutVector[i] <- myCutValue }
       cutVector[i] <- myCutValue
-    }
+    } # end for loop
+    #
     # print(cutVector)
-    
+    #
     # use only descending slope segments
     descRows <- which(mySlope == -1)
-    cutRows <- descRows[myDiffs[descRows] < cutVector[descRows]]
-    stopRow2 <- cutRows[1]
-        
-    return(stopRow2)
+    # ignore the first several descending rows 
+    # to avoid over sensitivity to high frequency noise
     
-  }
+    # descRows <- descRows[91:length(descRows)]
+    cutVector <- c(rep(0, time=90), cutVector[91:length(cutVector)])
+    
+    # keep only those descending rows for which 
+    # difference is smaller than the cut point porportion
+    cutRows <- descRows[myDiffs[descRows] < cutVector[descRows]]
+    stopRow2 <- cutRows[1] + yChangeOnset -1
+    #   
+    return(stopRow2)
+    #
+  } # end descentRule function
   
   stopRow2 <- descentRule(x=yChangeOnset, y=xPeakShort, z=myData, p=.5)
+  
+  # remove peaks after the data descend beyond the specified proportion
+  if(descentStop == TRUE) { 
+    if(!is.na(stopRow2)) xPeakShort <- xPeakShort[xPeakShort < stopRow2] 
+  } # end if
+  
+} # end loop over xOnset 
   
   ####################### 
 
@@ -538,11 +562,6 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
 
   # fix empty value
   if(length(yChangePeak) == 0) yChangePeak <- yChangeOnset # added 7-12-15
-  
-  
-  
-  
-  
   
   ############################
   
@@ -572,12 +591,14 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
                     yChangeOnsetValue, 
                     yChangePeakValue, 
                     yChangeValue,
+                    stopRow2,
                     segmentName)
   names(outputVector) <- c("responseOnsetRow",
                            "responsePeakRow",
                            "responseOnsetValue",
                            "responsePeakValue",
                            "responseChangevalue",
+                           "stopRow",
                            "segmentName")
   
   return(outputVector)  

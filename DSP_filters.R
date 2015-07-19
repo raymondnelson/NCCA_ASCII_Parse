@@ -93,7 +93,7 @@ applyFilter <- function(x=uniqueExams,
         chartData$AutoEDA <- lowPass.2(x=chartData$EDA1)
         chartData$AutoEDA <- highPass.03(data=chartData$AutoEDA)
         #chartData$AutoEDA <- lowPass.886(x=chartData$AutoEDA)
-        chartData$AutoEDA <- MASmooth(x==MASmooth(x=chartData$AutoEDA, y=7, times=2), y=7, times=2)
+        chartData$AutoEDA <- MASmooth(x=chartData$AutoEDA, y=5, times=5)
         # plot.ts()  
         
         # save the result to the list

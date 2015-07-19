@@ -135,6 +135,7 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       
       responseOnsetRow <- as.numeric(z[1])
       responseEndRow <- as.numeric(z[2])
+      stopRow <- as.numeric(z["stopRow"])
       
       # add the AutoEDAExtract column to the data frame
       segmentDF$AutoEDAExtract <- rep("", times=nrow(segmentDF))
@@ -158,7 +159,8 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
                              ROWEndRow,
                              responseOnsetRow, 
                              responseEndRow,
-                             endRow))
+                             endRow,
+                             stopRow))
       names(events) <- c("prestimRow", 
                          "onsetRow", 
                          "offsetRow", 
@@ -167,7 +169,8 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
                          "ROWEndRow", 
                          "responseOnsetRow",
                          "responseEndRow",
-                         "endRow")
+                         "endRow",
+                         "stopRow")
       ##
       for(i in 9:5) {if(events[i-1] == events[i]) events[i-1] <- events[i-1] - 1}
       for(i in 1:3) {if(events[i+1] == events[i]) events[i+1] <- events[i+1] + 1}
@@ -181,6 +184,7 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       segmentDF$AutoEDAExtract[events["responseOnsetRow"]] <- "responseOnsetRow"
       segmentDF$AutoEDAExtract[events["responseEndRow"]] <- "responseEndRow"
       segmentDF$AutoEDAExtract[events["endRow"]] <- "endRow"
+      segmentDF$AutoEDAExtract[events["stopRow"]] <- "stopRow"
       
       ###
       

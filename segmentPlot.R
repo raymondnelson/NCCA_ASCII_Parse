@@ -33,7 +33,7 @@ measuredSeg <- 15
 
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 
-mySegmentLists <- mySegmentLists[8:13]
+mySegmentLists <- mySegmentLists[1:2]
 
 
 ####
@@ -59,7 +59,7 @@ for (i in 1:length(mySegmentLists)) {
   outputList <- list()
   
   # iterate over the data frames in each data segment list
-  # j<-8
+  # j<-3
   for (j in 1:length(segmentList)) {  
     
     stimSegmentDF <- segmentList[[j]]
@@ -218,7 +218,7 @@ for (i in 1:length(mySegmentLists)) {
     ### EDA measurement lines
     
     # EDA offset
-     #yOffset <- stimSegmentDF$AutoEDA[1]
+    # yOffset <- stimSegmentDF$AutoEDA[1]
     
     EDAxOn <- which(stimSegmentDF$AutoEDAExtract=="responseOnsetRow")
     EDAxOff <- which(stimSegmentDF$AutoEDAExtract=="responseEndRow")
@@ -248,6 +248,10 @@ for (i in 1:length(mySegmentLists)) {
                       size=.6,
                       arrow=arrow(length=unit(0.4, "cm")))
     # } 
+
+    ## EDA descent stop
+
+    # g <- g + geom_point()
 
     # using geomsegment() is more difficult
     #   g <- g + geom_segment(aes(x=autoEDA["responsePeakRow"], 
