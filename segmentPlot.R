@@ -33,14 +33,14 @@ measuredSeg <- 15
 
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 
-mySegmentLists <- mySegmentLists[1:2]
+mySegmentLists <- mySegmentLists[1:3]
 
 
 ####
 
-printPlot <- FALSE
+printPlot <- TRUE
 
-if(printPlot == TRUE) pdf("Chart_1K_10-11-2015.pdf", height=4, width=6)  
+if(printPlot == TRUE) pdf("Chart_1_7-20-2015.pdf", height=4, width=6)  
   
 # iterate over the names of data segment lists
 # i<-1

@@ -29,8 +29,8 @@ library(stringr)
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 myEventLists <- ls(pattern="*_eventList$")
 
-# mySegmentLists <- mySegmentLists[7]
-# myEventLists <- myEventLists[7]
+# mySegmentLists <- mySegmentLists[1:3]
+# myEventLists <- myEventLists[1:3]
 
 
 

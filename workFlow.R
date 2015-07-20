@@ -90,7 +90,7 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/Cardio_extract.R', echo=TRUE)
 
 
 # plot the segments
-source('~/Documents/R_programming/NCCA_ASCII_Parse/segmentPlot.R', echo=TRUE)
+# source('~/Documents/R_programming/NCCA_ASCII_Parse/segmentPlot.R', echo=TRUE)
 
 
 
