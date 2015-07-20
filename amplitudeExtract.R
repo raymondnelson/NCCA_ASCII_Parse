@@ -21,8 +21,8 @@ myEventLists <- ls(pattern="*_eventList$")
 mySegmentLists <- mySegmentLists[1]
 myEventLists <- myEventLists[1]
 
-mySegmentDF <- get(mySegmentLists)[[1]]
-myEventDF <- get(myEventLists)[[1]]
+mySegmentDF <- get(mySegmentLists)[[2]]
+myEventDF <- get(myEventLists)[[2]]
 
 # myData <- mySegmentDF$AutoEDA
 myData <- mySegmentDF$CardioMA
@@ -672,7 +672,9 @@ for (i in 1:length(xOnsetVal)) {
   xPeakLoop <- xPeakLoop[which((xPeakLoop > xOnset[i]) & (xPeakLoop <= stopRow2))]
   #
   # use the xPeakLoop vector to determine the max xPeak for each xOnset
-  yChange[i] <- xPeakLoop[which.max(myData[xPeakLoop[xPeakLoop >= xOnset[i]]] - xOnsetVal[i])]
+  if(length(xPeakLoop) > 0) {  
+    yChange[i] <- xPeakLoop[which.max(myData[xPeakLoop[xPeakLoop >= xOnset[i]]] - xOnsetVal[i])]
+  }
   # yChange is a vector of xPeak rows for the max increase following each xOnsetVal
   #
   # loop output is a vector yChange to index the peak row for for each xOnset row
@@ -681,6 +683,9 @@ for (i in 1:length(xOnsetVal)) {
 
 # remove NAs that may result from different vector lengths
 yChange <- as.numeric(na.omit(yChange))
+
+# fix condition where there is no onset or peak
+if(is.na(yChange[1])) yChange[1] <- xOnset[1]
 
 # compute the differences between onset and peak values
 yChangeDiffs <- myData[yChange] - myData[xOnset]
