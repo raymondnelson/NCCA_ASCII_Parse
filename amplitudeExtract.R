@@ -298,14 +298,6 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   xOnsetVal <- myData[xOnset]
   xPeakVal <- myData[xPeak]
 
-
-  
-  
-  # deleted some unused stuff 7-16-2015
-  
-  
-  
-  
   ################
   
   # keep onset rows after the required response latency period
@@ -337,9 +329,10 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   ##################
 
   # Keep only those slope peaks that are >= the xOnset row
-  xPeakVal <- xPeakVal[which(xPeak >= xOnset[1])]
   xPeak <- xPeak[xPeak >= xOnset[1]]
-
+  # xPeakVal <- xPeakVal[which(xPeak >= xOnset[1])]
+  xPeakVal <- myData[xPeak]
+  
   ###
 
   # keep only the slope peaks that are <= ROWEndRow 
@@ -347,22 +340,25 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   # if FALSE this will keep all peaks in the measurement
   if(strictROW == TRUE) { # use FALSE to include any max peak in the measurement period
     ifelse(posSlope[ROWEndRow] == 1,
-           {xPeak <- xPeak[1:length(which(xPeak <= ROWEndRow)) + 1]; xPeakVal <- xPeakVal[xPeak <= ROWEndRow]},
-           {xPeak <- xPeak[xPeak <= ROWEndRow]; xPeakVal <- xPeakVal[xPeak <= ROWEndRow]})
+           {xPeak <- xPeak[1:length(which(xPeak <= ROWEndRow)) + 1]},
+           {xPeak <- xPeak[xPeak <= ROWEndRow]})
   }
-
+  xPeakVal <- myData[xPeak]
+  
   ###
 
   # keep only those slope peaks that are <= endRow
   if(longResponse == TRUE) { # use false to stop responses at the end of the measurement window
     ifelse(xOnset[1] <= ROWEndRow,
       ifelse(posSlope[endRow] == 1,
-             {xPeak <- xPeak[1:(length(which(xPeak <= endRow)) + 1)]; xPeakVal <- xPeakVal[xPeak <= endRow]},     
-             {xPeak <- xPeak[xPeak <= endRow]; xPeakVal <- xPeakVal[xPeak <= endRow]}),
-    {xPeak <- xPeak[xPeak <= endRow]; xPeakVal <- xPeakVal[xPeak <= endRow]})
+             {xPeak <- xPeak[1:(length(which(xPeak <= endRow)) + 1)]},     
+             {xPeak <- xPeak[xPeak <= endRow]}),
+    {xPeak <- xPeak[xPeak <= endRow]})
   }
   xPeak <- as.numeric(na.omit(xPeak))
-  xPeakVal <- as.numeric(na.omit(xPeakVal))
+  # xPeakVal <- as.numeric(na.omit(xPeakVal))
+  xPeakVal <- myData[xPeak]
+  
   ###
 
   # fix empty xPeak row
@@ -371,198 +367,219 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
     xPeakVal <- myData[xPeak]
   }
   
-  
-  
-  
-  # more deleted unused stuff 7-16-2015
-  
-  
-  
+  # now we have vectors for xOnset, xPeak, xOnsetVal and xPeakVal
+  print(xOnset)
+  print(xOnsetVal)
+  print(xPeak)
+  print(xPeakVal)
   
   ###############################
   
-  # compute a vector of max amplitudes for each onset and all subsequent Peaks
-
-  # make a loop output vector
-  yChange <- rep("", times=length(xOnset)) 
-  # i <- 1
-  for (i in 1:length(xOnset)) {
-    # this has to be in a loop to iteratively shorten the comparison
-    yChange[i] <- max(myData[xPeak[xPeak >= xOnset[i]]] - myData[xOnset[i]])
-    # yChange is a vector of xPeak rows for the max increase following each xOnset
-  } # end for loop
-
-  # remove NAs that may result from different vector lengths
-  yChange <- as.numeric(na.omit(yChange))
-  
-  
-  ### get the response onset
-  
-  ### need a loop to select the next onset 
-  
-  # get the max change value from the vector. this is the response onset row 
-  yChangeMaxIndex <- which.max(as.numeric(yChange))
-  
-  # use the first if the index fails or is null
-  if(length(yChangeMaxIndex) == 0) yChangeMaxIndex <- 1
-  
-  
-  ##### now make a loop to use subsequent onset points if necessary
-  
-  for (i in yChangeMaxIndex:length(yChange)) { 
-    # added loop 7-18-2015 to select a subsequent xOnset if the data descend 1/2 way
-
-  # get the onset row by indexing the max change value
-  yChangeOnset <- xOnset[yChangeMaxIndex]
-  print(yChangeOnset)
-
-  # get the onset value
-  yChangeOnsetValue <- myData[yChangeOnset]
-
-  #####################
-
-  
-
-  
-  # even more deleted unused stuff 7-16-2015
   
   
   
   
-  ##########################
-
   
-  
-  
-  # 4th section with deleted unused stuff 7-16-2015
-  
-  
-    
-  
-  #########################
-
-  # make a short vector of the xPeak row >=  xOnset
-  xPeakShort <- xPeak[xPeak >= yChangeOnset] # could use which() but it makes no difference
-  print(xPeakShort)
-  
-  #############################
-  
-  # 7-16-15 remove all ascending onset and peak segments 
-  # after the data descend below the yChangeOnsetValue
-  
-  # do this by monitoring the yAxis difference after the yChangeValue
-  # and remove all peaks after the first row where the diff is negative 
-  
-  negDiff <- function(x=yChangeOnset, y=yChangeOnsetValue, z=myData) {
-    # function to remove all peak segments after the data descend below the yChangeOnset
-    yChangeOnset <- x
-    yChangeOnsetValue <- y
-    myData <- z
-    #
-    myValues <- myData[(yChangeOnset+1):length(myData)]
-    myDiffs <- myValues - yChangeOnsetValue
-    stopRow <- yChangeOnset + which(myDiffs < 0)[1]
-    #
-    return(stopRow)
-  } # end negDiff function
-  
-  stopRow <- negDiff(x=yChangeOnset, y=yChangeOnsetValue, z=myData)
-  
-  # remove peaks if and after the data descend below the reposnse onset value
-  if(!is.na(stopRow)) xPeakShort <- xPeakShort[xPeakShort <= stopRow]
-  
-  #########################
+#   # compute a vector of max amplitudes for each onset and all subsequent Peaks
+# 
+#   # make a loop output vector
+#   yChange <- rep("", times=length(xOnset)) 
+#   # i <- 1
+#   for (i in 1:length(xOnsetVal)) {
+#     # this has to be in a loop to iteratively shorten the comparison
+#     yChange[i] <- max(myData[xPeak[xPeak >= xOnset[i]]] - xOnsetVal[i])
+#     # yChange is a vector of xPeak values for the max increase following each xOnset
+#     #
+#     # need the xOnset row which can be obtained later by indexing xOnset 
+#     # with the max value of yChange
+#     #
+#     # the peak row can be obtained by indexing myData after yChange+1
+#     # with the peak value
+#     #
+#     # need a vector of onset and peak values values
+#     # to determine the largest chang
+#     
+#   } # end for loop
+# 
+#   # remove NAs that may result from different vector lengths
+#   yChange <- as.numeric(na.omit(yChange))
+#   
+#   
+#   ### get the response onset
+#   
+#   ### need a loop to select the next onset 
+#   
+#   # get the max change value from the vector. this is the response onset row 
+#   yChangeMaxIndex <- which.max(as.numeric(yChange))
+#   
+#   # use the first if the index fails or is null
+#   if(length(yChangeMaxIndex) == 0) yChangeMaxIndex <- 1
+#   
+# #   
+# #   ##### now make a loop to use subsequent onset points if necessary
+# #   
+# #   for (i in yChangeMaxIndex:length(yChange)) { 
+# #     # added loop 7-18-2015 to select a subsequent xOnset if the data descend 1/2 way
+# # 
+# 
+# # get the onset row by indexing the max change value
+#   yChangeOnset <- xOnset[yChangeMaxIndex]
+#   print(yChangeOnset)
+# 
+#   # get the onset value
+#   yChangeOnsetValue <- myData[yChangeOnset]
+# 
+#   #####################
+# 
+#   # make a short vector of the xPeak row >=  xOnset
+#   xPeakShort <- xPeak[xPeak >= yChangeOnset] # could use which() but it makes no difference
+#   print(xPeakShort)
+#   
+#   #############################
+#   
+#   
+#   
+#   
+#   
+#   
+#   ###########################
+#   
+#   # 7-16-15 remove all ascending onset and peak segments 
+#   # after the data descend below the yChangeOnsetValue
+#   
+#   # do this by monitoring the yAxis difference after the yChangeValue
+#   # and remove all peaks after the first row where the diff is negative 
+#   
+#   negDiff <- function(x=yChangeOnset, y=yChangeOnsetValue, z=myData) {
+#     # function to remove all peak segments after the data descend below the yChangeOnset
+#     yChangeOnset <- x
+#     yChangeOnsetValue <- y
+#     myData <- z
+#     #
+#     myValues <- myData[(yChangeOnset+1):length(myData)]
+#     myDiffs <- myValues - yChangeOnsetValue
+#     stopRow <- yChangeOnset + which(myDiffs < 0)[1]
+#     #
+#     return(stopRow)
+#   } # end negDiff function
+#   
+#   stopRow <- negDiff(x=yChangeOnset, y=yChangeOnsetValue, z=myData)
+#   
+#   # remove peaks if and after the data descend below the reposnse onset value
+#   if(!is.na(stopRow)) xPeakShort <- xPeakShort[xPeakShort <= stopRow]
+#   
+#   #########################
+#  
+#   # remove upward slope segments after the ROW and in the measurement window
+#   # if the data descend more than 50% from the previous highest peak
+#   
+#   descentRule <- function(x=yChangeOnset, y=xPeakShort, z=myData, p=.5) {
+#     # function to remove positive slope segments 
+#     # if the data descend more than a proportion p
+#     yChangeOnset <- x
+#     xPeakShort <- y
+#     myData <- z
+#     prop <- p
+#     #
+#     xPeakShortValues <- myData[xPeakShort]
+#     xPeakShortDiffs <- xPeakShortValues - myData[yChangeOnset]
+#     cutValues <- prop * xPeakShortDiffs
+#     myValues <- myData[(yChangeOnset+1):length(myData)]
+#     myDiffs <- myValues - myData[yChangeOnset]
+#     mySlope <- c(0, ifelse(diff(myValues)>0, 1, ifelse(diff(myValues)<0, -1, 0)))
+#     #
+#     # now look for descending myValues that are less than descCut for previous peaks
+#     #
+#     # make an empty vector
+#     cutVector <- numeric(length=length(myDiffs))
+#     # populate the cut vector
+#     for (i in 1:length(myDiffs)) {
+#       # make a vector myCutValues for the vector myDiffs
+#       # myCutValues needs to be 1/2 the diff of the preceeding max peak
+#       currentRow <- i + yChangeOnset - 1
+#       ifelse(length(which(xPeakShort <= currentRow)) > 0,
+#              myCutValue <- max(cutValues[which(xPeakShort <= currentRow)]),
+#              myCutValue <- 0)
+#       #
+#       # use i to check the max preceeding diff
+#       # if(myDiffs[i] <  myCutValue) { cutVector[i] <- myCutValue }
+#       cutVector[i] <- myCutValue
+#     } # end for loop
+#     #
+#     # print(cutVector)
+#     #
+#     # use only descending slope segments
+#     descRows <- which(mySlope == -1)
+#     # ignore the first several descending rows 
+#     # to avoid over sensitivity to high frequency noise
+#     
+#     # descRows <- descRows[91:length(descRows)]
+#     cutVector <- c(rep(0, time=90), cutVector[91:length(cutVector)])
+#     
+#     # keep only those descending rows for which 
+#     # difference is smaller than the cut point porportion
+#     cutRows <- descRows[myDiffs[descRows] < cutVector[descRows]]
+#     stopRow2 <- cutRows[1] + yChangeOnset -1
+#     #   
+#     return(stopRow2)
+#     #
+#   } # end descentRule function
+#   
+#   stopRow2 <- descentRule(x=yChangeOnset, y=xPeakShort, z=myData, p=.5)
+#   
+#   # remove peaks after the data descend beyond the specified proportion
+#   if(descentStop == TRUE) { 
+#     if(!is.na(stopRow2)) xPeakShort <- xPeakShort[xPeakShort < stopRow2] 
+#   } # end if
  
-  # remove upward slope segments after the ROW and in the measurement window
-  # if the data descend more than 50% from the previous highest peak
   
-  descentRule <- function(x=yChangeOnset, y=xPeakShort, z=myData, p=.5) {
-    # function to remove positive slope segments 
-    # if the data descend more than a proportion p
-    yChangeOnset <- x
-    xPeakShort <- y
-    myData <- z
-    prop <- p
-    #
-    xPeakShortValues <- myData[xPeakShort]
-    xPeakShortDiffs <- xPeakShortValues - myData[yChangeOnset]
-    cutValues <- prop * xPeakShortDiffs
-    myValues <- myData[(yChangeOnset+1):length(myData)]
-    myDiffs <- myValues - myData[yChangeOnset]
-    mySlope <- c(0, ifelse(diff(myValues)>0, 1, ifelse(diff(myValues)<0, -1, 0)))
-    #
-    # now look for descending myValues that are less than descCut for previous peaks
-    #
-    # make an empty vector
-    cutVector <- numeric(length=length(myDiffs))
-    # populate the cut vector
-    for (i in 1:length(myDiffs)) {
-      # make a vector myCutValues for the vector myDiffs
-      # myCutValues needs to be 1/2 the diff of the preceeding max peak
-      currentRow <- i + yChangeOnset - 1
-      ifelse(length(which(xPeakShort <= currentRow)) > 0,
-             myCutValue <- max(cutValues[which(xPeakShort <= currentRow)]),
-             myCutValue <- 0)
-      #
-      # use i to check the max preceeding diff
-      # if(myDiffs[i] <  myCutValue) { cutVector[i] <- myCutValue }
-      cutVector[i] <- myCutValue
-    } # end for loop
-    #
-    # print(cutVector)
-    #
-    # use only descending slope segments
-    descRows <- which(mySlope == -1)
-    # ignore the first several descending rows 
-    # to avoid over sensitivity to high frequency noise
-    
-    # descRows <- descRows[91:length(descRows)]
-    cutVector <- c(rep(0, time=90), cutVector[91:length(cutVector)])
-    
-    # keep only those descending rows for which 
-    # difference is smaller than the cut point porportion
-    cutRows <- descRows[myDiffs[descRows] < cutVector[descRows]]
-    stopRow2 <- cutRows[1] + yChangeOnset -1
-    #   
-    return(stopRow2)
-    #
-  } # end descentRule function
   
-  stopRow2 <- descentRule(x=yChangeOnset, y=xPeakShort, z=myData, p=.5)
   
-  # remove peaks after the data descend beyond the specified proportion
-  if(descentStop == TRUE) { 
-    if(!is.na(stopRow2)) xPeakShort <- xPeakShort[xPeakShort < stopRow2] 
-  } # end if
   
-} # end loop over xOnset 
   
-  ####################### 
+  
+# } # end loop over xOnset 
+#   
+#   ####################### 
 
-  # make a short vector of the peak values
-  xPeakShortValues <- myData[xPeakShort] 
-  
-  # make a vector of the differences between xPeakShortValues and yChangeOnsetValue
-  xPeakShortDifferences <- xPeakShortValues - yChangeOnsetValue
-  
-  # use xOnset to xPeak differences to remove measurements after data descend below the xOnsetVal
-  if(length(which(xPeakShortDifferences < 0)) > 0) {  
-    # remove differences after the first negative difference
-    # this will occur when the data descend below the onset value
-    removeNegDiff <- c(which(xPeakShortDifferences < 0)[1]:length(xPeakShortDifferences))
-    xPeakShort <- xPeakShort[-removeNegDiff]
-    xPeakShortValues <- xPeakShortValues[-removeNegDiff]
-    xPeakShortDifferences <- xPeakShortDifferences[-removeNegDiff]
-  }
 
-  ###
 
-  # get the peak row
-  yChangePeak <- xPeakShort[which.max(xPeakShortDifferences)]
 
-  # fix empty value
-  if(length(yChangePeak) == 0) yChangePeak <- yChangeOnset # added 7-12-15
+
+
+
+#   # make a short vector of the peak values
+#   xPeakShortValues <- myData[xPeakShort] 
+#   
+#   # make a vector of the differences between xPeakShortValues and yChangeOnsetValue
+#   xPeakShortDifferences <- xPeakShortValues - yChangeOnsetValue
+#   
+#   # use xOnset to xPeak differences to remove measurements after data descend below the xOnsetVal
+#   if(length(which(xPeakShortDifferences < 0)) > 0) {  
+#     # remove differences after the first negative difference
+#     # this will occur when the data descend below the onset value
+#     removeNegDiff <- c(which(xPeakShortDifferences < 0)[1]:length(xPeakShortDifferences))
+#     xPeakShort <- xPeakShort[-removeNegDiff]
+#     xPeakShortValues <- xPeakShortValues[-removeNegDiff]
+#     xPeakShortDifferences <- xPeakShortDifferences[-removeNegDiff]
+#   }
+# 
+#   ###
+# 
+#   # get the peak row
+#   yChangePeak <- xPeakShort[which.max(xPeakShortDifferences)]
+# 
+#   # fix empty value
+#   if(length(yChangePeak) == 0) yChangePeak <- yChangeOnset # added 7-12-15
   
+  #########################
+
+  # source the maxChange.R script to get
+source('~/Documents/R_programming/NCCA_ASCII_Parse/maxChange.R', echo=TRUE)
+
+
+
+
   ############################
   
   # fix condition where yChangeOnset == yChangePeak
@@ -571,19 +588,24 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
     yChangeOnsetValue <- myData[yChangeOnset]
   }
 
-  # get the peak value 
-  yChangePeakValue <- myData[yChangePeak]
-  # or this way
-  # yChangePeakValue <- xPeakShortDifferences[which.max(xPeakShortDifferences)] + yChangeOnsetValue
+#   # get the peak value 
+#   yChangePeakValue <- myData[yChangePeak]
+#   # or this way
+#   # yChangePeakValue <- xPeakShortDifferences[which.max(xPeakShortDifferences)] + yChangeOnsetValue
+#   
+#   ###
+#   
+#   # compute the change from response onset to response peak
+#   yChangeValue <- yChangePeakValue - yChangeOnsetValue
+#   # or
+#   # yChangeValue <- max(xPeakShortDifferences)
   
-  ###
-  
-  # compute the change from response onset to response peak
-  yChangeValue <- yChangePeakValue - yChangeOnsetValue
-  # or
-  # yChangeValue <- max(xPeakShortDifferences)
-  
-  ###
+
+
+
+
+
+  ####################
   
   # construct the output vector
   outputVector <- c(yChangeOnset, 
