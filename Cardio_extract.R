@@ -1,9 +1,6 @@
-# functions for cardio signal processing 
+# function to extract onset and end of cardio responses
 
-# minPeak()
-# maxPeak()
-# minMaxPeak()
-# cardioSmooth1()
+# uses the ampltitudeExtract.R script with the amplitudeExtract() function
 
 ########################
 
@@ -15,7 +12,6 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/amplitudeExtract.R', echo=TRU
 
 cps <- 30
 prestimSeg <- 5
-EDALat <- .5
 CardioLat <- .5
 ROWEnd <- 5
 measuredSeg <- 15
@@ -29,8 +25,8 @@ library(stringr)
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 myEventLists <- ls(pattern="*_eventList$")
 
-# mySegmentLists <- mySegmentLists[1:3]
-# myEventLists <- myEventLists[1:3]
+# mySegmentLists <- mySegmentLists[1]
+# myEventLists <- myEventLists[1]
 
 
 
@@ -50,7 +46,11 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
   #
   ####  
   
-  # iterate over the segment lists
+  # vectors of names
+  mySegmentLists <- x
+  myEventLists <- y  
+  
+    # iterate over the segment lists
   # i<-1
   for (i in 1:length(mySegmentLists)) {
     
@@ -66,7 +66,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
     segmentNames <- names(segmentList)
     
     # iterate over the data frames in each list
-    # j<-4
+    # j=2
     for (j in 1:length(segmentNames)) {  
       
       segmentDF <- segmentList[[j]]
@@ -77,45 +77,61 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
       
 #       # remove NA rows
 #       segmentDF <- na.omit(segmentDF)
-#       
-#       # get the segment start row
+      
+      # get the segment start row
 #       startRow <- segmentDF$Sample[1]
 #       
 #       # get the responseOnsetRow and responseEndRow
+#       label <- eventDF$Label
 #       onsetRow <- eventDF$Begin - (startRow - 1)
 #       offsetRow <- eventDF$End - (startRow - 1)
+#       answerRow <- eventDF$Answer - (startRow - 1)
 #       ROWEndRow <- eventDF$Answer - (startRow - 1) + (ROWEnd * cps)
-#       EndRow <- onsetRow + (measuredSeg * cps)
-#       
+#       endRow <- onsetRow + (measuredSeg * cps)
+#       name <- paste(segmentDF$examName[1],
+#                     segmentDF$chartName[1],
+#                     eventDF$Label,
+#                     sep="_")
+      
 #       # correct for segments shorter than the measurement segment
 #       if(EndRow > nrow(segmentDF)) {
 #         EndRow <- nrow(segmentDF)
 #       }
-
-      # add the cardioExtract column to the data frame
-      segmentDF$CardioExtract <- rep("", times=nrow(segmentDF))
 
       CardioData <- segmentDF$CardioMA
       
       ####
       # col 17 = diastolic, 18=systolic, 19=minmax, 20=moving average
       # ampExt <- amplitudeExtract(x=segmentDF, y=eventDF, column=20)
-      ampExt <- amplitudeExtract(x=CardioData, 
+#       ampExt <- amplitudeExtract(x=CardioData, 
+#                                  begin=onsetRow, 
+#                                  end=offsetRow, 
+#                                  answer=answerRow,
+#                                  start=startRow,
+#                                  lat=CardioLat,
+#                                  label=label,
+#                                  segmentName=name)
+      
+      ampExt <- amplitudeExtract(x=CardioData,
                                  begin=eventDF$Begin, 
                                  end=eventDF$End, 
                                  answer=eventDF$Answer,
                                  start=segmentDF$Sample[1],
-                                 lat=CardioLat,
+                                 lat=EDALat,
                                  label=eventDF$Label,
                                  segmentName=paste(segmentDF$examName[1],
                                                    segmentDF$chartName[1],
                                                    eventDF$Label,
                                                    sep="_"))
-      
+
+
       responseOnsetRow <- as.numeric(ampExt[1])
       responseEndRow <- as.numeric(ampExt[2])
       stopRow <- as.numeric(ampExt["stopRow"])
       
+      # add the cardioExtract column to the data frame
+      segmentDF$CardioExtract <- rep("", times=nrow(segmentDF))
+
       ###
       
       # make sure that events are on distinct rows
