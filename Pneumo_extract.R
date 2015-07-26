@@ -56,8 +56,8 @@ pneumoExtract <- function(x, y) {
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 myEventLists <- ls(pattern="*_eventList$")
 
-# mySegmentLists <- mySegmentLists[6]
-# myEventLists <- myEventLists[6]
+mySegmentLists <- mySegmentLists[1:3]
+myEventLists <- myEventLists[1:3]
 
 
 
@@ -84,10 +84,12 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
   mySegmentLists <- x
   myEventLists <- y  
   
+  source('~/Documents/R_programming/NCCA_ASCII_Parse/pArtifact.R', echo=TRUE)
+  
   ###
   
   # iterate over the segment lists
-  # i <- 1
+  # i=1
   for (i in 1:length(mySegmentLists)) {
     
     # get the names
@@ -102,7 +104,7 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
     segmentNames <- names(segmentList)
     
     # iterate over the data frames in each list
-    # j <- 1
+    # j=1
     for (j in 1:length(segmentNames)) {  
       
       segmentDF <- segmentList[[j]]
@@ -153,8 +155,31 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       segmentDF$UPneumoExtract[aBuffOn] <- "aBuffOn"
       segmentDF$UPneumoExtract[aBuffOff] <- "aBuffOff"
       segmentDF$LPneumoExtract[aBuffOn] <- "aBuffOn"
-      segmentDF$LPneumoExtract[aBuffOff] <- "aBuffOff"        
+      segmentDF$LPneumoExtract[aBuffOff] <- "aBuffOff"  
       
+      # add the Upper and Lower pneumo artifact columns to the data frame
+      segmentDF$UPneumoArtifacts <- rep("", times=nrow(segmentDF))
+      segmentDF$LPneumoArtifacts <- rep("", times=nrow(segmentDF))
+      
+      ###
+      
+      # source('~/Documents/R_programming/NCCA_ASCII_Parse/pArtifact.R', echo=TRUE)
+      
+      ###
+      
+      # get the artifacts
+      pneumoAU <- sigChange(x=segmentDF$UPneumoS)
+      print(pneumoAU)
+      pneumoAL <- sigChange(x=segmentDF$LPneumoS)
+      print(pneumoAL)
+      
+      # add the artifact data to the data frame
+      segmentDF$UPneumoArtifacts[pneumoAU] <- "Artifact"
+      segmentDF$UPneumoArtifacts[pneumoAL] <- "Artifact"
+      segmentDF$LPneumoArtifacts[pneumoAL] <- "Artifact"
+      segmentDF$LPneumoArtifacts[pneumoAU] <- "Artifact"
+      
+      #
       segmentList[[j]] <- segmentDF
       
     } # end iteration over data frames in each list

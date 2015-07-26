@@ -13,3 +13,4 @@ mySegmentLists <- mySegmentLists[2]
 myEventLists <- myEventLists[2]
 
 myCardioData <- PF090316_1_Charts[[1]][,c(1:6,10)]
+

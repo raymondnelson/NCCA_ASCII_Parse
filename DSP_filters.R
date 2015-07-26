@@ -57,6 +57,7 @@ applyFilter <- function(x=uniqueExams,
   source('~/Documents/R_programming/NCCA_ASCII_Parse/lowPass.2.R', echo=TRUE)
   source('~/Documents/R_programming/NCCA_ASCII_Parse/highPass.03.R', echo=TRUE)
   source('~/Documents/R_programming/NCCA_ASCII_Parse/MASmooth.R', echo=TRUE)
+  source('~/Documents/R_programming/NCCA_ASCII_Parse/tsVar.R', echo=TRUE)
   
   ###
   
@@ -90,11 +91,18 @@ applyFilter <- function(x=uniqueExams,
 
         chartData$UPneumoS <- lowPass.886(x=chartData$UPneumo)
         chartData$LPneumoS <- lowPass.886(x=chartData$LPneumo)
+        
+        chartData$UPneumoMean <- tsMean(x=chartData$UPneumoS)
+        chartData$UPneumoVar <- tsVar(x=chartData$UPneumoS)
+        
+        chartData$LPneumoMean <- tsMean(x=chartData$LPneumoS)
+        chartData$LPneumoVar <- tsVar(x=chartData$LPneumoS)
+                
         chartData$AutoEDA <- lowPass.2(x=chartData$EDA1)
         chartData$AutoEDA <- highPass.03(data=chartData$AutoEDA)
         #chartData$AutoEDA <- lowPass.886(x=chartData$AutoEDA)
-        chartData$AutoEDA <- MASmooth(x=chartData$AutoEDA, y=4, times=6)
-        # plot.ts()  
+        chartData$AutoEDA <- MASmooth(x=chartData$AutoEDA, y=5, times=6)
+        # plot.ts()
         
         # save the result to the list
         seriesData[[k]] <- chartData
@@ -114,7 +122,6 @@ applyFilter <- function(x=uniqueExams,
   if(output==TRUE) return(seriesData) 
   
 } # end applyFilter function
-
 
 ####
 

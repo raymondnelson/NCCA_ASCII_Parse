@@ -1,15 +1,17 @@
 # amplitude extract function for EDA and Cardio data
 #
 # 1. compute ROW as the segment before ROWEndRow and after the onset latencyRow 
-# 2. compute the row number for the onset of all positive slope segments in the ROW
+# 2. compute the row for all positive slope segments that start in the ROW
 # 3. compute the onset value for the onset of all positive slope segments inside the ROW 
-# 4. locate the subsequent row and value for all positive peak points after each onset
-# 4a. add additional peak rows and values for which the onset values occur
-#     inside the measurement period after ROWEndRow and the onset value is > than
-#     the max onset value inside the ROW
-# 5. the last peak can be outside the ROW or even outside the measurement period
-# 6. compute the difference between each onset and all subsquent peak values
-# 7. select the onset and subsequent peak with the max difference  
+# 4. locate the row and value for all positive peak points
+# 5. keep only those peaks that occur after the first onset in the ROW
+# 6. keep all peaks in the measurement window
+# 7. keep one additional peak if the slope is + at the end of the measurement window
+# 9. select the max change for each onset and all subsequent peaks
+# 9a. for each onset exclude response peaks after the data descend below the onset value
+# 9b. for each onset exclude response peaks after the data descend 50% from the previous max peak
+# 10. select the onset and peak with max increase
+# 
 # 
 #
 ######################################
@@ -21,8 +23,8 @@ myEventLists <- ls(pattern="*_eventList$")
 mySegmentLists <- mySegmentLists[1]
 myEventLists <- myEventLists[1]
 
-mySegmentDF <- get(mySegmentLists)[[2]]
-myEventDF <- get(myEventLists)[[2]]
+mySegmentDF <- get(mySegmentLists)[[3]]
+myEventDF <- get(myEventLists)[[3]]
 
 # myData <- mySegmentDF$AutoEDA
 myData <- mySegmentDF$CardioMA
@@ -321,8 +323,8 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   }
 
   # fix condition where xOnset is >= the number of rows in the data frame  
-  if(xOnset[1] >= nrow(segmentDF)) {
-    xOnset <- (nrow(segmentDF))
+  if(xOnset[1] >= length(myData)) {
+    xOnset <- length(myData)
     xOnsetVal <- myData[xOnset]
   }
   
@@ -388,6 +390,13 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
   descentProp <- function(x=xOnset, y=xPeakLoop, z=myData, p=.5) {
     # function to exclude rows after the data descend more than a proportion p
     # from a the previous highest peak after response onset
+    # x is a vector of reponse onset rows
+    # y is a is a vector of peak rows prior to the point where data deseend
+    # below the onset value
+    # z is a vector of time series values
+    # p is a proportion for which the data are evaluated if it descend below p
+    # for the prior maximum response peak value - response onset value 
+    
     yChangeOnset <- x
     xPeakLoop <- y
     myData <- z
