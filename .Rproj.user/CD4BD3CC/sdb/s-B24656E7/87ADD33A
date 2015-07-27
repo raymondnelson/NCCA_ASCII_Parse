@@ -1,0 +1,17 @@
+{
+    "contents" : "# get all stimulus segments for a unique series\n#\n# requires eventList for all events for each series for each exam\n# requires _\n\n# source the NCCAASCIIParse.R script first\n\n##########################################\n\n# source the NCCAASCII_parse.R script first\n\nlibrary(stringr)\n\n# get exam names from the _Data data frames\nuniqueExams <- unique(str_sub(ls(pattern=\"*_Data$\", pos=1),1, -6))\n\n#####\n\n# source the centerData.R script first to get the exam chart\n# and center the onset to zero\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/centerData.R', echo=TRUE)\n\n# source the DSP_filters.R script to process the time series data\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/DSP_filters.R', echo=TRUE)\n\n# then source the setRange.R script to set the range of data from 0 to 100\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/setRange.R', echo=TRUE)\n\n# source the cardioProc script to process the diastolic \nsource('~/Documents/R_programming/NCCA_ASCII_Parse/cardioSigProc.R', echo=TRUE)\n\n# source the pneumoSigProc script to process the upper and lower pneumograph data \nsource('~/Documents/R_programming/NCCA_ASCII_Parse/pneumoSigProc.R', echo=TRUE)\n\n\n# save the environment in the present state\nsave.image(file=\"NCCAworking2.Rda\")\n\n\n\n#####\n\n# source the getEventsList.R function to make a list \n# of all onset offset answer events for all stimuli \n# for all charts series and exams\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/getEventLists.R', echo=TRUE)\n\n# source the stimSegment.r script to make lists of all segments for each chart\n# source getEventLists() function first\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/getSegmentLists.R', echo=TRUE)\n\n# save the environment in the present state\n# save.image(file=\"NCCAworking3.Rda\")\n# load(\"NCCAworking3.Rda\")\n\n\n#####\n\n# add the events to the data frames\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/addEventColumn.R', echo=TRUE)\n\n# add the PneumoExtract columns for the upper and lower pneumo sensors\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/Pneumo_extract.R', echo=TRUE)\n\n# add the AutoEDAExtract column\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/EDAExtractFn.R', echo=TRUE)\n\n# add the cardio Extract column and cardio response measurements\nsource('~/Documents/R_programming/NCCA_ASCII_Parse/Cardio_extract.R', echo=TRUE)\n\n# save the environment in the present state\n# save.image(file=\"NCCA_working4.Rda\")\n\n\n# look at a data frame\n\n# mySegmentLists <- ls(pattern=\"*_dataSegmentList$\")\n# myEventLists <- ls(pattern=\"*_eventList$\")\n# \n# mySegmentLists <- mySegmentLists[1]\n# myEventLists <- myEventLists[1]\n# \n# mySegmentDF <- get(mySegmentLists)[[1]]\n# myEventDF <- get(myEventLists)[[1]]\n# \n# myData <- mySegmentDF$AutoEDA\n# #myData <- mySegmentDF$CardioMA\n# \n# begin <- myEventDF$Begin\n# end <- myEventDF$End\n# answer <- myEventDF$Answer\n# start <- mySegmentDF$Sample[1]\n# lat <- .5\n\n\n# plot the segments\n# source('~/Documents/R_programming/NCCA_ASCII_Parse/segmentPlot.R', echo=TRUE)\n\n\n\n\n",
+    "created" : 1437739550763.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3991404824",
+    "id" : "87ADD33A",
+    "lastKnownWriteTime" : 1438008508,
+    "path" : "~/Documents/R_programming/NCCA_ASCII_Parse/workFlow.R",
+    "project_path" : "workFlow.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

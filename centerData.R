@@ -21,6 +21,23 @@ library(stringr)
 
 # eventData <- PF090316_Stimuli[PF090316_Stimuli$chartName==chartName,]
 
+#####
+
+# first make a small function to center a column
+centerColumn <- function(x) {
+  #function to set the onset value of the sensor data
+  # to zero
+  # x is a data column from a data frame of recorded time series data
+  # out put is a vector of centered values
+  ifelse(max(x)==min(x),
+         x <- x*0,
+         x <- x - x[1]
+  )
+  return(x)
+} # end centerColumn function
+
+#####
+
 # center the data at zero for all columns
 centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
   # input x is a vector of unique exams names for the data frames 
@@ -28,18 +45,18 @@ centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
   # use a search string "*_Data^" to identify the exams for which
   # the time series data is in the global invironment
   
-  # first make a small internal function to center a column
-  centerColumn <- function(x) {
-    #function to set the onset value of the sensor data
-    # to zero
-    # x is a data column from a data frame of recorded time series data
-    # out put is a vector of centered values
-    ifelse(max(x)==min(x),
-           x <- x*0,
-           x <- x - x[1]
-    )
-    return(x)
-  } # end centerColumn function
+#   # first make a small private function to center a column
+#   centerColumn <- function(x) {
+#     #function to set the onset value of the sensor data
+#     # to zero
+#     # x is a data column from a data frame of recorded time series data
+#     # out put is a vector of centered values
+#     ifelse(max(x)==min(x),
+#            x <- x*0,
+#            x <- x - x[1]
+#     )
+#     return(x)
+#   } # end centerColumn function
   
   ###
   
@@ -77,6 +94,8 @@ centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
         myData <- stimData[stimData$chartName==chartName,]
         # myData <- as.data.frame(get(paste0(examName, "_Data"), pos=1))
         
+        ###
+        
         # loop over columns and use the function to center the data
         for (l in 7:ncol(myData)) {
           myData[,l] <- centerColumn(myData[,l])
@@ -84,9 +103,6 @@ centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
   
         # add the data frame to the ouput list
         outputList[[k]] <- myData
-        
-        
-        
         
       } # end loop over unique charts
       
@@ -103,10 +119,7 @@ centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
       
     } # end loop over unique series
 
-    
-    
-    
-    } # end loop over unique exams
+  } # end loop over unique exams
   
   # return the output from the last unique exam
   if(output==TRUE) return(myData)

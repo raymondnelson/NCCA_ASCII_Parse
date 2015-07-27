@@ -14,7 +14,7 @@ library(stringr)
 
 
 # get exam names from the _Data data frames
-uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
+# uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
 
 
 
@@ -64,7 +64,7 @@ cardioSigProc <- function(x=uniqueExams,
           xOut[i+y-1] <- c(i+y-1) }, 
         next())
     } # end for loop
-return(na.omit(xOut))
+    return(na.omit(xOut))
   } # end minPeak function
 
   #####
@@ -106,7 +106,7 @@ return(na.omit(xOut))
           xOut[i+y-1] <- c(i+y-1) }, 
         next())
     } # end for loop
-  return(na.omit(xOut))
+    return(na.omit(xOut))
   }  # end maxPeak
   
   #####
@@ -131,9 +131,9 @@ return(na.omit(xOut))
           xOut[i+y-1] <- c(i+y-1) },
         next()))
     } # end for loop
-  xOut <- na.omit(xOut)
-  # xOut <- c(xOut, rep(xOut[length[xOut]], times=(x-length(xOut))))
-  return(xOut)
+    xOut <- na.omit(xOut)
+    # xOut <- c(xOut, rep(xOut[length[xOut]], times=(x-length(xOut))))
+    return(xOut)
   } # end minMaxPeak function
   
   ##### 
@@ -187,7 +187,7 @@ return(na.omit(xOut))
   
   #### end of private helper functions
 
-  #####
+  ###################################
   
   # loop over each chart in the list 
   # i=1
@@ -223,13 +223,9 @@ return(na.omit(xOut))
         # get the min peak values for the min peak rows
         minVal <- chartData$Cardio1[minOut]
         
-        ###
-        
         # interpolate between the min peak values
         diastolicInterp <- c(interpolatePeaks(x=minOut, y=minVal),0)
         # plot.ts(diastolicInterp, ylim=c(-3,10))
-        
-        ###
         
         # add diastolic cardio column to each data from in the list
         chartData$CardioDiastolic <- diastolicInterp[1:nrow(chartData)]
@@ -283,10 +279,6 @@ return(na.omit(xOut))
         chartData$CardioMA <- smoothedCardio[1:nrow(chartData)]
         # myCardioData2$CardioMA <- smoothedCardio[1:nrow(myCardioData)]
         # ts.plot(myCardioData2[1:3000,c(1,2,6, 7)])
-        
-        ####
-        
-        # use a function to extract the response amplitude from the cardio data
         
         #####
         

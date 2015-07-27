@@ -55,9 +55,50 @@ setwd("~/Documents/R_programming/NCCA_ASCII_Parse/data_working")
 
 # may need to first fix all problem characters in file and directory names
 
-source("~/Documents/R_programming/NCCA_ASCII_Parse/fixFileNames.r", echo=FALSE)
+# source("~/Documents/R_programming/NCCA_ASCII_Parse/fixFileNames.r", echo=FALSE)
+
+fixFileNames <- function() {
+  # function to remove problem characters from filenames
+  
+  # remove ( characters from all filenames
+  fileNames <- list.files()
+  for (i in 1:length(fileNames)) {
+    file.rename(fileNames[i], gsub("\\(", "", fileNames[i]))
+  }
+  # newFileNames <- list.files()
+  
+  # remove ) characters from all filenames
+  fileNames <- list.files()
+  for (i in 1:length(fileNames)) {
+    file.rename(fileNames[i], gsub("\\)", "", fileNames[i]))
+  }
+  # newFileNames <- list.files()
+  
+  # replace space characters for all filenames
+  fileNames <- list.files()
+  for (i in 1:length(fileNames)) {
+    file.rename(fileNames[i], gsub(" ", "_", fileNames[i]))
+  }
+  # newFileNames <- list.files()
+  
+  # replace "_Cleaned_Copy" in all filenames
+  fileNames <- list.files()
+  for (i in 1:length(fileNames)) {
+    file.rename(fileNames[i], gsub("_Cleaned_Copy", "", fileNames[i]))
+  }
+  
+  #output
+  fileNames <- list.files()
+  return(fileNames)
+  
+} # fixFileNames()
+
+# fixFileNames()
 
 fixFileNames()
+
+
+
 
 ################# 
 
@@ -616,7 +657,9 @@ dataParse <- function(x=dataNames, makeDF=TRUE, saveCSV=TRUE) {
     # this should be done individually for each chart
     # because some difference may exist between exams
     
-    # number of data columns
+    ###
+    
+    # set the number of data columns
     cols <- 7
     colWidths <- rep(11, cols)
     
@@ -798,35 +841,35 @@ parseUniqueExams(x=uniqueExamNames, clean=TRUE)
 
 
 
-##########################################
-
-# source the script and call the function to parse the stimulus events
-
-source('~/Documents/R_programming/NCCA_ASCII_Parse/eventParse.r', echo=FALSE)
-
-# eventParse function make a stimulus matrix for the events
-# for each series, keeping only the charts with >=2 CQs and >=2 RQS,
-# and will set the length of the stimulus sequence to the max length
-# for each series
-
-eventParse(x="_Stimuli$", saveCSV=TRUE, makeDF=TRUE, type="CQT")
-
-
-
-#########################################
-
-
-
-source('~/Documents/R_programming/NCCA_ASCII_Parse/stimulusParse.r', echo=FALSE)
-
-stimCheck(x="_Stimuli$", saveCSV=TRUE, makeDF=TRUE)
-
-# function to determine whether stimulus text is identical for questions on all charts
-# x input is a character string to identify the Stimuli data frames
-# output is a data frame and csv warning regarding differences 
-
-
-####################################
+# ##########################################
+# 
+# # source the script and call the function to parse the stimulus events
+# 
+# source('~/Documents/R_programming/NCCA_ASCII_Parse/eventParse.r', echo=FALSE)
+# 
+# # eventParse function make a stimulus matrix for the events
+# # for each series, keeping only the charts with >=2 CQs and >=2 RQS,
+# # and will set the length of the stimulus sequence to the max length
+# # for each series
+# 
+# eventParse(x="_Stimuli$", saveCSV=TRUE, makeDF=TRUE, type="CQT")
+# 
+# 
+# 
+# #########################################
+# 
+# 
+# 
+# source('~/Documents/R_programming/NCCA_ASCII_Parse/stimulusParse.r', echo=FALSE)
+# 
+# 
+# # function to determine whether stimulus text is identical for questions on all charts
+# # x input is a character string to identify the Stimuli data frames
+# # output is a data frame and csv warning regarding differences 
+# 
+# stimCheck(x="_Stimuli$", saveCSV=TRUE, makeDF=TRUE)
+# 
+# ####################################
 
 
 
@@ -848,7 +891,32 @@ saveData <- function(x) {
 
 saveData(uniqueExams)
 
+#####
+
+# clean up 
+
+rm(chartHeader)
+rm(cleanUp)
+rm(dataFile)
+rm(dataParse)
+rm(eventTable)
+rm(fixFileNames)
+rm(getCharts)
+rm(headerFile)
+rm(parseUniqueExams)
+rm(saveData)
+rm(stimEvents)
+rm(uniqueNames)
+
+rm(list=ls(pattern="_Header$"))
+
+
+#####
+
 # save environment in this state
 
 save.image(file="NCCAworking.Rda")
+
+# load(file="NCCAworking.Rda")
+
 

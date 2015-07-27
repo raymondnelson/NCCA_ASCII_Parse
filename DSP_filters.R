@@ -53,17 +53,17 @@ applyFilter <- function(x=uniqueExams,
   ###
   
   # source the scripts for the DSP filters
-  source('~/Documents/R_programming/NCCA_ASCII_Parse/lowPass.886.R', echo=TRUE)
+#   source('~/Documents/R_programming/NCCA_ASCII_Parse/lowPass.886.R', echo=TRUE)
   source('~/Documents/R_programming/NCCA_ASCII_Parse/lowPass.2.R', echo=TRUE)
   source('~/Documents/R_programming/NCCA_ASCII_Parse/highPass.03.R', echo=TRUE)
   source('~/Documents/R_programming/NCCA_ASCII_Parse/MASmooth.R', echo=TRUE)
-  source('~/Documents/R_programming/NCCA_ASCII_Parse/tsVar.R', echo=TRUE)
+#   source('~/Documents/R_programming/NCCA_ASCII_Parse/tsVar.R', echo=TRUE)
   
   ###
   
   uniqueExams <- x
   
-  # loop over each chart in the list 
+  # loop over each exam in the list 
   # i <- 1
   for(i in 1:length(uniqueExams)) {
     
@@ -88,19 +88,22 @@ applyFilter <- function(x=uniqueExams,
       for(k in 1:length(seriesData)) {
         # get the data frame with the time series data for each chart in the series
         chartData <- seriesData[[k]]
+        
+        # apply the filter functions to the data frame columns
 
-        chartData$UPneumoS <- lowPass.886(x=chartData$UPneumo)
-        chartData$LPneumoS <- lowPass.886(x=chartData$LPneumo)
-        
-        chartData$UPneumoMean <- tsMean(x=chartData$UPneumoS)
-        chartData$UPneumoVar <- tsVar(x=chartData$UPneumoS)
-        
-        chartData$LPneumoMean <- tsMean(x=chartData$LPneumoS)
-        chartData$LPneumoVar <- tsVar(x=chartData$LPneumoS)
+#         chartData$UPneumoS <- lowPass.886(x=chartData$UPneumo)
+#         chartData$LPneumoS <- lowPass.886(x=chartData$LPneumo)
+#         
+#         chartData$UPneumoMean <- tsMean(x=chartData$UPneumoS)
+#         chartData$UPneumoVar <- tsVar(x=chartData$UPneumoS)
+#         
+#         chartData$LPneumoMean <- tsMean(x=chartData$LPneumoS)
+#         chartData$LPneumoVar <- tsVar(x=chartData$LPneumoS)
                 
         chartData$AutoEDA <- lowPass.2(x=chartData$EDA1)
         chartData$AutoEDA <- highPass.03(data=chartData$AutoEDA)
         #chartData$AutoEDA <- lowPass.886(x=chartData$AutoEDA)
+        # smooth the Auto EDA more to improve the feature extraction algorithm
         chartData$AutoEDA <- MASmooth(x=chartData$AutoEDA, y=5, times=6)
         # plot.ts()
         
