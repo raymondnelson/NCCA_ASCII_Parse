@@ -29,8 +29,12 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/setRange.R', echo=TRUE)
 # source the cardioProc script to process the diastolic 
 source('~/Documents/R_programming/NCCA_ASCII_Parse/cardioSigProc.R', echo=TRUE)
 
+# source the pneumoSigProc script to process the upper and lower pneumograph data 
+source('~/Documents/R_programming/NCCA_ASCII_Parse/pneumoSigProc.R', echo=TRUE)
+
+
 # save the environment in the present state
-# save.image(file="NCCAworking2.Rda")
+save.image(file="NCCAworking2.Rda")
 
 
 
@@ -46,7 +50,7 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/getEventLists.R', echo=TRUE)
 source('~/Documents/R_programming/NCCA_ASCII_Parse/getSegmentLists.R', echo=TRUE)
 
 # save the environment in the present state
-# save.image(file="NCCAworking3.Rda")
+save.image(file="NCCAworking3.Rda")
 # load("NCCAworking3.Rda")
 
 
@@ -65,7 +69,7 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/EDAExtractFn.R', echo=TRUE)
 source('~/Documents/R_programming/NCCA_ASCII_Parse/Cardio_extract.R', echo=TRUE)
 
 # save the environment in the present state
-# save.image(file="NCCA_working4.Rda")
+save.image(file="NCCA_working4.Rda")
 
 
 # look at a data frame

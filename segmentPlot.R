@@ -37,9 +37,9 @@ mySegmentLists <- mySegmentLists[1:3]
 
 ####
 
-printPlot <- FALSE
+printPlot <- TRUE
 
-if(printPlot == TRUE) pdf("Chart_1_7-20-2015.pdf", height=5, width=7)  
+if(printPlot == TRUE) pdf("Exam_1_7-27-2015.pdf", height=5, width=7)  
   
 # iterate over the names of data segment lists
 # i=1

@@ -56,8 +56,8 @@ pneumoExtract <- function(x, y) {
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 myEventLists <- ls(pattern="*_eventList$")
 
-mySegmentLists <- mySegmentLists[1:3]
-myEventLists <- myEventLists[1:3]
+# mySegmentLists <- mySegmentLists[1:3]
+# myEventLists <- myEventLists[1:3]
 
 
 

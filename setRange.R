@@ -12,6 +12,26 @@
 
 ###
 
+# first make a function to call for each column in each data frame
+setColRange <- function(x1, y) {
+  # function to set each column range
+  # x is a zero centered column from the data frome of recorded time series data
+  # y is the max range value 
+  # function to st the range of values to 100
+  # input is a column vector from the chartData data frame
+  # maxVal <- 
+  # minVal <- min(x)
+  rangeVal <- max(x1)-min(x1)
+  rangeCoef <- y / rangeVal
+  ifelse(rangeVal==0,
+         x1 <- x1 * 0,
+         x1 <- x1 * rangeCoef
+  )
+  return(x1)
+} # end setColRange function
+
+###
+
 setRange <- function(x=uniqueExams, y=100, showNames=FALSE, outputData=FALSE) {
   # function to set range for all column ranges
   # x is a vector of unique exams in the global environment
@@ -19,32 +39,30 @@ setRange <- function(x=uniqueExams, y=100, showNames=FALSE, outputData=FALSE) {
   # showNames will print the exam series and chart names to the console
   # outputData will return the list for the last exam series in the input
   
-  ###
+#   ###
+#   
+#   # first make a private function to call for each column in each data frame
+#   setColRange <- function(x1) {
+#     # function to set each column range
+#     # x is a zero centered column from the data frome of recorded time series data
+#     # y is the max range value 
+#     # function to st the range of values to 100
+#     # input is a column vector from the chartData data frame
+#     # maxVal <- 
+#     # minVal <- min(x)
+#     rangeVal <- max(x1)-min(x1)
+#     rangeCoef <- colrange / rangeVal
+#     ifelse(rangeVal==0,
+#            x1 <- x1 * 0,
+#            x1 <- x1 * rangeCoef
+#     )
+#     return(x1)
+#   } # end setColRange function
+#   
+#   ###
   
-  # first make a function to call for each column in each data frame
-  setColRange <- function(x1) {
-    # function to set each column range
-    # x is a zero centered column from the data frome of recorded time series data
-    # y is the max range value 
-    # function to st the range of values to 100
-    # input is a column vector from the chartData data frame
-    # maxVal <- 
-    # minVal <- min(x)
-    rangeVal <- max(x1)-min(x1)
-    rangeCoef <- colrange / rangeVal
-    
-    ifelse(rangeVal==0,
-           x1 <- x1 * 0,
-           x1 <- x1 * rangeCoef
-    )
-    
-    return(x1)
-    
-  } # end setColRange function
-  
-  ###
-  
-  colrange <- as.numeric(y)
+  # get the range from the function input y value
+  colRange <- as.numeric(y)
   
   # loop over each exam in the list 
   # i <- 1
@@ -74,10 +92,12 @@ setRange <- function(x=uniqueExams, y=100, showNames=FALSE, outputData=FALSE) {
         
         if(showNames==TRUE) print(chartNames[k])
         
+        ###
+        
         # call the function for all data columns in the data frame
         # l <- 6
         for (l in 7:ncol(chartData)) {
-          chartData[,l] <- setColRange(chartData[,l])
+          chartData[,l] <- setColRange(x1=chartData[,l], y=colRange)
         } # end for loop to set all column ranges
   
         # save the result 
