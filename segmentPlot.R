@@ -37,7 +37,7 @@ mySegmentLists <- mySegmentLists[1:3]
 
 ####
 
-printPlot <- TRUE
+printPlot <- FALSE
 
 if(printPlot == TRUE) pdf("Exam_1_7-27-2015.pdf", height=5, width=7)  
   
