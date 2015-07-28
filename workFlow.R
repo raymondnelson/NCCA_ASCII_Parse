@@ -14,6 +14,8 @@ library(stringr)
 # get exam names from the _Data data frames
 uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
 
+
+
 #####
 
 # source the centerData.R script first to get the exam chart
@@ -32,6 +34,7 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/cardioSigProc.R', echo=TRUE)
 # source the pneumoSigProc script to process the upper and lower pneumograph data 
 source('~/Documents/R_programming/NCCA_ASCII_Parse/pneumoSigProc.R', echo=TRUE)
 
+# source the 
 
 # save the environment in the present state
 save.image(file="NCCAworking2.Rda")
@@ -54,6 +57,7 @@ save.image(file="NCCAworking3.Rda")
 # load("NCCAworking3.Rda")
 
 
+
 #####
 
 # add the events to the data frames
@@ -70,6 +74,7 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/Cardio_extract.R', echo=TRUE)
 
 # save the environment in the present state
 save.image(file="NCCA_working4.Rda")
+
 
 
 # look at a data frame
@@ -93,9 +98,9 @@ save.image(file="NCCA_working4.Rda")
 # lat <- .5
 
 
+
 # plot the segments
 # source('~/Documents/R_programming/NCCA_ASCII_Parse/segmentPlot.R', echo=TRUE)
-
 
 
 

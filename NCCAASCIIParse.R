@@ -5,13 +5,17 @@
 # 6-12-2015 working
 #
 #
+#
 # this script contains the following functions
+#
+# fixFileNames()
+# to remove problem characters from the file names
 #
 # getcharts() 
 # to make a character vector of the names of NCCAASCII text output files
 #
-# uniqueExams()
-# to make a short list of unique exam names
+# uniqueNames()
+# to make a short list of unique exam names from the fileNames vector - output from getCharts()
 #
 # headerFile()
 # to make a separate txt file of the header information
@@ -50,6 +54,8 @@ library("stringr", lib.loc="/Library/Frameworks/R.framework/Versions/3.0/Resourc
 # setwd("~/Documents/R_programming/NCCA_ASCII_Parse/PF090316 (Cleaned Copy)")
 
 setwd("~/Documents/R_programming/NCCA_ASCII_Parse/data_working")
+
+
 
 #################
 
@@ -96,7 +102,6 @@ fixFileNames <- function() {
 # fixFileNames()
 
 fixFileNames()
-
 
 
 
@@ -166,6 +171,7 @@ uniqueNames <- function(x = fileNames) {
 
 uniqueExamNames <- uniqueNames(fileNames) # need to call the getCharts function first
 print(uniqueExamNames)
+
 
 
 ####################################
@@ -317,7 +323,6 @@ chartHeader <- function(x=headerNames, makeDF=TRUE, saveCSV=TRUE) {
 } # chartHeader end
 
 # chartHeader(x=headerNames, makeDF=TRUE, saveCSV=TRUE)
-
 
 
 
