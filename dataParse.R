@@ -6,7 +6,7 @@
 #
 # this script contains the following function
 #
-# dataParse()
+# dataToCSV()
 # to convert the time series data to .csv format
 #
 #
@@ -43,7 +43,7 @@ dataParse <- function(x=dataNames, makeDF=TRUE, saveCSV=TRUE) {
     
     # read the text data from the data vector
     cNames <- str_trim(as.vector(t(read.fwf(textConnection(get(currentChartName), open = "r"), 
-                                            widths = c(6, 9, 9, 11, 11, 11, 11, 11, 11, 11, 11), 
+                                            widths = c(6, 9, 9, 11, 11, 11, 11, 11, 11, 11), 
                                             header = FALSE, 
                                             skip = 0,
                                             n = 1)
@@ -51,7 +51,7 @@ dataParse <- function(x=dataNames, makeDF=TRUE, saveCSV=TRUE) {
                                  ),
                        side = "both")
     myDF <- read.fwf(textConnection(get(currentChartName), open = "r"), 
-                       widths = c(6, 9, 9, 11, 11, 11, 11, 11, 11, 11, 11), 
+                       widths = c(6, 9, 9, 11, 11, 11, 11, 11, 11, 11), 
                        header = FALSE, 
                        skip = 1,
                        col.names = cNames,

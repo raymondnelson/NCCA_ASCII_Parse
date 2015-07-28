@@ -1,2 +1,0 @@
-01 Charts in this series have different numbers of stimulus events.
-02 Some charts in the series are excluded because they do not include >=2 CQs and >=2 RQs.
