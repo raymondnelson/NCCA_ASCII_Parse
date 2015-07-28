@@ -1,5 +1,5 @@
 ############# R Function to parsing NCCA ASCII header information ##############
-# 6-12-2015 Raymond Nelson
+# 6-12-2015 Raymond Nelson 7-28-2015
 # 
 #
 #
