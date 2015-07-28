@@ -1,0 +1,8 @@
+data/*
+dump/*
+backup/*
+plots/*
+.Rproj.user/*
+.git
+.Rhistory
+.DS_Store
