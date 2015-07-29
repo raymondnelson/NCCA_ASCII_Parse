@@ -71,6 +71,8 @@ addStimulusColumns <- function(x=uniqueExams,
     timeSeriesDF$Events <- rep("", nrow(timeSeriesDF))
     timeSeriesDF$stimText <- rep("", nrow(timeSeriesDF))
     timeSeriesDF$Answer <- rep("", nrow(timeSeriesDF))
+    
+    timeSeriesDF <- timeSeriesDF[,c(1:6,(ncol(timeSeriesDF)-3):ncol(timeSeriesDF),7:(ncol(timeSeriesDF)-4))]
 
     # get the names of all unique series for the exam
     seriesNames <- unique(as.character(timeSeriesDF$seriesName))
