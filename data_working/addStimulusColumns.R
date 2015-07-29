@@ -102,13 +102,6 @@ addStimulusColumns <- function(x=uniqueExams,
         
         if(showNames==TRUE) print(chartName)
         
-#         ### add the columns
-#         
-#         chartDF$eventLabel <- rep("", nrow(chartDF))
-#         chartDF$Events <- rep("", nrow(chartDF))
-#         chartDF$stimText <- rep("", nrow(chartDF))
-#         chartDF$Answer <- rep("", nrow(chartDF))
-        
         ### add the data to the new columns
         
         chartDF$eventLabel[as.numeric(chartEvents$Begin)] <- chartEvents$Label
