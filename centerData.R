@@ -70,7 +70,7 @@ centerData <- function(x=uniqueExams, output=FALSE) {
     }
     
     # make a vector of the unique series in each exam
-    uniqueSeries <- unique(examDF$seriesName)
+    uniqueSeries <- as.character(unique(examDF$seriesName))
     
     # make an empty list to hold the output
     outputList <- NULL
