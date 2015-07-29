@@ -318,11 +318,11 @@ cardioSigProc <- function(x=uniqueExams,
       # name the data frames in the ouput list
       names(outputList) <- uniqueCharts
       
-    } # end loop over unique series
-    
 #     # save the list for the unique series
 #     assign(uniqueSeries[j], seriesDF, pos=1)
 
+    } # end loop over unique series
+    
     # save the examDF to the global environment with the centered data
     assign(paste0(examName, "_Data"), examDF, pos=1)
     
