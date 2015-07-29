@@ -25,10 +25,12 @@
 
 
 
-# library(stringr)
-# 
-# # get exam names from the _Data data frames
-# uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
+library(stringr)
+ 
+
+
+# get exam names from the _Data data frames
+uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
 
 
 
@@ -38,9 +40,9 @@
 
 applyFilter <- function(x=uniqueExams, 
                         output=FALSE, 
-                        showNames=FALSE) {
+                        showNames=TRUE) {
   # function to apply a digital filter to the time series data
-  # x input is a list of unique exams
+  # x input is a vector of unique exam names
   # the input data is the output from the function in the centerData.R script
   # output=TRUE will output the list for the last exam series in the nput
   # showNames=TRUE will print the exam series names and chart names to the console
@@ -64,65 +66,94 @@ applyFilter <- function(x=uniqueExams,
   uniqueExams <- x
   
   # loop over each exam in the list 
-  # i <- 1
+  # i=1
   for(i in 1:length(uniqueExams)) {
     
     examName <- uniqueExams[i]
     
+    if(showNames==TRUE) print(uniqueExams[i])
+    
     # get the names of time series lists for all unique series in each exam
-    searchString <- paste0(examName, "*", "_Charts")
-    seriesNames <- ls(pattern=glob2rx(searchString), pos=1)
+    searchString <- paste0("*", examName, "_Data", "*")
+    # uniqueSeries <- ls(pattern=glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
       
+    examDF <- get(glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
+    
+    # add a column
+    examDF$c_AutoEDA <- rep(0, times=nrow(examDF))
+    
+    # get the names of unique series
+    uniqueSeries <- as.character(unique(examDF$seriesName))
+    
+    # make an empty list to hold the output
+    outputList <- NULL
+    
     # loop over each unique series
-    # j <- 1
-    for(j in 1:length(seriesNames)) {
+    # j=1
+    for(j in 1:length(uniqueSeries)) {
       
-      if(showNames==TRUE) print(seriesNames[j])
+      if(showNames==TRUE) print(paste("series", uniqueSeries[j]))
       
-     # get the list of time series data for the charts in the exam
-      seriesData <- get(seriesNames[j], pos=1)
-      chartNames <- names(seriesData)
+      # get the list of time series data for the charts in the exam
+      seriesDF <- examDF[examDF$seriesName==uniqueSeries[j],]
+      # seriesDF <- get(uniqueSeries[j], pos=1)
+      
+      # make a vector of unique exam names
+      # uniqueCharts <- names(seriesDF)
+      uniqueCharts <- as.character(unique(seriesDF$chartName))
       
       # loop over each chart in the series 
-      # k <- 1
-      for(k in 1:length(seriesData)) {
+      # k=1
+      for(k in 1:length(uniqueCharts)) {
         # get the data frame with the time series data for each chart in the series
-        chartData <- seriesData[[k]]
+        # chartDF <- seriesDF[[k]]
+        chartDF <- examDF[examDF$chartName==uniqueCharts[k],]
+        
+        if(showNames==TRUE) print(uniqueCharts[k])
+        
+        chartOnsetRow <- which(examDF$chartName==uniqueCharts[k])[1]
         
         # apply the filter functions to the data frame columns
 
-#         chartData$UPneumoS <- lowPass.886(x=chartData$UPneumo)
-#         chartData$LPneumoS <- lowPass.886(x=chartData$LPneumo)
+#         chartDF$UPneumoS <- lowPass.886(x=chartDF$UPneumo)
+#         chartDF$LPneumoS <- lowPass.886(x=chartDF$LPneumo)
 #         
-#         chartData$UPneumoMean <- tsMean(x=chartData$UPneumoS)
-#         chartData$UPneumoVar <- tsVar(x=chartData$UPneumoS)
+#         chartDF$UPneumoMean <- tsMean(x=chartDF$UPneumoS)
+#         chartDF$UPneumoVar <- tsVar(x=chartDF$UPneumoS)
 #         
-#         chartData$LPneumoMean <- tsMean(x=chartData$LPneumoS)
-#         chartData$LPneumoVar <- tsVar(x=chartData$LPneumoS)
+#         chartDF$LPneumoMean <- tsMean(x=chartDF$LPneumoS)
+#         chartDF$LPneumoVar <- tsVar(x=chartDF$LPneumoS)
                 
-        chartData$AutoEDA <- lowPass.2(x=chartData$EDA1)
-        chartData$AutoEDA <- highPass.03(data=chartData$AutoEDA)
-        #chartData$AutoEDA <- lowPass.886(x=chartData$AutoEDA)
+        chartDF$c_AutoEDA <- lowPass.2(x=chartDF$c_EDA1)
+        chartDF$c_AutoEDA <- highPass.03(data=chartDF$c_AutoEDA)
+        #chartDF$AutoEDA <- lowPass.886(x=chartDF$AutoEDA)
         # smooth the Auto EDA more to improve the feature extraction algorithm
-        chartData$AutoEDA <- MASmooth(x=chartData$AutoEDA, y=5, times=6)
+        chartDF$c_AutoEDA <- MASmooth(x=chartDF$c_AutoEDA, y=5, times=6)
         # plot.ts()
         
-        # save the result to the list
-        seriesData[[k]] <- chartData
+        # save the result to the output list
+        outputList[[k]] <- chartDF
+
+        # save the chartDF to the examDF
+        examDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
         
-        if(showNames==TRUE) print(chartNames[k])
-        
-      } # end for loop over each chart in each series
-      
-      # save the list for the unique series
-      assign(seriesNames[j], seriesData, pos=1)
+      } # end loop over unique charts
+
+      # name the data frames in the ouput list
+      names(outputList) <- uniqueCharts
       
     } # end loop over unique series
     
+#     # save the list for the unique series
+#     assign(uniqueSeries[j], seriesDF, pos=1)
+
+    # save the examDF to the global environment with the centered data
+    assign(paste0(examName, "_Data"), examDF, pos=1)
+      
   } # end loop over unique exams
   
   # return the last
-  if(output==TRUE) return(seriesData) 
+  if(output==TRUE) return(seriesDF) 
   
 } # end applyFilter function
 
