@@ -124,6 +124,7 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       
       # get the responseOnsetRow and responseEndRow
       responseOnsetRow <- begin + 1 
+      endRow <- begin + (measuredSeg * cps)
       responseEndRow <- responseOnsetRow + (measuredSeg * cps) 
       
       aBuffOn <- eventDF$Answer - (startRow - 1) - (1 * cps)
@@ -147,6 +148,8 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       segmentDF$LPneumoExtract[end] <- "offsetRow"
       segmentDF$UPneumoExtract[responseOnsetRow] <- "responseOnsetRow"
       segmentDF$LPneumoExtract[responseOnsetRow] <- "responseOnsetRow"
+      segmentDF$UPneumoExtract[endRow] <- "endRow"
+      segmentDF$LPneumoExtract[endRow] <- "endRow"
       segmentDF$UPneumoExtract[responseEndRow] <- "responseEndRow"
       segmentDF$LPneumoExtract[responseEndRow] <- "responseEndRow"
       
