@@ -6,19 +6,15 @@
 ##################################
 
 
-
-# PF090316_1.01A_eventList
-
-
 # get the stimulus segment using the values from the segEvents list
 # stimSegment <- chartData[segEvents$onsetRow-30*50:segEvents$prestimRow+5+25,]
 
 # can use na.omit(match(vecA, vecB))
 
-# library(stringr)
-# 
+library(stringr)
+
 # # get exam names from the _Stimuli data frames
-# uniqueExams <- unique(str_sub(ls(pattern="*_Stimuli$", pos=1),1, -9))
+uniqueExams <- unique(str_sub(ls(pattern="*_Stimuli$", pos=1),1, -9))
 
 ###
 
