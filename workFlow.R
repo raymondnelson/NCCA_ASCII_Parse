@@ -45,7 +45,7 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/setRange.R', echo=TRUE)
 
 # save the environment in the present state
 save.image(file="NCCAworking2.Rda")
-
+# load(file="NCCAworking2.Rda")
 
 
 #####
@@ -63,6 +63,10 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/getSegmentLists.R', echo=TRUE
 save.image(file="NCCAworking3.Rda")
 # load("NCCAworking3.Rda")
 
+#####
+
+# remove _Stimuli data frames
+rm(list=c(ls(pattern="*_Stimuli$")))
 
 
 #####
