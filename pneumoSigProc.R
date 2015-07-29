@@ -126,7 +126,7 @@ pneumoSigProc <- function(x=uniqueExams,
   } # end loop over unique exams
   
   # return the last
-  if(output==TRUE) return(seriesDF) 
+  if(output==TRUE) return(examDF) 
   
 } # end pneumoSigProc function
 
