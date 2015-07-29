@@ -14,12 +14,19 @@ library(stringr)
 # get exam names from the _Data data frames
 uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
 
+#####
+
+
+
 
 
 #####
 
-# source the centerData.R script first to get the exam chart
-# and center the onset to zero
+# source the addStimulusColumns.R script to add 4 stimulus event columns,
+# including events, question onset, question offset,  answer, and question text
+source('~/Documents/R_programming/NCCA_ASCII_Parse/data_working/addStimulusColumns.R', echo=TRUE)
+
+# source the centerData.R script first to center the onset to zero
 source('~/Documents/R_programming/NCCA_ASCII_Parse/centerData.R', echo=TRUE)
 
 # source the DSP_filters.R script to process the time series data
