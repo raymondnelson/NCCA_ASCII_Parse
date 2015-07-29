@@ -118,7 +118,6 @@ addStimulusColumns <- function(x=uniqueExams,
           as.numeric(chartEvents$Answer) <- as.numeric(chartEvents$End)+1 }
         chartDF$Events[as.numeric(chartEvents$Answer)] <- "answer"
           
-          
         # save the chart data to the time series data frame
         examDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
         
