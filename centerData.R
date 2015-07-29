@@ -49,18 +49,24 @@ centerData <- function(x=uniqueExams, output=FALSE) {
     
     examDF <- get(paste0(examName, "_Data"), pos=1)
     
+    # remove any previously centered columns
+    examDFNames <- names(examDF)
+    examDFNames <- examDFNames[strtrim(examDFNames, 2)!="c_"]
+    
+    examDF <- examDF[,1:length(examDFNames)]
+    
     # add additional columns for the centered data
     newColNames <- paste0("c_", names(examDF[11:ncol(examDF)]))
-    newColNames <- newColNames[strtrim(newColNames, 4)!="c_c_"]
+    # newColNames <- newColNames[strtrim(newColNames, 4)!="c_c_"]
     # m=1
     for (m in 1:length(newColNames)) {
-      # modified this so it will not continue to add new columns
+      # this should not continue to add new columns
       # if the script is sourced repeatedly
-      # examDF <- cbind(examDF, rep(0, times=nrow(examDF)))
-      examDF[,(length(which(strtrim(names(examDF), 2)!="c_"))+m)] <- rep(0, times=nrow(examDF))
+      examDF <- cbind(examDF, rep(0, times=nrow(examDF)))
+      # examDF[,(length(which(strtrim(names(examDF), 2)!="c_"))+1)] <- rep(0, times=nrow(examDF))
       # name each new column
-      # names(examDF)[ncol(examDF)] <- newColNames[m]
-      names(examDF)[(length(which(strtrim(names(examDF), 2)!="c_"))+m)]
+      names(examDF)[ncol(examDF)] <- newColNames[m]
+      # names(examDF)[(length(which(strtrim(names(examDF), 2)!="c_"))+m)] <- newColNames[m]
     }
     
     # make a vector of the unique series in each exam
