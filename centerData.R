@@ -9,17 +9,10 @@ library(stringr)
 
 
 # # get exam names from the _Data data frames
-# uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
+uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
 
 
 
-# chartName <- unique(PF090316_Stimuli$chartName)[1]
-
-# get chart 1
-
-# chartData <- PF090316_Data[PF090316_Data$chartName==chartName,]
-
-# eventData <- PF090316_Stimuli[PF090316_Stimuli$chartName==chartName,]
 
 #####
 
@@ -61,15 +54,23 @@ centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
   ###
   
   # loop over the exams
-  # i <- 1
+  # i=1
   for (i in 1:length(uniqueExams)) {
     examName <- uniqueExams[i]
     stimData <- get(paste0(examName, "_Data"), pos=1)
     
-    # remove extra characters from the lables column
-    library(stringr)
-    stimData$Label <- as.character(stimData$Label)
-    stimData$Label <- str_replace_all(stimData$Label, "[- ]", "")
+    # add additional columns for the centered data
+    newColNames <- paste0("c_", names(stimData[11:ncol(stimData)]))
+    # l=1
+    for (l in 1:length(newColNames)) {
+      stimData <- cbind(stimData, rep(0, times=nrow(stimData)))
+      names(stimData)[ncol(stimData)] <- newColNames[l]
+    }
+    
+#     # remove extra characters from the lables column
+#     library(stringr)
+#     stimData$Label <- as.character(stimData$Label)
+#     stimData$Label <- str_replace_all(stimData$Label, "[- ]", "")
     
     # make a vector of the unique series in each exam
     # uniqueSeries <- unique(strtrim(stimData$chartName, 1))
@@ -79,14 +80,16 @@ centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
     outputList <- NULL
     
     # loop over each unique series
-    # j <- 1
+    # j=1
     for (j in 1:length(uniqueSeries)) {
       seriesName <- uniqueSeries[j]
       searchString <- paste0(seriesName, ".")
+      
+      # get a vector of unique chart names
       uniqueCharts <- unique(grep(searchString, stimData$chartName, value=TRUE))
       
       # loop over unique charts for each series for each exam
-      # k <- 1
+      # k=1
       for (k in 1:length(uniqueCharts)) {
         chartName <- uniqueCharts[k]
         
@@ -97,12 +100,23 @@ centerData <- function(x=uniqueExams, output=FALSE, makeDF=TRUE) {
         ###
         
         # loop over columns and use the function to center the data
-        for (l in 7:ncol(myData)) {
+        names(stimData)==
+        
+        for (l in 11:ncol(myData)) {
           myData[,l] <- centerColumn(myData[,l])
         } # end loop over columns to center data
-  
-        # add the data frame to the ouput list
+        
+        # add the centered data frame to the ouput list
         outputList[[k]] <- myData
+        
+#         # modify the column names for the centered data
+#         names(myData[11:ncol(myData)]) <- paste0("c_", names(myData[11:ncol(myData)]))
+#   
+#         which(stimData$chartName=="1_02A")[1]
+#         
+#         # add the centered chart data frame to the input data frame 
+#         
+#         myData[,11:ncol(myData)]
         
       } # end loop over unique charts
       
