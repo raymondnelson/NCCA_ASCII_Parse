@@ -58,80 +58,80 @@ addStimulusColumns <- function(x=uniqueExams,
     if(showNames==TRUE) print(examName)
     
     # get the time series data  
-    timeSeriesDF <- get(paste0(examName, "_Data"), pos=1)
+    examDF <- get(paste0(examName, "_Data"), pos=1)
     eventDF <- get(paste0(examName, "_Stimuli"), pos=1)
     
     # remove extra characters from the lables column
     library(stringr)
-    timeSeriesDF$Label <- as.character(timeSeriesDF$Label)
-    timeSeriesDF$Label <- str_replace_all(timeSeriesDF$Label, "[- ]", "")
+    examDF$Label <- as.character(examDF$Label)
+    examDF$Label <- str_replace_all(examDF$Label, "[- ]", "")
     
     #add the 4 new columns
-    timeSeriesDF$eventLabel <- rep("", nrow(timeSeriesDF))
-    timeSeriesDF$Events <- rep("", nrow(timeSeriesDF))
-    timeSeriesDF$stimText <- rep("", nrow(timeSeriesDF))
-    timeSeriesDF$Answer <- rep("", nrow(timeSeriesDF))
+    examDF$eventLabel <- rep("", nrow(examDF))
+    examDF$Events <- rep("", nrow(examDF))
+    examDF$stimText <- rep("", nrow(examDF))
+    examDF$Answer <- rep("", nrow(examDF))
     
-    timeSeriesDF <- timeSeriesDF[,c(1:6,(ncol(timeSeriesDF)-3):ncol(timeSeriesDF),7:(ncol(timeSeriesDF)-4))]
+    examDF <- examDF[,c(1:6,(ncol(examDF)-3):ncol(examDF),7:(ncol(examDF)-4))]
 
     # get the names of all unique series for the exam
-    seriesNames <- unique(as.character(timeSeriesDF$seriesName))
+    uniqueSeries <- unique(as.character(examDF$seriesName))
     
     # loop over each unique series
     # j=1
-    for(j in 1:length(seriesNames)) {
+    for(j in 1:length(uniqueSeries)) {
       
-      if(showNames==TRUE) print(paste("series ", seriesNames[j]))
+      if(showNames==TRUE) print(paste("series ", uniqueSeries[j]))
       
-      seriesDF <- timeSeriesDF[timeSeriesDF$seriesName==seriesNames[j],]
+      seriesDF <- examDF[examDF$seriesName==uniqueSeries[j],]
       
       # make a vector of names for all charts in the series
-      chartNames <- unique(as.character(seriesDF$chartName))
+      uniqueCharts <- unique(as.character(seriesDF$chartName))
       
       # loop over each chart in the series 
       # k=1
-      for(k in 1:length(chartNames)) {
+      for(k in 1:length(uniqueCharts)) {
         # get the data frame with the time series data for each chart in the series
         
-        chartName <- chartNames[k]
+        chartName <- uniqueCharts[k]
         
-        chartOnsetRow <- which(timeSeriesDF$chartName==chartNames[k])[1]
+        chartOnsetRow <- which(examDF$chartName==uniqueCharts[k])[1]
         
-        chartData <- seriesDF[seriesDF$chartName==chartNames[k],]
-        chartEvents <- eventDF[eventDF$chartName==chartNames[k],]
+        chartDF <- seriesDF[seriesDF$chartName==uniqueCharts[k],]
+        chartEvents <- eventDF[eventDF$chartName==uniqueCharts[k],]
         
         if(showNames==TRUE) print(chartName)
         
 #         ### add the columns
 #         
-#         chartData$eventLabel <- rep("", nrow(chartData))
-#         chartData$Events <- rep("", nrow(chartData))
-#         chartData$stimText <- rep("", nrow(chartData))
-#         chartData$Answer <- rep("", nrow(chartData))
+#         chartDF$eventLabel <- rep("", nrow(chartDF))
+#         chartDF$Events <- rep("", nrow(chartDF))
+#         chartDF$stimText <- rep("", nrow(chartDF))
+#         chartDF$Answer <- rep("", nrow(chartDF))
         
         ### add the data to the new columns
         
-        chartData$eventLabel[as.numeric(chartEvents$Begin)] <- chartEvents$Label
-        chartData$Events[as.numeric(chartEvents$Begin)] <- "onset"
-        chartData$Events[as.numeric(chartEvents$End)] <- "offset"
-        chartData$Events[as.numeric(chartEvents$Answer)] <- "answer"
-        chartData$Answer[as.numeric(chartEvents$Answer)] <- chartData$Label[as.numeric(chartEvents$Answer)]
-        chartData$stimText[as.numeric(chartEvents$Begin)] <- chartEvents$Statement
+        chartDF$eventLabel[as.numeric(chartEvents$Begin)] <- chartEvents$Label
+        chartDF$Events[as.numeric(chartEvents$Begin)] <- "onset"
+        chartDF$Events[as.numeric(chartEvents$End)] <- "offset"
+        chartDF$Events[as.numeric(chartEvents$Answer)] <- "answer"
+        chartDF$Answer[as.numeric(chartEvents$Answer)] <- chartDF$Label[as.numeric(chartEvents$Answer)]
+        chartDF$stimText[as.numeric(chartEvents$Begin)] <- chartEvents$Statement
         
         # save the chart data to the time series data frame
-        timeSeriesDF[chartOnsetRow:(nrow(chartData)+chartOnsetRow-1),] <- chartData
+        examDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
         
       } # end loop over each K chart
       
     } # end loop over each j series
     
     # save the time series data frame to the global environment
-    assign(paste0(examName, "_Data"), timeSeriesDF, pos=1)
+    assign(paste0(examName, "_Data"), examDF, pos=1)
   
   } # end loop over each i exam
   
   # return the output from the last unique exam
-  if(output==TRUE) return(timeSeriesDF)
+  if(output==TRUE) return(examDF)
 
 } # end addStimulusColumns function
   
