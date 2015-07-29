@@ -127,7 +127,7 @@ centerData <- function(x=uniqueExams, output=FALSE) {
   } # end loop over unique exams
   
   # return the output from the last unique exam
-  if(output==TRUE) return(chartDF)
+  if(output==TRUE) return(examDF)
   
 } # end function centerData
 
