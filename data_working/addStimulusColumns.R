@@ -55,6 +55,8 @@ addStimulusColumns <- function(x=uniqueExams,
     # get the exam name
     examName <- uniqueExams[i]
     
+    if(showNames==TRUE) print(examName)
+    
     # get the time series data  
     timeSeriesDF <- get(paste0(examName, "_Data"), pos=1)
     eventDF <- get(paste0(examName, "_Stimuli"), pos=1)
@@ -64,7 +66,7 @@ addStimulusColumns <- function(x=uniqueExams,
     timeSeriesDF$Label <- as.character(timeSeriesDF$Label)
     timeSeriesDF$Label <- str_replace_all(timeSeriesDF$Label, "[- ]", "")
     
-    #add the columns
+    #add the 4 new columns
     timeSeriesDF$eventLabel <- rep("", nrow(timeSeriesDF))
     timeSeriesDF$Events <- rep("", nrow(timeSeriesDF))
     timeSeriesDF$stimText <- rep("", nrow(timeSeriesDF))
@@ -77,7 +79,7 @@ addStimulusColumns <- function(x=uniqueExams,
     # j=1
     for(j in 1:length(seriesNames)) {
       
-      if(showNames==TRUE) print(seriesNames[j])
+      if(showNames==TRUE) print(paste("series ", seriesNames[j]))
       
       seriesDF <- timeSeriesDF[timeSeriesDF$seriesName==seriesNames[j],]
       
@@ -114,15 +116,22 @@ addStimulusColumns <- function(x=uniqueExams,
         chartData$Answer[as.numeric(chartEvents$Answer)] <- chartData$Label[as.numeric(chartEvents$Answer)]
         chartData$stimText[as.numeric(chartEvents$Begin)] <- chartEvents$Statement
         
+        # save the chart data to the time series data frame
+        timeSeriesDF[chartOnsetRow:(nrow(chartData)+chartOnsetRow-1),] <- chartData
+        
       } # end loop over each K chart
-      
-      # save the chart data to the time series data frame
-      timeSeriesDF[chartOnsetRow:nrow(chartData),] <- chartData
       
     } # end loop over each j series
     
+    # save the time series data frame to the global environment
+    assign(paste0(examName, "_Data"), timeSeriesDF, pos=1)
+  
   } # end loop over each i exam
   
+  # return the output from the last unique exam
+  if(output==TRUE) return(timeSeriesDF)
+
 } # end addStimulusColumns function
   
+addStimulusColumns(x=uniqueExams, output=FALSE, showNames=TRUE)
   
