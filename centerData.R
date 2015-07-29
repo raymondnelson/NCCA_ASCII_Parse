@@ -131,6 +131,6 @@ centerData <- function(x=uniqueExams, output=FALSE) {
   
 } # end function centerData
 
-chartData <- centerData(x=uniqueExams, output=FALSE)
+centerData(x=uniqueExams, output=FALSE)
 
 
