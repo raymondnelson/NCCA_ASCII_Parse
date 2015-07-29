@@ -32,49 +32,49 @@ getEventLists <- function(x=uniqueExams, makeList=TRUE, returnOut=FALSE) {
   # i <- 1
   for (i in 1:length(uniqueExams)) {
     examName <- uniqueExams[i]
-    stimData <- get(paste0(examName, "_Stimuli"), pos=1)
-    # uniqueSeries <- unique(strtrim(stimData$chartName, 1))
-    uniqueSeries <- unique(stimData$seriesName)
+    examStimuli <- get(paste0(examName, "_Stimuli"), pos=1)
+    # uniqueSeries <- unique(strtrim(examStimuli$chartName, 1))
+    uniqueSeries <- unique(examStimuli$seriesName)
     
     # loop over each series
     # j <- 1
     for (j in 1:length(uniqueSeries)) {
       seriesName <- uniqueSeries[j]
       searchString <- paste0(seriesName, ".")
-      uniqueCharts <- unique(grep(searchString, stimData$chartName, value=TRUE))
+      uniqueCharts <- unique(grep(searchString, examStimuli$chartName, value=TRUE))
       
       # loop over unique charts for each series for each exam
       # k <- 1
       for (k in 1:length(uniqueCharts)) {
         chartName <- uniqueCharts[k]
-        chartEvents <- stimData[stimData$chartName==chartName,]   
+        chartStimuli <- examStimuli[examStimuli$chartName==chartName,]   
         
         # make an object to hold the results of each iteration of the the next loop
         eventList <- NULL
         
         # loop over the rows and make a list of onset, offset and answer rows in the data
         # l <- 1
-        for (l in 1:nrow(chartEvents)) {
-          myList <- cbind.data.frame(chartEvents[l,5],
-                                     as.numeric(chartEvents[l,6]),
-                                     as.numeric(chartEvents[l,7]),
-                                     as.numeric(chartEvents[l,8]))
+        for (l in 1:nrow(chartStimuli)) {
+          myList <- cbind.data.frame(chartStimuli[l,5],
+                                     as.numeric(chartStimuli[l,6]),
+                                     as.numeric(chartStimuli[l,7]),
+                                     as.numeric(chartStimuli[l,8]))
           colnames(myList) <- c("Label", "Begin", "End", "Answer")
           eventList[[l]] <- myList
-          # eventList[[l]] <- as.numeric(chartEvents[l,6:8])
+          # eventList[[l]] <- as.numeric(chartStimuli[l,6:8])
         }
         # using a loop allows a named list output
-        names(eventList) <- chartEvents$Label
+        names(eventList) <- chartStimuli$Label
         
 #         # make a data frame of the onset offset and answer columns for each chart
 #         # not using vectorization in order to use a list output
-#         eventList <- cbind.data.frame(chartEvents$Label,
-#                                       as.numeric(chartEvents$Begin), 
-#                                       as.numeric(chartEvents$End), 
-#                                       as.numeric(chartEvents$Answer), 
+#         eventList <- cbind.data.frame(chartStimuli$Label,
+#                                       as.numeric(chartStimuli$Begin), 
+#                                       as.numeric(chartStimuli$End), 
+#                                       as.numeric(chartStimuli$Answer), 
 #                                       stringsAsFactors=FALSE)
-#         # eventList <- chartEvents[,6:8]
-#         # row.names(eventList) <- chartEvents$Label
+#         # eventList <- chartStimuli[,6:8]
+#         # row.names(eventList) <- chartStimuli$Label
 #         colnames(eventList) <- c("Label", "Begin", "End", "Answer")
 
         eventListName <- paste0(examName, "_", chartName, "_eventList")
