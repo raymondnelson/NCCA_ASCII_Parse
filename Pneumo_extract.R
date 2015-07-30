@@ -23,7 +23,7 @@ measuredSeg <- 15
 ###########
 
 
-# function to compute the sum of absolute diffs in y axis exursion
+# function to compute the sum of absolute differences in y axis exursion
 pneumoExtract <- function(x, y) {
   # function to extract the excursion length measurement from pneumo data
   # x = vector of time series data for the measured stimulus segment
@@ -33,8 +33,7 @@ pneumoExtract <- function(x, y) {
   responseEndRow <- x[which(x=="responseEndRow")]
   aBuffOn <- x[which(x=="aBuffOn")]
   aBuffOf <- x[which(x=="aBuffOff")]
-  x <- x[c(responseOnsetRow:aBuffOn, responseEndRow:aBuffOff)]
-  #
+  x <- x[c(responseOnsetRow:aBuffOn, aBuffOff:responseEndRow)]
   return(sum(abs(diff(x))))  
 } # end pneumoExtract function
 
@@ -43,14 +42,6 @@ pneumoExtract <- function(x, y) {
 
 #############
 
-# # Pneumo measurement
-# P1 <- sum(diff(stimSegment$LPneumo[150:600]))
-# P2 <- sum(diff(stimSegment$UPneumo[150:600]))
-# print(c("P1", P1))
-# print(c("P2", P2))
-
-
-##############
 
 
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
@@ -140,8 +131,8 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       segmentDF$LPneumoExtract <- rep("", times=nrow(segmentDF))
       
       # add the response onset and response end data to the 2 pneumo columns
-      segmentDF$UPneumoExtract[1] <- "prestimRow"
-      segmentDF$LPneumoExtract[1] <- "prestimRow"
+#       segmentDF$UPneumoExtract[1] <- "prestimRow"
+#       segmentDF$LPneumoExtract[1] <- "prestimRow"
       segmentDF$UPneumoExtract[begin] <- "onsetRow"
       segmentDF$LPneumoExtract[begin] <- "onsetRow"
       segmentDF$UPneumoExtract[end] <- "offsetRow"

@@ -135,7 +135,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
       ###
       
       # make sure that events are on distinct rows
-      prestimRow <- 1
+#       prestimRow <- 1
       onsetRow <- eventDF$Begin - segmentDF$Sample[1] + 1 
       offsetRow <- eventDF$End - segmentDF$Sample[1] + 1 
       answerRow <- eventDF$Answer - segmentDF$Sample[1] + 1 
@@ -145,8 +145,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
       ROWEndRow <- eventDF$Answer - segmentDF$Sample[1] + 1 + (ROWEnd * cps)
       endRow <- eventDF$Begin - segmentDF$Sample[1] + 1 + (measuredSeg * cps)
       #
-      events <- as.numeric(c(prestimRow, 
-                    onsetRow, 
+      events <- as.numeric(c(onsetRow, 
                     offsetRow, 
                     answerRow, 
                     latencyRow, 
@@ -155,8 +154,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
                     responseEndRow,
                     endRow,
                     stopRow))
-      names(events) <- c("prestimRow", 
-                           "onsetRow", 
+      names(events) <- c("onsetRow", 
                            "offsetRow", 
                            "answerRow", 
                            "latencyRow", 
@@ -169,7 +167,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
       for(i in 9:5) {if(events[i-1] == events[i]) events[i-1] <- events[i-1] - 1}
       for(i in 1:3) {if(events[i+1] == events[i]) events[i+1] <- events[i+1] + 1}
       ##
-      segmentDF$CardioExtract[events["prestimRow"]] <- "prestimRow"
+#       segmentDF$CardioExtract[events["prestimRow"]] <- "prestimRow"
       segmentDF$CardioExtract[events["onsetRow"]] <- "onsetRow"
       segmentDF$CardioExtract[events["offsetRow"]] <- "offsetRow"
       segmentDF$CardioExtract[events["answerRow"]] <- "answerRow"

@@ -141,7 +141,7 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       segmentDF$AutoEDAExtract <- rep("", times=nrow(segmentDF))
       
       # make sure that events are on distinct rows
-      prestimRow <- 1
+#       prestimRow <- 1
       onsetRow <- eventDF$Begin - segmentDF$Sample[1] + 1 
       offsetRow <- eventDF$End - segmentDF$Sample[1] + 1 
       answerRow <- eventDF$Answer - segmentDF$Sample[1] + 1 
@@ -151,8 +151,7 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       # responseEndRow
       endRow <- eventDF$Begin - segmentDF$Sample[1] + 1 + (measuredSeg * cps)
       #
-      events <- as.numeric(c(prestimRow, 
-                             onsetRow, 
+      events <- as.numeric(c(onsetRow, 
                              offsetRow, 
                              answerRow, 
                              latencyRow, 
@@ -161,8 +160,7 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
                              responseEndRow,
                              endRow,
                              stopRow))
-      names(events) <- c("prestimRow", 
-                         "onsetRow", 
+      names(events) <- c("onsetRow", 
                          "offsetRow", 
                          "answerRow", 
                          "latencyRow", 
@@ -175,7 +173,7 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       for(i in 9:5) {if(events[i-1] == events[i]) events[i-1] <- events[i-1] - 1}
       for(i in 1:3) {if(events[i+1] == events[i]) events[i+1] <- events[i+1] + 1}
       ##
-      segmentDF$AutoEDAExtract[events["prestimRow"]] <- "prestimRow"
+#       segmentDF$AutoEDAExtract[events["prestimRow"]] <- "prestimRow"
       segmentDF$AutoEDAExtract[events["onsetRow"]] <- "onsetRow"
       segmentDF$AutoEDAExtract[events["offsetRow"]] <- "offsetRow"
       segmentDF$AutoEDAExtract[events["answerRow"]] <- "answerRow"
