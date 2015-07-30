@@ -39,8 +39,8 @@ addStimulusColumns <- function(x=uniqueExams,
   # output is a data frame with the same name
   # with additional columns for
   #
-  # eventLabel indicating the onset
-  # Events
+  # eventLabel indicating the onset of the stimulus text
+  # Events including Begin, End and Answer rows
   # stimText
   # Answer
   
@@ -109,14 +109,14 @@ addStimulusColumns <- function(x=uniqueExams,
         chartDF$stimText[as.numeric(chartEvents$Begin)] <- chartEvents$Statement
         chartDF$Answer[as.numeric(chartEvents$Answer)] <- chartDF$Label[as.numeric(chartEvents$Answer)]
         
-        chartDF$Events[as.numeric(chartEvents$Begin)] <- "onset"
+        chartDF$Events[as.numeric(chartEvents$Begin)] <- "onsetRow"
         # correct for situation where End and Answer have the same row as Begin 
         if (as.numeric(chartEvents$End) <= as.numeric(chartEvents$Begin)) {
           as.numeric(chartEvents$End) <- as.numeric(chartEvents$Begin)+1 }
-        chartDF$Events[as.numeric(chartEvents$End)] <- "offset"
+        chartDF$Events[as.numeric(chartEvents$End)] <- "offsetRow"
         if (as.numeric(chartEvents$Answer) <= as.numeric(chartEvents$End)) {
           as.numeric(chartEvents$Answer) <- as.numeric(chartEvents$End)+1 }
-        chartDF$Events[as.numeric(chartEvents$Answer)] <- "answer"
+        chartDF$Events[as.numeric(chartEvents$Answer)] <- "answerRow"
           
         # save the chart data to the time series data frame
         examDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
