@@ -115,9 +115,10 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       eventDF <- eventList[[j]]
       
       # fix problem when answerRow == offsetRow
-      if(eventDF$Answer == eventDF$End) eventDF$Answer <- eventDF$Answer + 1
+      if(eventDF$End == eventDF$Begin) eventDF$End <- eventDF$Begin + 1
+      if(eventDF$Answer <= eventDF$End) eventDF$Answer <- eventDF$End + 1
       
-      EDAData <- segmentDF$AutoEDA
+      EDAData <- segmentDF$c_AutoEDA
       
       # columns 9=manualEDA, column 16=AutoEDA
       # z <- amplitudeExtract(x=segmentDF[,9], y=eventDF, column=16)
