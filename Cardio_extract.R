@@ -51,7 +51,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
   myEventLists <- y  
   
     # iterate over the segment lists
-  # i<-1
+  # i=1
   for (i in 1:length(mySegmentLists)) {
     
     # get the names
@@ -66,14 +66,15 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
     segmentNames <- names(segmentList)
     
     # iterate over the data frames in each list
-    # j=2
+    # j=1
     for (j in 1:length(segmentNames)) {  
       
       segmentDF <- segmentList[[j]]
       eventDF <- eventList[[j]]
       
       # fix problem when answerRow == offsetRow
-      if(eventDF$Answer == eventDF$End) eventDF$Answer <- eventDF$Answer + 1
+      if(eventDF$End == eventDF$Begin) eventDF$End <- eventDF$Begin + 1
+      if(eventDF$Answer <= eventDF$End) eventDF$Answer <- eventDF$End + 1
       
 #       # remove NA rows
 #       segmentDF <- na.omit(segmentDF)
@@ -98,7 +99,7 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
 #         EndRow <- nrow(segmentDF)
 #       }
 
-      CardioData <- segmentDF$CardioMA
+      CardioData <- segmentDF$c_CardioMA
       
       ####
       # col 17 = diastolic, 18=systolic, 19=minmax, 20=moving average
