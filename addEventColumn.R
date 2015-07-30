@@ -64,9 +64,9 @@ addEvents <- function(x=segmentDF, y=eventDF) {
   # add the Events column to the data frame
   segmentDF$Events <- rep("", times=nrow(segmentDF))
   
-  prestimRow <- eventDF$Begin - (startRow-1) - (cps*prestimSeg)
-  # correction for X announcement for which there may not be 5 seconds prestimulus
-  if(prestimRow < 1) prestimRow <- 1
+#   prestimRow <- eventDF$Begin - (startRow-1) - (cps*prestimSeg)
+#   # correction for X announcement for which there may not be 5 seconds prestimulus
+#   if(prestimRow < 1) prestimRow <- 1
   onsetRow <- eventDF$Begin - (startRow-1)
   #EDALatRow <- onsetRow + cps*EDALat
   offsetRow <- eventDF$End - (startRow-1)
@@ -88,7 +88,7 @@ addEvents <- function(x=segmentDF, y=eventDF) {
   # if(ROWEndRow > nrow(segmentDF)) ROWEndRow <- (nrow(segmentDF)-2)
   if(endRow > nrow(segmentDF)) endRow <- (nrow(segmentDF)-1)
   
-  segmentDF$Events[prestimRow] <- "prestimRow"
+#   segmentDF$Events[prestimRow] <- "prestimRow"
   segmentDF$Events[onsetRow] <- "onsetRow"
   # segmentDF$Events[EDALatRow] <- "EDALatRow"
   segmentDF$Events[offsetRow] <- "offsetRow"
