@@ -557,3 +557,4 @@ amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentNa
 
 # amplitudeExtract(x, begin, end, answer, start, lat, label, segmentName)
 
+
