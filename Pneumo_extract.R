@@ -104,6 +104,10 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       
       # remove NA rows
       # segmentDF <- na.omit(segmentDF)
+
+      # fix problem when answerRow == offsetRow
+      if(eventDF$End == eventDF$Begin) eventDF$End <- eventDF$Begin + 1
+      if(eventDF$Answer <= eventDF$End) eventDF$Answer <- eventDF$End + 1
       
       # get the segment start row
       startRow <- segmentDF$Sample[1]
