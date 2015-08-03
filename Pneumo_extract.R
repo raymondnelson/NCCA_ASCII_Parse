@@ -92,6 +92,8 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
     segmentList <- get(segmentListName, pos=1)
     eventList <- get(eventListName, pos=1)
     
+    print(segmentListName)
+    
     # save the names of the stimulus segments
     segmentNames <- names(segmentList)
     
@@ -101,6 +103,8 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       
       segmentDF <- segmentList[[j]]
       eventDF <- eventList[[j]]
+      
+      print(segmentNames[j])
       
       # remove NA rows
       # segmentDF <- na.omit(segmentDF)

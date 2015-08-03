@@ -20,10 +20,6 @@ setColRange <- function(x1, y) {
   # function to set each column range
   # x is a zero centered column from the data frome of recorded time series data
   # y is the max range value 
-  # function to st the range of values to 100
-  # input is a column vector from the chartDF data frame
-  # maxVal <- 
-  # minVal <- min(x)
   rangeVal <- max(x1)-min(x1)
   rangeCoef <- y / rangeVal
   ifelse(rangeVal==0,
@@ -44,10 +40,10 @@ setRange <- function(x=uniqueExams, y=100, showNames=TRUE, output=FALSE) {
   
   ###
   
-  uniqueExams <- x
-  
   # get the range from the function input y value
   colRange <- as.numeric(y)
+  
+  uniqueExams <- x
   
   # loop over each exam in the list 
   # i=1
@@ -96,7 +92,7 @@ setRange <- function(x=uniqueExams, y=100, showNames=TRUE, output=FALSE) {
         ###
         
         # call the function for all data columns in the data frame
-        # l=
+        # l=1
         for (l in min(useCols):max(useCols)) {
           chartDF[,l] <- setColRange(x1=chartDF[,l], y=colRange)
         } # end for loop to set all column ranges

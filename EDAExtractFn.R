@@ -132,7 +132,8 @@ EDAExtractFn <- function(x=mySegmentLists, y=myEventLists) {
                             segmentName=paste(segmentDF$examName[1],
                                               segmentDF$chartName[1],
                                               eventDF$Label,
-                                              sep="_"))
+                                              sep="_"),
+                            nSmooth=4)
       
       responseOnsetRow <- as.numeric(z[1])
       responseEndRow <- as.numeric(z[2])

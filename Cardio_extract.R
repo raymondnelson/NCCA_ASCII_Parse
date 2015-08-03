@@ -1,6 +1,6 @@
 # function to extract onset and end of cardio responses
 
-# uses the ampltitudeExtract.R script with the amplitudeExtract() function
+# uses the amplitudeExtract.R script with the amplitudeExtract() function
 
 ########################
 
@@ -123,7 +123,8 @@ cardioExtract <- function(x=mySegmentLists, y=myEventLists) {
                                  segmentName=paste(segmentDF$examName[1],
                                                    segmentDF$chartName[1],
                                                    eventDF$Label,
-                                                   sep="_"))
+                                                   sep="_"),
+                                 nSmooth=4)
 
 
       responseOnsetRow <- as.numeric(ampExt[1])

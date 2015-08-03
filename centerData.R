@@ -99,7 +99,7 @@ centerData <- function(x=uniqueExams, output=FALSE) {
         chartDF <- examDF[examDF$chartName==chartName,]
         # chartDF <- as.data.frame(get(paste0(examName, "_Data"), pos=1))
         
-        ###
+        ##### apply the function to the data columns
         
         # loop over columns and use the function to center the data
         # l=11

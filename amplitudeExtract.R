@@ -17,27 +17,27 @@
 ######################################
 
 
-mySegmentLists <- ls(pattern="*_dataSegmentList$")
-myEventLists <- ls(pattern="*_eventList$")
-
-mySegmentLists <- mySegmentLists[1]
-myEventLists <- myEventLists[1]
-
-mySegmentDF <- get(mySegmentLists)[[3]]
-myEventDF <- get(myEventLists)[[3]]
-
-# myData <- mySegmentDF$AutoEDA
-myData <- mySegmentDF$CardioMA
-
-begin <- myEventDF$Begin
-end <- myEventDF$End
-answer <- myEventDF$Answer
-# if(answer == end) answer <- answer+1
-start <- mySegmentDF$Sample[1]
-lat <- .5
-nSmooth <- 4
-label <- myEventDF$Label
-segmentName <- paste(mySegmentDF$examName[1], mySegmentDF$chartName[1], myEventDF$Label, sep="_")
+# mySegmentLists <- ls(pattern="*_dataSegmentList$")
+# myEventLists <- ls(pattern="*_eventList$")
+# 
+# mySegmentLists <- mySegmentLists[1]
+# myEventLists <- myEventLists[1]
+# 
+# mySegmentDF <- get(mySegmentLists)[[3]]
+# myEventDF <- get(myEventLists)[[3]]
+# 
+# # myData <- mySegmentDF$AutoEDA
+# myData <- mySegmentDF$CardioMA
+# 
+# begin <- myEventDF$Begin
+# end <- myEventDF$End
+# answer <- myEventDF$Answer
+# # if(answer == end) answer <- answer+1
+# start <- mySegmentDF$Sample[1]
+# lat <- .5
+# nSmooth <- 4
+# label <- myEventDF$Label
+# segmentName <- paste(mySegmentDF$examName[1], mySegmentDF$chartName[1], myEventDF$Label, sep="_")
 
 #########
 
@@ -49,9 +49,9 @@ CardioLat <- .5
 ROWEnd <- 5
 measuredSeg <- 15
 
-x <- myData
+#####
 
-amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentName) {
+amplitudeExtract <- function(x, begin, end, answer, start, lat, label, segmentName, nSmooth) {
   # function to extract the amplitude of EDA increase in response to a stimulus
   #
   # x is a vector of time series data for a single stimulus segment
