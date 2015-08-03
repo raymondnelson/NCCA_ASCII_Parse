@@ -24,7 +24,7 @@ uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
 
 # source the addStimulusColumns.R script to add 4 stimulus event columns,
 # including events, question onset, question offset,  answer, and question text
-source('~/Documents/R_programming/NCCA_ASCII_Parse/data_working/addStimulusColumns.R', echo=TRUE)
+source('~/Documents/R_programming/NCCA_ASCII_Parse/addStimulusColumns.R', echo=TRUE)
 
 # source the centerData.R script first to center the onset to zero
 source('~/Documents/R_programming/NCCA_ASCII_Parse/centerData.R', echo=TRUE)
@@ -41,7 +41,8 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/pneumoSigProc.R', echo=TRUE)
 # then source the setRange.R script to set the range of data from 0 to 100
 source('~/Documents/R_programming/NCCA_ASCII_Parse/setRange.R', echo=TRUE)
 
-# source the 
+# source the pArtifact2.R script to artifact the pneumo data
+source('~/Documents/R_programming/NCCA_ASCII_Parse/pArtifact2.R', echo=TRUE)
 
 # save the environment in the present state
 save.image(file="NCCAworking2.Rda")
@@ -72,7 +73,7 @@ rm(list=c(ls(pattern="*_Stimuli$")))
 #####
 
 # add the events to the data frames
-source('~/Documents/R_programming/NCCA_ASCII_Parse/addEventColumn.R', echo=TRUE)
+# source('~/Documents/R_programming/NCCA_ASCII_Parse/addEventColumn.R', echo=TRUE)
 
 # add the PneumoExtract columns for the upper and lower pneumo sensors
 source('~/Documents/R_programming/NCCA_ASCII_Parse/Pneumo_extract.R', echo=TRUE)
