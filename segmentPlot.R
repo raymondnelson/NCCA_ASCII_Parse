@@ -33,18 +33,17 @@ measuredSeg <- 15
 
 mySegmentLists <- ls(pattern="*_dataSegmentList$")
 
-mySegmentLists <- mySegmentLists[1:3]
+mySegmentLists <- mySegmentLists[1]
 
 ####
 
 printPlot <- FALSE
 
-if(printPlot == TRUE) pdf("Exam_1_7-27-2015.pdf", height=5, width=7)  
+if(printPlot == TRUE) pdf("Exam_6_7-28-2015.pdf", height=5, width=7)  
   
 # iterate over the names of data segment lists
 # i=1
 for (i in 1:length(mySegmentLists)) {
-  
   # get the name of the segment list
   segmentListName <- mySegmentLists[i]
   
@@ -54,7 +53,7 @@ for (i in 1:length(mySegmentLists)) {
   # save the names of the stimulus segments
   segmentNames <- names(segmentList)
   
-  # make an empty output list
+  # make an empty output list to save the chart
   outputList <- list()
   
   # iterate over the data frames in each data segment list
@@ -82,49 +81,45 @@ for (i in 1:length(mySegmentLists)) {
     
     ###
     
-    # scale the cardio - not used yet but may be able to auto size the cardio data
-    UPneumoScale <- 40 / (max(stimSegmentDF$UPneumoS[1:300]) - min(stimSegmentDF$UPneumoS[1:150]))
-    LPneumoScale <- 40 / (max(stimSegmentDF$LPneumoS[1:300]) - min(stimSegmentDF$LPneumoS[1:150]))
-    EDAScale <- 100 / (max(na.omit(stimSegmentDF$AutoEDA)) - min(na.omit(stimSegmentDF$AutoEDA)))
+    # get the scaling values
+    UPneumoScale <- 40 / (max(stimSegmentDF$c_UPneumoS[1:300]) - min(stimSegmentDF$c_UPneumoS[1:150]))
+    LPneumoScale <- 40 / (max(stimSegmentDF$c_LPneumoS[1:300]) - min(stimSegmentDF$c_LPneumoS[1:150]))
+    EDAScale <- 100 / (max(na.omit(stimSegmentDF$c_AutoEDA)) - min(na.omit(stimSegmentDF$c_AutoEDA)))
+    # scale the cardio pulse amplitude using the first 4 seconds
     outDiff <- NULL
     for (i in 1:121) {
-      outDiff <- c(outDiff, diff(range(stimSegmentDF$Cardio1[i:(i+29)])))
+      outDiff <- c(outDiff, diff(range(stimSegmentDF$c_Cardio1[i:(i+29)])))
     }
     cardioScale <- 50 / mean(outDiff)
     
     # scale the data for plotting
-#    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS * 1
-    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS * UPneumoScale
-#    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS * 1
-    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS * LPneumoScale
-#     stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA * 1
-    stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA * EDAScale
-#     stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 * 20
-    stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 * cardioScale
-#    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA * 20
-    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA * cardioScale
-    stimSegmentDF$CardioDiastolic <- stimSegmentDF$CardioDiastolic * cardioScale
-    stimSegmentDF$CardioSystolic <- stimSegmentDF$CardioSystolic * cardioScale
+    stimSegmentDF$c_UPneumoS <- stimSegmentDF$c_UPneumoS * UPneumoScale
+    stimSegmentDF$c_LPneumoS <- stimSegmentDF$c_LPneumoS * LPneumoScale
+    stimSegmentDF$c_AutoEDA <- stimSegmentDF$c_AutoEDA * EDAScale
+    stimSegmentDF$c_Cardio1 <- stimSegmentDF$c_Cardio1 * cardioScale
+    stimSegmentDF$c_CardioMA <- stimSegmentDF$c_CardioMA * cardioScale
+    stimSegmentDF$c_CardioDiastolic <- stimSegmentDF$c_CardioDiastolic * cardioScale
+    stimSegmentDF$c_CardioSystolic <- stimSegmentDF$c_CardioSystolic * cardioScale
     
     # offset the data for plotting
     yOffset <- c(125, 50, 0, -75)
-    UPneumoOffset <- stimSegmentDF$UPneumoS[1]
-    LPneumoOffset <- stimSegmentDF$LPneumoS[1]
-    AutoEDAOffset <- stimSegmentDF$AutoEDA[1]
-    CardioMAOffset <- stimSegmentDF$CardioMA[1]
-    CardioDiastolicOffset <- stimSegmentDF$CardioDiastolicOffset[1]
-    Cardio1Offset <- stimSegmentDF$Cardio1[1]
-    stimSegmentDF$UPneumoS <- stimSegmentDF$UPneumoS - UPneumoOffset + yOffset[1]
-    stimSegmentDF$LPneumoS <- stimSegmentDF$LPneumoS - LPneumoOffset + yOffset[2]
-    stimSegmentDF$AutoEDA <- stimSegmentDF$AutoEDA - AutoEDAOffset + yOffset[3]
-    stimSegmentDF$Cardio1 <- stimSegmentDF$Cardio1 - Cardio1Offset + yOffset[4]
+    UPneumoOffset <- stimSegmentDF$c_UPneumoS[1]
+    LPneumoOffset <- stimSegmentDF$c_LPneumoS[1]
+    AutoEDAOffset <- stimSegmentDF$c_AutoEDA[1]
+    CardioMAOffset <- stimSegmentDF$c_CardioMA[1]
+#    CardioDiastolicOffset <- stimSegmentDF$c_CardioDiastolicOffset[1]
+    Cardio1Offset <- stimSegmentDF$c_Cardio1[1]
+    stimSegmentDF$c_UPneumoS <- stimSegmentDF$c_UPneumoS - UPneumoOffset + yOffset[1]
+    stimSegmentDF$c_LPneumoS <- stimSegmentDF$c_LPneumoS - LPneumoOffset + yOffset[2]
+    stimSegmentDF$c_AutoEDA <- stimSegmentDF$c_AutoEDA - AutoEDAOffset + yOffset[3]
+    stimSegmentDF$c_Cardio1 <- stimSegmentDF$c_Cardio1 - Cardio1Offset + yOffset[4]
     # use the Cardio1Offset to center the CardioMA data on the Cardio1 data
-    stimSegmentDF$CardioMA <- stimSegmentDF$CardioMA - Cardio1Offset + yOffset[4]
-    stimSegmentDF$CardioDiastolic <- stimSegmentDF$CardioDiastolic - Cardio1Offset + yOffset[4]
-    stimSegmentDF$CardioSystolic <- stimSegmentDF$CardioSystolic - Cardio1Offset + yOffset[4]
+    stimSegmentDF$c_CardioMA <- stimSegmentDF$c_CardioMA - Cardio1Offset + yOffset[4]
+#    stimSegmentDF$c_CardioDiastolic <- stimSegmentDF$c_CardioDiastolic - Cardio1Offset + yOffset[4]
+#    stimSegmentDF$c_CardioSystolic <- stimSegmentDF$c_CardioSystolic - Cardio1Offset + yOffset[4]
     
     # remove NA rows if necessary for XX segments using times series data columns
-    stimSegmentDF <- stimSegmentDF[complete.cases(stimSegmentDF[,7:10]),]
+    stimSegmentDF <- stimSegmentDF[complete.cases(stimSegmentDF[,17:21]),]
     
     # make the plot
     g <- ggplot()
@@ -132,22 +127,22 @@ for (i in 1:length(mySegmentLists)) {
 
     ### vertical lines 
     # onset line
-    onsetRow <- which(stimSegmentDF$Events=="onsetRow")
+    onsetRow <- which(stimSegmentDF$Events=="onsetRow")[1]
     g <- g + geom_vline(aes(xintercept=as.numeric(onsetRow)))
     # EDA latency
-    EDALatRow <- which(stimSegmentDF$Events=="onsetRow")+(EDALat*cps)
+    EDALatRow <- which(stimSegmentDF$Events=="onsetRow")[1]+(EDALat*cps)
     g <- g + geom_vline(aes(xintercept=as.numeric(EDALatRow)), color="grey80")
     # offset line
-    offsetRow <- which(stimSegmentDF$Events=="offsetRow")
+    offsetRow <- which(stimSegmentDF$Events=="offsetRow")[1]
     g <- g + geom_vline(aes(xintercept=as.numeric(offsetRow)))
     # answer line
-    answerRow <- which(stimSegmentDF$Events=="answerRow")
+    answerRow <- which(stimSegmentDF$Events=="answerRow")[1]
     g <- g + geom_vline(aes(xintercept=as.numeric(answerRow)), color="black")
     # end of response onset window
-    ROWEndRow <- which(stimSegmentDF$Events=="answerRow")+(ROWEnd*cps)
+    ROWEndRow <- which(stimSegmentDF$Events=="answerRow")[1]+(ROWEnd*cps)
     g <- g + geom_vline(aes(xintercept=as.numeric(ROWEndRow)), color="grey80")
     # end of scoring window
-    endRow <- which(stimSegmentDF$Events=="onsetRow")+(measuredSeg*cps)
+    endRow <- which(stimSegmentDF$Events=="onsetRow")[1]+(measuredSeg*cps)
     if(endRow > nrow(stimSegmentDF)) endRow <- (nrow(stimSegmentDF))
     g <- g + geom_vline(aes(xintercept=as.numeric(endRow)), color="grey70")
     
@@ -186,27 +181,27 @@ for (i in 1:length(mySegmentLists)) {
                       fill="blue")
 
     # data segments
-    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=AutoEDA), color="green4", size=.75) + coord_cartesian(ylim=c(-175, 175))
-    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=Cardio1), color="red") + coord_cartesian(ylim=c(-175, 175))
-    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=UPneumoS), color="blue1") + coord_cartesian(ylim=c(-175, 175))
-    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=LPneumoS), color="blue4") + coord_cartesian(ylim=c(-175, 175))
-    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=CardioMA), color="black") + coord_cartesian(ylim=c(-175, 175))
-#    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=CardioDiastolic), color="grey50") + coord_cartesian(ylim=c(-175, 175))
-#    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=CardioSystolic), color="grey50") + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=c_AutoEDA), color="green4", size=.75) + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=c_Cardio1), color="red") + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=c_UPneumoS), color="blue1") + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=c_LPneumoS), color="blue4") + coord_cartesian(ylim=c(-175, 175))
+    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=c_CardioMA), color="black") + coord_cartesian(ylim=c(-175, 175))
+#    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=c_CardioDiastolic), color="grey50") + coord_cartesian(ylim=c(-175, 175))
+#    g <- g + geom_line(data=na.omit(stimSegmentDF), aes(x=(1:nrow(na.omit(stimSegmentDF))), y=c_CardioSystolic), color="grey50") + coord_cartesian(ylim=c(-175, 175))
     
-    # g <- g + geom_line(data=stimSegmentDF, aes(x=(1:nrow(stimSegmentDF)), y=Move1), color="grey20")
-    # g <- g + geom_line(data=stimSegmentDF, aes(x=(1:nrow(stimSegmentDF)), y=Aux02), color="grey20")
+    # g <- g + geom_line(data=stimSegmentDF, aes(x=(1:nrow(stimSegmentDF)), y=c_Move1), color="grey20")
+    # g <- g + geom_line(data=stimSegmentDF, aes(x=(1:nrow(stimSegmentDF)), y=c_Aux02), color="grey20")
     
     # Pneumo measurement lines
     
-    g <- g + geom_line(data=stimSegmentDF[onsetRow:endRow,], aes(x=onsetRow:endRow, y=UPneumoS), color="blue1", size=1.25)
-    g <- g + geom_line(data=stimSegmentDF[onsetRow:endRow,], aes(x=onsetRow:endRow, y=LPneumoS), color="blue3", size=1.25)
+    g <- g + geom_line(data=stimSegmentDF[onsetRow:endRow,], aes(x=onsetRow:endRow, y=c_UPneumoS), color="blue1", size=1.25)
+    g <- g + geom_line(data=stimSegmentDF[onsetRow:endRow,], aes(x=onsetRow:endRow, y=c_LPneumoS), color="blue3", size=1.25)
     # buffer around the verbal response is not included in the measurement
     # upper pneumo answer buffer
     aBuffXOnU <- which(stimSegmentDF$UPneumoExtract=="aBuffOn")
     aBuffXOffU <- which(stimSegmentDF$UPneumoExtract=="aBuffOff")
-    aBuffYOnU <- stimSegmentDF$UPneumoS[aBuffXOnU]
-    aBuffYOffU <- stimSegmentDF$UPneumoS[aBuffXOffU] 
+    aBuffYOnU <- stimSegmentDF$c_UPneumoS[aBuffXOnU]
+    aBuffYOffU <- stimSegmentDF$c_UPneumoS[aBuffXOffU] 
     g <- g + annotate("segment",
                       x=aBuffXOnU,
                       xend=aBuffXOffU,
@@ -218,8 +213,8 @@ for (i in 1:length(mySegmentLists)) {
     # lower pneumo answer buffer
     aBuffXOnL <- which(stimSegmentDF$LPneumoExtract=="aBuffOn")
     aBuffXOffL <- which(stimSegmentDF$LPneumoExtract=="aBuffOff")
-    aBuffYOnL <- stimSegmentDF$LPneumoS[aBuffXOnU]
-    aBuffYOffL <- stimSegmentDF$LPneumoS[aBuffXOffU] 
+    aBuffYOnL <- stimSegmentDF$c_LPneumoS[aBuffXOnU]
+    aBuffYOffL <- stimSegmentDF$c_LPneumoS[aBuffXOffU] 
     g <- g + annotate("segment",
                       x=aBuffXOnL,
                       xend=aBuffXOffL,
@@ -232,18 +227,18 @@ for (i in 1:length(mySegmentLists)) {
     ### Penumo artifacts
 
     g <- g + annotate("point", x=which(stimSegmentDF$UPneumoArtifacts=="Artifact"),
-                                    y=stimSegmentDF$UPneumoS[which(stimSegmentDF$UPneumoArtifacts=="Artifact")],
+                                    y=stimSegmentDF$c_UPneumoS[which(stimSegmentDF$UPneumoArtifacts=="Artifact")],
                                     shape=4, size=2)
     g <- g+ annotate("point", x=which(stimSegmentDF$LPneumoArtifacts=="Artifact"),
-                      y=stimSegmentDF$LPneumoS[which(stimSegmentDF$LPneumoArtifacts=="Artifact")],
+                      y=stimSegmentDF$c_LPneumoS[which(stimSegmentDF$LPneumoArtifacts=="Artifact")],
                       shape=4, size=2)
 
     ### EDA measurement lines
     
     EDAxOn <- which(stimSegmentDF$AutoEDAExtract=="responseOnsetRow")
     EDAxOff <- which(stimSegmentDF$AutoEDAExtract=="responseEndRow")
-    EDAyOn <- stimSegmentDF$AutoEDA[EDAxOn]
-    EDAyOff <- stimSegmentDF$AutoEDA[EDAxOff]
+    EDAyOn <- stimSegmentDF$c_AutoEDA[EDAxOn]
+    EDAyOff <- stimSegmentDF$c_AutoEDA[EDAxOff]
 
     # if(EDAxOn <= ROWEndRow) {
     # horzontal EDA segment measurement
@@ -273,21 +268,12 @@ for (i in 1:length(mySegmentLists)) {
 
     # g <- g + geom_point()
 
-    # using geomsegment() is more difficult
-    #   g <- g + geom_segment(aes(x=autoEDA["responsePeakRow"], 
-    #                             xend=autoEDA["responsePeakRow"], 
-    #                             y=autoEDA["responseOnsetValue"], 
-    #                             yend=autoEDA["responsePeakValue"]), 
-    #                         color="purple", 
-    #                         size=.5, 
-    #                         arrow=arrow(length=unit(0.4, "cm")))
-    
 #     ### Cardio measurement Lines
     
     cardioXOn <- which(stimSegmentDF$CardioExtract=="responseOnsetRow")
     cardioXOff <- which(stimSegmentDF$CardioExtract=="responseEndRow")
-    cardioYOn <- stimSegmentDF$CardioMA[cardioXOn]
-    cardioYOff <- stimSegmentDF$CardioMA[cardioXOff]
+    cardioYOn <- stimSegmentDF$c_CardioMA[cardioXOn]
+    cardioYOff <- stimSegmentDF$c_CardioMA[cardioXOff]
     
     # if(cardioXOn <= ROWEndRow) {
     # horzontal Cardio segment measurement
