@@ -27,16 +27,16 @@
 # label <- myEventDF$Label
 # segmentName <- paste(mySegmentDF$examName[1], mySegmentDF$chartName[1], myEventDF$Label, sep="_")
 # 
-# ####
-# 
-# cps <- 30
-# prestimSeg <- 5
-# EDALat <- .5
-# CardioLat <- .5
-# ROWEnd <- 5
-# measuredSeg <- 15
+####
 
-#x <- myData
+cps <- 30
+prestimSeg <- 5
+EDALat <- .5
+CardioLat <- .5
+ROWEnd <- 5
+measuredSeg <- 15
+
+# x <- myData
 
 ####
 
@@ -55,17 +55,20 @@
   sigChange <- function(x, N=5, m=1) {
     # compare each 1 second with the preceeding N seconds
     # x is the time series data for upper or lower respiration
-    # N is the number of second to evaluate
+    # N is the number of prior seconds to compare
+    # m is the number of seconds to evaluate
   
     myData <- na.omit(x)
 
-    #i=1
+    # preLen is the length in seconds of the preceeding segment
+    preLen <- cps*N
+    # postLen is the length in seconds of the current segment
+    postLen <- cps*m
+
+    # a loop to make a vector of 1 and -1 if the variance is significant 
+    # i=1
     y <- rep(0, times=length(myData))
     for (i in 1:(length(y)-(N*cps)-(m*cps)-1)) {
-      # preLen is the length in seconds of the preceeding segment
-      preLen <- cps*N
-      # postLen is the length in seconds of the current segment
-      postLen <- cps*m
       # preDiff is the absolute difference for successive samples in the preLen segment
       preDiff <- exp(abs(diff(myData[i:(i+preLen-1)])))^10
       # postDiff is the absolute difference for successive samples in the postLen segment
@@ -115,7 +118,8 @@
 pVarChange <- function(x=stimSegmentDF$UPneumoVar, N=6, m=2) {
   # compare each 1 second with the preceeding N seconds
   # x is the 1 second variance time series data for upper or lower respiration
-  # N is the number of second to evaluate
+  # N is the number of prior second to compare
+  # m is the number of seconds to evaluate
   
   myData <- na.omit(x)
   
