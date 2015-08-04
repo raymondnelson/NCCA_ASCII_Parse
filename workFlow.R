@@ -29,6 +29,9 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/addStimulusColumns.R', echo=T
 # source the centerData.R script first to center the onset to zero
 source('~/Documents/R_programming/NCCA_ASCII_Parse/centerData.R', echo=TRUE)
 
+# then source the setRange.R script to set the range of data from 0 to 100
+source('~/Documents/R_programming/NCCA_ASCII_Parse/setRange.R', echo=TRUE)
+
 # source the DSP_filters.R script to process the time series data
 source('~/Documents/R_programming/NCCA_ASCII_Parse/DSP_filters.R', echo=TRUE)
 
@@ -37,9 +40,6 @@ source('~/Documents/R_programming/NCCA_ASCII_Parse/cardioSigProc.R', echo=TRUE)
 
 # source the pneumoSigProc script to process the upper and lower pneumograph data 
 source('~/Documents/R_programming/NCCA_ASCII_Parse/pneumoSigProc.R', echo=TRUE)
-
-# then source the setRange.R script to set the range of data from 0 to 100
-source('~/Documents/R_programming/NCCA_ASCII_Parse/setRange.R', echo=TRUE)
 
 # source the pArtifact2.R script to artifact the pneumo data
 source('~/Documents/R_programming/NCCA_ASCII_Parse/pArtifact2.R', echo=TRUE)
