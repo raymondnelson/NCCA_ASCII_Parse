@@ -29,7 +29,7 @@ measuredSeg <- 15
 
 
 
-newPArtifactFn<- function(x=uniqueExams, showNames=TRUE, ouput=FALSE) {
+processStimSegment<- function(x=uniqueExams, showNames=TRUE, ouput=FALSE) {
   # function to iterate over a vector of data frame names 
   # and add UPneumoArtifacts and LPneumoArtifacts column to the time series data frame
   #
@@ -86,7 +86,7 @@ newPArtifactFn<- function(x=uniqueExams, showNames=TRUE, ouput=FALSE) {
         
         eventRows <- chartDF$eventLabel[chartDF$eventLabel!=""]
         
-        # loop over all the events in the chart
+        # loop over all the events in the chart data frame
         # l=1
         for (l in 1:length(eventRows)) {
           
@@ -95,4 +95,14 @@ newPArtifactFn<- function(x=uniqueExams, showNames=TRUE, ouput=FALSE) {
           answer
           
           endRow
+          
+        } # end loop over l events in the chart data frame
+        
+      } # end loop over K charts
+      
+    } # end loop over J series
+    
+  } # end loop over i exams 
+  
+} # end processStimSegment function
           
