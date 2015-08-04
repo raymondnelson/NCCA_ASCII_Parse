@@ -147,7 +147,7 @@ applyFilter <- function(x=uniqueExams,
 #     # save the list for the unique series
 #     assign(uniqueSeries[j], seriesDF, pos=1)
 
-    # save the examDF to the global environment with the centered data
+    # save the examDF to the global environment
     assign(paste0(examName, "_Data"), examDF, pos=1)
       
   } # end loop over unique exams
