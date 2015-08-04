@@ -120,7 +120,7 @@ pneumoSigProc <- function(x=uniqueExams,
       
     } # end loop over unique series
 
-    # save the examDF to the global environment with the centered data
+    # save the examDF to the global environment
     assign(paste0(examName, "_Data"), examDF, pos=1)
 
   } # end loop over unique exams

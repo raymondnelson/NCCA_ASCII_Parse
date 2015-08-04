@@ -180,7 +180,7 @@ pneumoExtractFn <- function(x=mySegmentLists, y=myEventLists) {
       
       #
       segmentList[[j]] <- segmentDF
-      
+     
     } # end iteration over data frames in each list
     
     names(segmentList) <- segmentNames
