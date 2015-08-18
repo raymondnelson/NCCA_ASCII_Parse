@@ -18,7 +18,7 @@ uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
 
 
 
-# uniqueExams <- uniqueExams[1:2]
+# uniqueExams <- uniqueExams[1]
 
 
 
@@ -43,68 +43,70 @@ cardioSigProc <- function(x=uniqueExams,
   
   uniqueExams <- x
   
-  ########### some private helper functions 
+  ########### some helper functions 
   
-  minPeak <- function(x=chartDF$Cardio1, y=10) {
+  minPeak <- function(x, y) {
     # private function to get the diastolic peaks from the cardio data
     # x input is a time series vector
     # y input is the number of offset samples 
     # buffer will be double the offset value
-    # xOut <- numeric(length=length(x))
-    xOut <- c(1, rep(NA, times=(length(x)-2)), length(x))
-    input_buffer <- x[1:(2*y)]
+    xOut <- rep(NA, times=(length(x)))
+    xOut[1] <- 1
+    xOut[length(xOut)] <- length(xOut)
+    input_buffer <- x[2:(2*y+1)]
     for (i in 2:(length(x)-(2*y))) {
       input_buffer <- c(input_buffer[2:(2*y)], x[i+(2*y)])
-      ifelse(input_buffer[y]==min(input_buffer),
-        { xOut[(i+.5*y):(i+y-2)] <- NA
-          xOut[i+y-1] <- c(i+y-1) }, 
-        next())
+            ifelse(input_buffer[y+1]==min(input_buffer),
+             xOut[i+y+1] <- c(i+y+1), # +1 because we started at 2
+             next()
+             )
     } # end for loop
     return(na.omit(xOut))
   } # end minPeak function
 
   #####
   
-  interpolatePeaks <- function(x, y) {
-    # private function to interpolate between peak segments of time series input data
-    # x is a vector of peak row numbers in the data
-    # y is a vector of peak values in the data
-    peakValDiff <- diff(y)
-    peakOutDiff <- diff(x)
-    peakDivisor <- peakOutDiff
-    peakDivisor[which(peakOutDiff>1)] <- (peakOutDiff[which(peakOutDiff>1)])
-    peakValDiff <- peakValDiff / peakDivisor
-    peakFill <- rep(peakValDiff, times=peakOutDiff)
-    peakFill <- cumsum(peakFill)
-    peakFill[minOut] <- minVal
-    return(peakFill)
-  } # end interpolatePeaks
-  # diastolicInterp <- c(interpolatePeaks(x=minOut, y=minVal),0 )
-  # plot.ts(diastolicInterp, ylim=c(-3,10))
-  
-  #####
-  
-  maxPeak <- function(x=chartDF, y) {
+  maxPeak <- function(x, y) {
     # function to get the diastolic peaks from the cardio data
     # x input is a time series vector
     # y input is the number of offset samples 
     # buffer will be double the offset value
     # xOut <- numeric(length=length(x))
-    xOut <- c(1, rep(NA, times=(length(x)-2)), length(x))
-    input_buffer <- x[1:(2*y)]
+    xOut <- rep(NA, times=(length(x)))
+    xOut[1] <- 1
+    xOut[length(xOut)] <- length(xOut)
+    input_buffer <- x[2:(2*y+1)]
     for (i in 2:(length(x)-(2*y))) {
-      # input buffer changed to [2:length(inpub_buffer)] not [2:(2*y)]
-      input_buffer <- c(input_buffer[2:length(input_buffer)], x[i+(2*y)])
-      ifelse(input_buffer[y]==max(input_buffer),
-        { xOut[(i+.5*y):(i+y-2)] <- NA
-          xOut[i+y-1] <- c(i+y-1) }, 
-        next())
+      input_buffer <- c(input_buffer[2:(2*y)], x[i+(2*y)])
+      ifelse(input_buffer[y+1]==max(input_buffer),
+             xOut[i+y+1] <- c(i+y+1), # +1 because we started at 2
+             next()
+      )
     } # end for loop
     return(na.omit(xOut))
   }  # end maxPeak
   
   #####
   
+  interpolatePeaks <- function(x, y) {
+    # private function to interpolate between peak segments of time series input data
+    # x is a vector of peak row numbers in the data frame
+    # y is a vector of peak row values in the data frame
+    peakOutDiff <- diff(x)
+    peakValDiff <- diff(y)
+    peakDivisor <- peakOutDiff
+    # peakDivisor[which(peakOutDiff>0)] <- (peakOutDiff[which(peakOutDiff>0)])
+    peakValDiff2 <- peakValDiff / peakDivisor
+    peakFill <- rep(peakValDiff2, times=peakOutDiff)
+    peakFill2 <- cumsum(peakFill)
+    # peakFill2[x] <- y # to preserve the exact peak values for verification of the interpolation
+    return(c(y[1], peakFill2))
+  } # end interpolatePeaks
+  # diastolicInterp <- c(interpolatePeaks(x=minOut, y=minVal),0 )
+  # plot.ts(diastolicInterp, ylim=c(-3,10))
+  
+  #####
+
   minMaxPeak <- function(x, y) {
     # private function to get the diastolic peaks from the cardio data
     # x input is a time series vector
@@ -235,16 +237,16 @@ cardioSigProc <- function(x=uniqueExams,
         ####
         
         # use a function to get the min peak rows
-        minOut <- minPeak(x=chartDF$c_Cardio1, y=7)
+        minOut <- minPeak(x=chartDF$c_Cardio1, y=15)
         
         # get the min peak values for the min peak rows
-        minVal <- chartDF$c_Cardio1[minOut]
+        minVal <- chartDF$c_Cardio1[na.omit(minOut)]
         
         # interpolate between the min peak values
-        diastolicInterp <- c(interpolatePeaks(x=minOut, y=minVal),0)
+        diastolicInterp <- interpolatePeaks(x=na.omit(minOut), y=na.omit(minVal))
         # plot.ts(diastolicInterp, ylim=c(-3,10))
         
-        # add diastolic cardio column to each data from in the list
+        # add the vector to the diastolic cardio column 
         chartDF$c_CardioDiastolic <- diastolicInterp[1:nrow(chartDF)]
         # myCardioData2$Diast <- diastolicInterp[1:nrow(myCardioData)]
         # ts.plot(myCardioData2[1:3000,c(1,2,6, 7)])
@@ -252,39 +254,39 @@ cardioSigProc <- function(x=uniqueExams,
         ####
         
         # get the max peak values
-        maxOut <- maxPeak(x=chartDF$c_Cardio1, y=7)
+        maxOut <- maxPeak(x=chartDF$c_Cardio1, y=15)
         
         # get the max peak values
         maxVal <- chartDF$c_Cardio1[maxOut]
         
         # interpolate between max peak values
-        systolicInterp <- c(interpolatePeaks(x=maxOut, y=maxVal),0)
+        systolicInterp <- interpolatePeaks(x=maxOut, y=maxVal)[1:nrow(chartDF)]
         # plot.ts(systolicInterp, ylim=c(-3,10))
         # myCardioData2$CardioSyst <- systolicInterp
         # ts.plot(myCardioData2[1:3000,c(1,2,6)])
         
         # add the systolic time series to the data frame
-        chartDF$c_CardioSystolic <- systolicInterp[1:nrow(chartDF)]
+        chartDF$c_CardioSystolic <- systolicInterp
         
         ####
         
         # compute a min-Max of the cardio time series data
         
         # get the minMax output
-        minMaxOut <- minMaxPeak(x=chartDF$c_Cardio1, y=7)
+        minMaxOut <- minMaxPeak(x=chartDF$c_Cardio1, y=15)
         
         # get the minMax values
         minMaxVal <- chartDF$c_Cardio1[minMaxOut]
         
         # interpolate the minMax values
-        minMaxInterp <- na.omit(c(interpolatePeaks(x=minMaxOut, y=minMaxVal), 0))
+        minMaxInterp <- na.omit(c(interpolatePeaks(x=minMaxOut, y=minMaxVal), 0))[1:nrow(chartDF)]
         # plot.ts(minMaxInterp, ylim=c(-3,10))
         
 #         # adjust the length
 #         minMaxInterp <- c(minMaxInterp, rep(0, times=15))
         
         # add the time series to the data frame
-        chartDF$c_CardioMinMax <- minMaxInterp[1:nrow(chartDF)]
+        chartDF$c_CardioMinMax <- minMaxInterp
         
         #### 
         
