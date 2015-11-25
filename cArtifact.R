@@ -46,7 +46,7 @@ newPArtifactFn<- function(x=uniqueExams, showNames=TRUE, output=FALSE) {
   source('~/Documents/R_programming/NCCA_ASCII_Parse/pneumoSigProcHelper.R', echo=FALSE)
   
   #####
-
+  
   # loop over each exam in the list 
   for(i in 1:length(uniqueExams)) {
     # i=i
@@ -150,7 +150,7 @@ newPArtifactFn<- function(x=uniqueExams, showNames=TRUE, output=FALSE) {
         chartDF$c_UPneumoInh_a[maxAmpChange] <- "Artifact"
         chartDF$c_UPneumoMid_a[minRateChange] <- "Artifact"
         chartDF$c_UPneumoExh_a[minAmpChange] <- "Artifact"
-
+        
         # lower
         
         maxPeaks <- maxPeak(x=chartDF$c_LPneumo, y=7)
@@ -199,26 +199,26 @@ newPArtifactFn<- function(x=uniqueExams, showNames=TRUE, output=FALSE) {
         
         ###
         
-#         # get the pneumo artifacts using Tukey Fences 
-#         
-#         # pneumoAU <- sigChange(x=chartDF$c_UPneumo)
-#         pneumoAU_Inh <- tukeyFence1(x1=chartDF$c_UPneumoInh, x2=chartDF$c_UPneumoMid, inner=3)
-#         # which(pneumoAU_Inh=="X")
-#         pneumoAU_Exh <- tukeyFence1(x1=chartDF$c_UPneumoMid, x2=chartDF$c_UPneumoExh, inner=3)
-#         # which(pneumoAU_Exh=="X")
-#         # print(pneumoAU)
-#         pneumoAL_Inh <- tukeyFence1(x1=chartDF$c_LPneumoInh, x2=chartDF$c_LPneumoMid, inner=3)
-#         # which(pneumoAL_Inh=="X")
-#         pneumoAL_Exh <- tukeyFence1(x1=chartDF$c_LPneumoMid, x2=chartDF$c_LPneumoExh, inner=3)
-#         # which(pneumoAL_Exh=="X")
-#         # pneumoAL <- sigChange(x=chartDF$c_LPneumo)
-#         # print(pneumoAL)
+        #         # get the pneumo artifacts using Tukey Fences 
+        #         
+        #         # pneumoAU <- sigChange(x=chartDF$c_UPneumo)
+        #         pneumoAU_Inh <- tukeyFence1(x1=chartDF$c_UPneumoInh, x2=chartDF$c_UPneumoMid, inner=3)
+        #         # which(pneumoAU_Inh=="X")
+        #         pneumoAU_Exh <- tukeyFence1(x1=chartDF$c_UPneumoMid, x2=chartDF$c_UPneumoExh, inner=3)
+        #         # which(pneumoAU_Exh=="X")
+        #         # print(pneumoAU)
+        #         pneumoAL_Inh <- tukeyFence1(x1=chartDF$c_LPneumoInh, x2=chartDF$c_LPneumoMid, inner=3)
+        #         # which(pneumoAL_Inh=="X")
+        #         pneumoAL_Exh <- tukeyFence1(x1=chartDF$c_LPneumoMid, x2=chartDF$c_LPneumoExh, inner=3)
+        #         # which(pneumoAL_Exh=="X")
+        #         # pneumoAL <- sigChange(x=chartDF$c_LPneumo)
+        #         # print(pneumoAL)
         
-#         # add all the artifacts to both pneumo channels in the data frame - 
-#         chartDF$c_UPneumoInh_a[which(pneumoAU_Inh=="X")] <- "Artifact"
-#         chartDF$c_UPneumoExh_a[which(pneumoAU_Exh=="X")] <- "Artifact"
-#         chartDF$c_LPneumoInh_a[which(pneumoAL_Inh=="X")] <- "Artifact"
-#         chartDF$c_LPneumoExh_a[which(pneumoAL_Exh=="X")] <- "Artifact"
+        #         # add all the artifacts to both pneumo channels in the data frame - 
+        #         chartDF$c_UPneumoInh_a[which(pneumoAU_Inh=="X")] <- "Artifact"
+        #         chartDF$c_UPneumoExh_a[which(pneumoAU_Exh=="X")] <- "Artifact"
+        #         chartDF$c_LPneumoInh_a[which(pneumoAL_Inh=="X")] <- "Artifact"
+        #         chartDF$c_LPneumoExh_a[which(pneumoAL_Exh=="X")] <- "Artifact"
         
         ### save the chartDF to the larger examDF for all charts
         examDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
@@ -238,8 +238,8 @@ newPArtifactFn<- function(x=uniqueExams, showNames=TRUE, output=FALSE) {
 } # end newPArtifactFn()
 
 # newPArtifactFn(x=uniqueExams, showNames=TRUE, output=FALSE)
-  
-  
+
+
 
 
 
