@@ -1,19 +1,20 @@
 # amplitude extract function for EDA and Cardio data
 #
-# 1. compute ROW as the segment before ROWEndRow and after the onset latencyRow 
-# 2. compute the row for all positive slope segments that start in the ROW
-# 3. compute the onset value for the onset of all positive slope segments inside the ROW 
-# 4. locate the row and value for all positive peak points
-# 5. keep only those peaks that occur after the first onset in the ROW
-# 6. keep all peaks in the measurement window
-# 7. keep one additional peak if the slope is + at the end of the measurement window
-# 9. select the max change for each onset and all subsequent peaks
-# 9a. for each onset exclude response peaks after the data descend below the onset value
-# 9b. for each onset exclude response peaks after ROWEndRow if data descend 50% from the previous max peak
-# 10. select the onset and peak with max increase
+# a. define the EW from stimulus onset to endRow
+# b. define the onsetRow as the stimulus onset
+# c. efine the endRow as the end of the EW
+# d. define the ROWEndRow as 5 seconds after verbal answer
+# e. define the latencyRow as .5 seconds after stimulus onset
+# d. define ROW as the segment before ROWEndRow and after the onset latencyRow 
+# 1. locate the row and value for the onset of all positive slope segments that start in the ROW
+# 2. locate the row and value for all positive slope peaks after the first onset inside the ROW
+# 3. option: exclude positive slope segments for which the onset is after the ROWEndRow
+# 4. keep all peaks in the ES plus one additional peak if the slope is + at the end of the EW
+# 5. option: exclude all peaks after the endRow even if the slope is + at the end of the EW
+# 6. exclude changes that occur after the data have descended to a new lower + slope onset value 
+# 7. option: excluded changes that occur after the data have descended 50% from the previous max peak
+# 8. select the max change for each + slope and all subsequent peaks that are not excluded
 # 
-# 
-#
 ######################################
 
 
@@ -25,19 +26,6 @@
 # 
 # mySegmentDF <- get(mySegmentLists)[[3]]
 # myEventDF <- get(myEventLists)[[3]]
-# 
-# # myData <- mySegmentDF$AutoEDA
-# myData <- mySegmentDF$CardioMA
-# 
-# begin <- myEventDF$Begin
-# end <- myEventDF$End
-# answer <- myEventDF$Answer
-# # if(answer == end) answer <- answer+1
-# start <- mySegmentDF$Sample[1]
-# lat <- .5
-# nSmooth <- 4
-# label <- myEventDF$Label
-# segmentName <- paste(mySegmentDF$examName[1], mySegmentDF$chartName[1], myEventDF$Label, sep="_")
 
 
 
@@ -56,25 +44,21 @@
 
 amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strictROW=FALSE, descentStop=FALSE) {
   # function to extract the amplitude of EDA increase in response to a stimulus
-  # input is a list of 9 items including all of the information needed to extract the response
+  # input is a list of 10 items including all of the information needed to extract the response
   # 1. begin is a scalar indicating the row number of the onset of the stimulus
   # 2. end is a scalar indicating the row number of the end of the stimulus
   # 3. answer is a scalar indicating the row number of the verbal answer
-  # 4. start is the starting row number from the chart data frame
-  # 5. Lat is the required latency after stimulus onset before which a responses is not evaluated
-  # 6. segmentName is the name of the stimulus event
-  # 7. nSmooth is the number of samples to smooth and ignore slope changes of small duration
-  # 8. segmentTitle is the full segment name including examName, seriesName, chartName and segmentName
-  # 9. dataVector is is a vector of time series data for a single stimulus segment
-  # prestimSeg is the length of the prestimulus segment in seconds
-  # ROWEnd is the number of seconds after the verbal answer
-  # ROWEnd defines the end of the segment during which a physiological response must begin
-  # onset of physiological response the onset of a positive slope segment during ROW
-  #
-  ####
-  #
-  # 
+  # 4. rowEnd is a scalar indicating the end of ROW in seconds after verbal answer
+  # 5. rate is a scalar that indicates that data rate in samples per second
+  # 6. start is the starting row number from the chart data frame
+  # 7. Lat is the required latency after stimulus onset before which a responses is not evaluated
+  # 8. segmentName is the name of the stimulus event
+  # 9. nSmooth is the number of samples to smooth and ignore slope changes of small duration
+  # 10. segmentTitle is the full segment name including examName, seriesName, chartName and segmentName
+  # 11. dataVector is is a vector of time series data for a single stimulus segment
+
   
+
   ##### helper functions required by amplitudeExtract() #####
   
   # a helper function to determine the positive or negative slope direction 
@@ -189,22 +173,23 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
   } # end positiveOnset function
   
   # helper function to find a change or increase in upward slope variance
-  slopeChange <- function(x=myData, nPre=2, nPost=2, p=.999) {
+  slopeChange <- function(x=myData, nPre=2, nPost=1, p=.997) {
     # function to find a change or increase in positive slope variance
     # useful to infer a response onset when the slope is already positive
     # i=1
     # x input is the vector of time series measurements
     # compare each N seconds with the next N seconds
     # p=.997 will be +3 standard deviations
+    # 10-27-2015 was nPre=1, nPost=.5
     # N is the number of second to evaluate
     # output is a vector of 0s the same length as input and including +1 change in slope energy
     y <- rep(0, times=length(x))
-    preLen <- cps*nPre
-    postLen <- cps*nPost
+    preLen <- dataRate*nPre
+    postLen <- dataRate*nPost
     for (i in 1:(length(y)-(preLen+postLen))) {
       preDiff <- diff(x[i:(i+preLen-1)])
       # require 1 sec of + slope to prevent a response onset after a change in slope during latency
-      if(all(preDiff[(length(preDiff)-cps+1):length(preDiff)] >= 0)) { 
+      if(all(preDiff[(length(preDiff)-((1*dataRate)+1)):length(preDiff)] >= 0)) { 
         postDiff <- c(diff(x[(i+preLen):(i+preLen+postLen-1)]))
         if(mean(postDiff) >= qnorm(p, mean=mean(preDiff), sd=sd(preDiff))) { 
           y[(i+(preLen))] <- 1 
@@ -213,9 +198,10 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
     } # end for loop
     # get the onset using a function to get positve slope onset rows
     y <- positiveOnset(y)
+    # y is now a vector of 0s with the onset of signficant changes in slope 
+    # marked by 1
     return(y)
   } # end slopeChange function
-  # 10-27-2015 was nPre=1, nPost=.5
   
   # helper function to locate the peak of all positive slope sections 
   slopePeak <- function(x=mySlope2) {
@@ -232,7 +218,7 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
   } # end slopePeak function
   
   # function to exclude peaks after the data descend more than a proportion p from the previous highest peak
-  descentProp <- function(x, y=xPeakLoop, z=myData, p=.5, ROWEnd=ROWEndRow) {
+  descentProp <- function(x, y=xPeakLoop, z=myData, dProp=.5, ROWEnd=ROWEndRow) {
     # function to exclude rows after the data descend more than a proportion p
     # from a the previous highest peak after response onset
     # this function is called iteratively in a for loop to select the max change from onset to peak
@@ -247,7 +233,7 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
     yChangeOnset <- x
     xPeakLoop <- y
     myData <- z
-    prop <- p
+    prop <- dProp
     # get the time series values for all peak points
     xPeakLoopValues <- myData[xPeakLoop]
     # compute the difference for each peak - response onset value
@@ -271,16 +257,19 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
     for (i in 1:length(myDiffs)) {
       # make a vector myCutValues for the vector myDiffs
       currentRow <- i + yChangeOnset - 1
-      # myCutValue needs to be 1/2 the diff of the preceeding max peak
+      # check the diff from the preceeding max peak
       myCutValue <- ifelse(length(which(xPeakLoop <= currentRow)) > 0,
                            max(cutValues[which(xPeakLoop <= currentRow)]),
                            0 )
+      
       # 10-15-2015 replaced by the better version in the preceeding 3 lines    
       #     ifelse(length(which(xPeakLoop <= currentRow)) > 0,
       #            myCutValue <- max(cutValues[which(xPeakLoop <= currentRow)]),
       #            myCutValue <- 0 )
+      
       # use i to check the max preceeding diff
       # # if(myDiffs[i] <  myCutValue) { cutVector[i] <- myCutValue }
+      
       # cutVector is the proportion p of the difference between the previous max peak and response onset value
       cutVector[i] <- myCutValue
     } # end for loop to make the cutVector
@@ -300,88 +289,17 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
     #
   } # end descentProp function
   
-  # descentPropROW # not used
-#####  
-#   # function to exclude peaks after the data descend more than a proportion p from the previous highest peak
-#   descentPropROW <- function(x, y=xPeakLoop, z=myData, p=.5, ROWEnd=ROWEndRow) {
-#     # function to exclude rows after the data descend more than a proportion p
-#     # from a the previous highest peak after response onset
-#     # this function is called iteratively in a for loop to select the max change from onset to peak
-#     # while excluding peaks that occur after the data have descended
-#     # more than a proportion p from a previous highest peak
-#     # x is a vector of a single reponse onset row index (x is a scalar)
-#     # y is a is a vector of peak indices (prior to decsent below the onset value)
-#     # z is a vector of time series values
-#     # p is a proportion for which the data are evaluated if it descend below p
-#     # for the prior maximum response peak value - response onset value 
-#     #
-#     yChangeOnset <- x
-#     xPeakLoop <- y
-#     myData <- z
-#     prop <- p
-#     # get the time series values for all peak points
-#     xPeakLoopValues <- myData[xPeakLoop]
-#     # compute the difference for each peak - response onset value
-#     xPeakLoopDiffs <- xPeakLoopValues - myData[yChangeOnset]
-#     # determine the cut value for each peak
-#     cutValues <- prop * xPeakLoopDiffs
-#     # get the vector of time series values after response onset
-#     myValues <- myData[(yChangeOnset+1):length(myData)]
-#     # myValues <- myData[(yChangeOnset+1):ROWEnd] # 10-15-2015 to end the 50% rule at ROWEnd
-#     # compute the difference for all time series values after response onset
-#     myDiffs <- myValues - myData[yChangeOnset]
-#     # make a vector of the slope direction for all time series samples after response onset
-#     mySlope <- c( 0, ifelse( diff(myValues)>0, 
-#                              1, 
-#                              ifelse(diff(myValues)<0, 
-#                                     -1, 0) ) )
-#     # look for descending myValues that are less than the cutValues for previous peaks
-#     # make an empty vector
-#     cutVector <- numeric(length=length(myDiffs))
-#     # populate the cutVector
-#     for (i in 1:length(myDiffs)) {
-#       # make a vector myCutValues for the vector myDiffs
-#       currentRow <- i + yChangeOnset - 1
-#       # myCutValue needs to be 1/2 the diff of the preceeding max peak
-#       myCutValue <- ifelse(length(which(xPeakLoop <= currentRow)) > 0,
-#                            max(cutValues[which(xPeakLoop <= currentRow)]),
-#                            0 )
-#       # 10-15-2015 replaced by the better version in the preceeding 3 lines    
-#       #     ifelse(length(which(xPeakLoop <= currentRow)) > 0,
-#       #            myCutValue <- max(cutValues[which(xPeakLoop <= currentRow)]),
-#       #            myCutValue <- 0 )
-#       # use i to check the max preceeding diff
-#       # # if(myDiffs[i] <  myCutValue) { cutVector[i] <- myCutValue }
-#       # cutVector is the proportion p of the difference between the previous max peak and response onset value
-#       cutVector[i] <- myCutValue
-#     } # end for loop to make the cutVector
-#     # print(cutVector)
-#     # use only descending slope segments
-#     descRows <- which(mySlope == -1)
-#     # ignore the first several descending rows to avoid over sensitivity to high frequency noise
-#     cutVector <- c(rep(0, time=90), cutVector[91:length(cutVector)])
-#     # determine the descending rows that are smaller than the corresponding index in cutVector
-#     cutRows <- descRows[myDiffs[descRows] < cutVector[descRows]]
-#     # use the first row index smaller than cutVector as the stopRow after which data are not used
-#     stopRow2 <- cutRows[1] + yChangeOnset - 1
-#     # use the last row in the data vector of stopRow2 is NA
-#     if(is.na(stopRow2) == TRUE) stopRow2 <- length(myData)
-#     # return a scalar with the stop row after which peaks are excluded 
-#     return(stopRow2)
-#     #
-#   } # end descentPropROW function
-  #
-  #
-  #
-  ##### end of helper function #####
-  #
+  ##### end of helper functions #####
+  
   ########
   #
   # get the information from the input list
   Begin <- as.numeric(extractList$begin)
   End <- as.numeric(extractList$end)
   Answer <- as.numeric(extractList$answer)
+  dataRate <- as.numeric(extractList$rate)
   Lat <- as.numeric(extractList$lat)
+  ROWEnd <- as.numeric(extractList$ROWEnd)
   startRow <- as.numeric(extractList$start)
   segmentName <- extractList$segmentName
   nSmooth <- as.numeric(extractList$nSmooth)
@@ -390,22 +308,21 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
   #  
   DFRows <- length(myData)
   #
-  # prestimRow <- eventDF$Begin - (startRow-1) - (cps*prestimSeg)
-  prestimRow <- Begin - (startRow-1) - (cps*prestimSeg) # first row of the time series vector
+  prestimRow <- Begin - (startRow-1) - (dataRate*prestimSeg) # first row of the time series vector
   # correction for prestimRow values < 1
   if(prestimRow<=0) prestimRow <- 1
   onsetRow <- Begin - (startRow-1) # onset of the stimulus in the time series vector
-  endRow <- onsetRow + (cps*measuredSeg) - 1 # end of the measurement window
+  endRow <- onsetRow + (dataRate*measuredSeg) - 1 # end of the measurement window
   # correction if endRow > DFRows
   if(endRow > DFRows) endRow <- DFRows
   offsetRow <- End - (startRow-1) # end of the question stimulus
-  latRow <- onsetRow + cps*Lat # repsonse latency period
+  latRow <- onsetRow + dataRate*Lat # repsonse latency period
   if(latRow >= (endRow-4)) latRow <- DFRows - 4
   if(offsetRow >= (endRow-2)) offsetRow <- DFRows - 2
   answerRow <- Answer - (startRow-1) # verbal answer
   # correction if there is no answer (answer row will be the same as offsetRow)
   if(answerRow==offsetRow) answerRow <- offsetRow + 1
-  ROWEndRow <- answerRow + (cps*ROWEnd) # typically 5 seconds after the verbal answer
+  ROWEndRow <- answerRow + (dataRate*ROWEnd) # typically 5 seconds after the verbal answer
   # correction if ROWEndRow > DFRows
   if(ROWEndRow > (DFRows-3)) ROWEndRow <- DFRows - 3
   #
@@ -496,8 +413,9 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
   #
   # Keep only those slope peaks that are >= the xOnset row
   xPeak <- xPeak[xPeak >= xOnset[1]]
+  xPeakVal <- myData[xPeak] 
+  # same effect as the line above
   # xPeakVal <- xPeakVal[which(xPeak >= xOnset[1])]
-  xPeakVal <- myData[xPeak] # same effect as the line a ove
   #
   ###############################
   #
@@ -578,7 +496,7 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
     # to the response onset level 
     stopRow2 <- length(myData) # to ensure this works when descentStop==FALSE
     if(descentStop==TRUE) {
-      stopRow2 <- descentProp(x=xOnset[i], y=xPeakLoop, z=myData, p=.5, ROWEnd=ROWEndRow)
+      stopRow2 <- descentProp(x=xOnset[i], y=xPeakLoop, z=myData, dProp=.5, ROWEnd=ROWEndRow)
       if(is.na(stopRow2)) stopRow2 <- length(myData)
     }
     #
