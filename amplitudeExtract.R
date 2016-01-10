@@ -510,19 +510,30 @@ amplitudeExtract <- function(extractList=extractList, strictWindow=FALSE, strict
            { xPeak <- xPeak[1:(length(which(xPeak <= ROWEndRow)) + 1)] }, 
            # this will keep only those xPeak indices that are less than ROWEndRow
            # of the slope is not = at ROWEndRow 
-           { xPeak <- xPeak[xPeak <= ROWEndRow] } ) }
+           { xPeak <- xPeak[xPeak <= ROWEndRow] } 
+           ) 
+    }
   xPeakVal <- myData[xPeak]
   #
   ###############################
   #
   # keep only those slope peaks that are <= endRow (end of measurement window)
-  if(strictWindow != TRUE) { # use TRUE to stop responses at the end of the measurement window
-    ifelse(xOnset[1] <= ROWEndRow,
-      { ifelse(posSlope[endRow] == 1,
-             { xPeak <- xPeak[1:(length(which(xPeak <= endRow)) + 1)] },  
-             # if not + at endRow only peaks < endRow are retained
-             { xPeak <- xPeak[xPeak <= endRow] } ) },
-    { xPeak <- xPeak[xPeak <= endRow] } ) }
+  ifelse(strictWindow == FALSE,
+         { # use TRUE to stop responses at the end of the measurement window
+           ifelse(xOnset[1] <= ROWEndRow, # check to see if there is at least one onset in the ROW
+                  # keep xPeak <= endRow plus one additional xPeak if the slope is + at the end of EW 
+                  { ifelse(posSlope[endRow] == 1,
+                           { xPeak <- xPeak[1:(length(which(xPeak <= endRow)) + 1)] },  
+                           # if not + slope at endRow only peaks < endRow are retained
+                           { xPeak <- xPeak[xPeak <= endRow] } ) },
+                  # if no XPeak rows are less than ROWEndRow then keep only xPeaks less than endRow
+                  # this is to prevent unexpectedly keeping an additional peak when there is no onset in the ROW
+                  { xPeak <- xPeak[xPeak <= endRow] } 
+           ) 
+         },
+         # if strictWindow == TRUE we keep only those xPeaks that are before endRow
+         { xPeak <- xPeak[xPeak <= endRow] }
+  ) # modified 1/9/2016 
   xPeak <- as.numeric(na.omit(xPeak))
   # xPeakVal <- as.numeric(na.omit(xPeakVal)) # not needed
   xPeakVal <- myData[xPeak]
