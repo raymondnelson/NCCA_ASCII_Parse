@@ -67,13 +67,11 @@ cardioSigProc <- function(x=uniqueExams,
     examDF$c_CardioDiastolic <- rep(0, times=nrow(examDF))
     examDF$c_CardioMinMax <- rep(0, times=nrow(examDF))
     examDF$c_CardioMA <- rep(0, times=nrow(examDF))
+    examDF$c_CardioMid <- rep(0, times=nrow(examDF))
     examDF$c_CardioAmp <- rep(0, times=nrow(examDF)) 
     
     # get the names of unique series
     uniqueSeries <- as.character(unique(examDF$seriesName))
-    
-    # make an empty list to hold the output
-#    outputList <- NULL
     
     # loop over each unique series
     for(j in 1:length(uniqueSeries)) {
@@ -113,7 +111,7 @@ cardioSigProc <- function(x=uniqueExams,
         chartDF$c_Cardio1 <- fixPeak(x=chartDF$c_Cardio1, times=2)
         
         # use a function to get the min peak rows
-        minOut <- minPeak(x=chartDF$c_Cardio1, y=8)
+        minOut <- minPeak(x=chartDF$c_Cardio1, y=round(.25*cps,0))
         
         # get the min peak values for the min peak rows
         minVal <- chartDF$c_Cardio1[na.omit(minOut)]
@@ -132,7 +130,7 @@ cardioSigProc <- function(x=uniqueExams,
         ####
         
         # get the max peak values
-        maxOut <- maxPeak(x=chartDF$c_Cardio1, y=8)
+        maxOut <- maxPeak(x=chartDF$c_Cardio1, y=round(.25*cps,0))
         
         # get the max peak values
         maxVal <- chartDF$c_Cardio1[maxOut]
@@ -152,7 +150,7 @@ cardioSigProc <- function(x=uniqueExams,
         # compute a min-Max of the cardio time series data
         
         # get the minMax output
-        minMaxOut <- minMaxPeakFn(x=chartDF$c_Cardio1, y=8)
+        minMaxOut <- minMaxPeakFn(x=chartDF$c_Cardio1, y=round(.25*cps,0))
         
         # get the minMax values
         minMaxVal <- chartDF$c_Cardio1[minMaxOut]
@@ -168,15 +166,19 @@ cardioSigProc <- function(x=uniqueExams,
         #### 
         
         # compute the smoothed cardio dta
-        smoothedCardio <- cardioSmooth1(x=chartDF$c_Cardio1, y=15, times=3)
-        
-        # plot.ts(smoothedCardio[1:3000], ylim=c(-3,10))
+        # smoothedCardio <- cardioSmooth1(x=chartDF$c_Cardio1, y=round(.5*cps,0), times=3)
         
         # add the smoothed cardio to the time series data frame
-        chartDF$c_CardioMA <- smoothedCardio[1:nrow(chartDF)]
+        # chartDF$c_CardioMid <- smoothedCardio[1:nrow(chartDF)]
+        chartDF$c_CardioMid <- cardioSmooth1(x=chartDF$c_Cardio1, y=round(.5*cps,0), times=3)
         
+        # plot.ts(chartDF$c_CardioMid[1:3000], ylim=c(-3,10))
         # myCardioData2$CardioMA <- smoothedCardio[1:nrow(myCardioData)]
         # ts.plot(myCardioData2[1:3000,c(1,2,6, 7)])
+        
+        # compute a more stable moving average for the cardio data
+        # to help with evaluation of stability of the data
+        chartDF$c_CardioMA <- cardioSmooth1(x=chartDF$c_CardioMid, y=round(5*cps,0), times=1)
         
         # add the cardio pulse amplitude to the time series data frame
         chartDF$c_CardioAmp <- chartDF$c_CardioSystolic - chartDF$c_CardioDiastolic
