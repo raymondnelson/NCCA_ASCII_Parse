@@ -118,14 +118,13 @@ applyFilter <- function(x=uniqueExams,
         chartDF$c_AutoEDA <- lowPass.2(x=chartDF$c_AutoEDA)
 
         # compute the moving average to show the tonic EDL activity
-        chartDF$c_AutoEDAMid <- MASmooth(x=chartDF$c_AutoEDA, y=7.5*cps, times=10) # was y=150, times=6 11/26/2015
+        chartDF$c_AutoEDAMid <- MASmooth(x=chartDF$c_AutoEDA, y=round(7.5*cps,0), times=10) # was y=150, times=6 11/26/2015
         
         # compute  the response peaks and interpolated peak lines
-        
-        chartDF$c_AutoEDAPeak <- interpolatePeaks(x=maxPeak(x=chartDF$c_AutoEDA, y=1.333*cps), 
-                                                  y=chartDF$c_AutoEDA[maxPeak(x=chartDF$c_AutoEDA, y=40)])
-        chartDF$c_AutoEDABase <- interpolatePeaks(x=minPeak(x=chartDF$c_AutoEDA, y=1.333*cps), 
-                                                  y=chartDF$c_AutoEDA[minPeak(x=chartDF$c_AutoEDA, y=40)])
+        chartDF$c_AutoEDAPeak <- interpolatePeaks(x=maxPeak(x=chartDF$c_AutoEDA, y=round(1.333*cps,0)), 
+                                                  y=chartDF$c_AutoEDA[maxPeak(x=chartDF$c_AutoEDA, y=round(1.333*cps,0))])
+        chartDF$c_AutoEDABase <- interpolatePeaks(x=minPeak(x=chartDF$c_AutoEDA, y=round(1.333*cps,0)), 
+                                                  y=chartDF$c_AutoEDA[minPeak(x=chartDF$c_AutoEDA, y=round(1.333*cps,0))])
         
         # save the chartDF to the seriesDF
         seriesDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF

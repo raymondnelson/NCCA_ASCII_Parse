@@ -11,7 +11,7 @@
 
 # function to smooth the EDA data to the midpoint
 
-MASmooth <- function(x=myData, y=7.5*cps, times=10) {
+MASmooth <- function(x=myData, y=round(7.5*cps,0), times=10) {
   # private function to calculate a smoothed average of the time series data
   # x input is a time series vector
   # y input is the number of offset samples
@@ -61,7 +61,7 @@ tukeyFence1 <- function(x=myPLE$c_PL, y=myMaxPeaks, z=5) {
   return(xOut)
 } # end tukeyFence1 function
 
-minPeak <- function(x, y=1.333*cps) {
+minPeak <- function(x, y=round(1.333*cps,0)) {
   # private function to get the response peaks from the pneumo data
   # will keep the index number of min peak samples
   # x input is a time series vector
@@ -82,7 +82,7 @@ minPeak <- function(x, y=1.333*cps) {
   return(as.numeric(na.omit(xOut)))
 } # end minPeak function
 
-maxPeak <- function(x, y=1.333*cps) {
+maxPeak <- function(x, y=round(1.333*cps,0)) {
   # function to get the response peaks from the EDA data
   # will keep the index number of max peak samples
   # x input is a time series vector
