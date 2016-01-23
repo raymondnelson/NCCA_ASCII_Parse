@@ -20,17 +20,8 @@
 
 # get exam names from the _Data data frames
 # uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
-
-
-
 # uniqueExams <- uniqueExams[1]
-
-
-
-
-
-
-
+  
 
 
 #########################
@@ -65,9 +56,7 @@ cardioSigProc <- function(x=uniqueExams,
     
     # get the names of time series lists for all unique series in each exam
     searchString <- paste0("*", examName, "_Data", "*")
-    # uniqueSeries <- ls(pattern=glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
-    # uniqueSeries <- ls(pattern=glob2rx(searchString), pos=1)
-    
+
     examDF <- get(glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
     
     examStartRow <- 1
@@ -94,34 +83,32 @@ cardioSigProc <- function(x=uniqueExams,
       if(showNames==TRUE) print(paste("series", seriesName))
       
       # get the time series data for the series
-      # seriesDF <- get(uniqueSeries[j], pos=1)
       seriesDF <- examDF[examDF$seriesName==uniqueSeries[j],]
       
       seriesOnsetRow <- which(examDF$seriesName==uniqueSeries[j])[1]
       seriesEndRow <- seriesOnsetRow + nrow(seriesDF) - 1
       
       # get the naems of unique charts
-      # uniqueCharts <- names(seriesDF)
       uniqueCharts <- as.character(unique(seriesDF$chartName))
       
       # loop over each chart in the series 
       # k=1
       for(k in 1:length(uniqueCharts)) {
         # get the data frame with the time series data for each chart in the series
-        # chartDF <- seriesDF[[k]]
         chartName <- uniqueCharts[k]
         
         chartDF <- seriesDF[seriesDF$chartName==uniqueCharts[k],]
         
         if(showNames==TRUE) print(chartName)
         
-        # chartOnsetRow <- which(examDF$chartName==uniqueCharts[k])[1]
         chartOnsetRow <- which(seriesDF$chartName==uniqueCharts[k])[1]
         chartEndRow <- chartOnsetRow + nrow(chartDF) - 1
         
         ####
         
         # first ensure that all peaks are recorded on a single sample
+        # because there are rare times in which the time series reduction 
+        # can result in a peak value over 2 adjacent samples
         # interpolate duplicated peak points
         chartDF$c_Cardio1 <- fixPeak(x=chartDF$c_Cardio1, times=2)
         
@@ -133,10 +120,12 @@ cardioSigProc <- function(x=uniqueExams,
         
         # interpolate between the min peak values
         diastolicInterp <- interpolatePeaks(x=na.omit(minOut), y=na.omit(minVal))
+
         # plot.ts(diastolicInterp, ylim=c(-3,10))
         
         # add the vector to the diastolic cardio column 
         chartDF$c_CardioDiastolic <- diastolicInterp[1:nrow(chartDF)]
+
         # myCardioData2$Diast <- diastolicInterp[1:nrow(myCardioData)]
         # ts.plot(myCardioData2[1:3000,c(1,2,6, 7)])
         
@@ -150,6 +139,7 @@ cardioSigProc <- function(x=uniqueExams,
         
         # interpolate between max peak values
         systolicInterp <- interpolatePeaks(x=maxOut, y=maxVal)[1:nrow(chartDF)]
+
         # plot.ts(systolicInterp, ylim=c(-3,10))
         # myCardioData2$CardioSyst <- systolicInterp
         # ts.plot(myCardioData2[1:3000,c(1,2,6)])
@@ -169,10 +159,8 @@ cardioSigProc <- function(x=uniqueExams,
         
         # interpolate the minMax values
         minMaxInterp <- na.omit(c(interpolatePeaks(x=minMaxOut, y=minMaxVal), 0))[1:nrow(chartDF)]
-        # plot.ts(minMaxInterp, ylim=c(-3,10))
         
-#         # adjust the length
-#         minMaxInterp <- c(minMaxInterp, rep(0, times=15))
+        # plot.ts(minMaxInterp, ylim=c(-3,10))
         
         # add the time series to the data frame
         chartDF$c_CardioMinMax <- minMaxInterp
@@ -181,10 +169,12 @@ cardioSigProc <- function(x=uniqueExams,
         
         # compute the smoothed cardio dta
         smoothedCardio <- cardioSmooth1(x=chartDF$c_Cardio1, y=15, times=3)
+        
         # plot.ts(smoothedCardio[1:3000], ylim=c(-3,10))
         
         # add the smoothed cardio to the time series data frame
         chartDF$c_CardioMA <- smoothedCardio[1:nrow(chartDF)]
+        
         # myCardioData2$CardioMA <- smoothedCardio[1:nrow(myCardioData)]
         # ts.plot(myCardioData2[1:3000,c(1,2,6, 7)])
         
@@ -193,21 +183,10 @@ cardioSigProc <- function(x=uniqueExams,
         
         #####
         
-        # save the chartDF in the output list
-        # outputList[[k]] <- chartDF
-
-        # save the chartDF to the examDF
-        # examDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
         # save the chartDF to the seriesDF
         seriesDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
         
       } # end for loop over each k chart in each series
-      
-      # name the data frames in the ouput list
-      # names(outputList) <- uniqueCharts
-      
-#     # save the list for the unique series
-#     assign(uniqueSeries[j], seriesDF, pos=1)
       
       # save the seriesDF to the examDF
       examDF[seriesOnsetRow:(seriesOnsetRow+nrow(seriesDF)-1),] <- seriesDF 
@@ -227,9 +206,7 @@ cardioSigProc <- function(x=uniqueExams,
 } # end cardioSicProg function
 
 
-####
-
-# call the function to recursively apply the filters
+# call the function to recursively apply the filters to all uniqueExams
 # cardioSigProc(x=uniqueExams, output=FALSE, showNames=TRUE)
 
 
