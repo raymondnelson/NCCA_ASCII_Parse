@@ -1,21 +1,26 @@
 # function to process the time series pneumograph data
-
+#
 # data should be centered at onset zero for these filters to work
+#
+###########################
 
 
 
-library(stringr)
+# library(stringr)
 
 
 
 # get exam names from the _Data data frames
-uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
+# uniqueExams <- unique(str_sub(ls(pattern="*_Data$", pos=1),1, -6))
+# uniqueExams <- uniqueExams[2]
 
 
 
-# uniqueExams <- uniqueExams[1:2]
+###
 
 
+
+######################################
 
 pneumoSigProc <- function(x=uniqueExams, 
                         output=FALSE, 
@@ -33,14 +38,14 @@ pneumoSigProc <- function(x=uniqueExams,
   
   ###
   
+  uniqueExams <- x
+  
   # source the scripts for the DSP filters
   source('~/Documents/R_programming/NCCA_ASCII_Parse/lowPass.886.R', echo=TRUE)
-  source('~/Documents/R_programming/NCCA_ASCII_Parse/MASmooth.R', echo=TRUE)
-  source('~/Documents/R_programming/NCCA_ASCII_Parse/tsVar.R', echo=TRUE)
+#   source('~/Documents/R_programming/NCCA_ASCII_Parse/MASmooth.R', echo=TRUE)
   
-  ###
-  
-  uniqueExams <- x
+  # source the maxPeak, minPeak and interpolatePeaks functions
+  source('~/Documents/R_programming/NCCA_ASCII_Parse/pneumoSigProcHelper.R', echo=TRUE)
   
   # loop over each exam in the list 
   # i=1
@@ -52,30 +57,40 @@ pneumoSigProc <- function(x=uniqueExams,
     
     # get the names of time series lists for all unique series in each exam
     searchString <- paste0("*", examName, "_Data", "*")
-    # uniqueSeries <- ls(pattern=glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
-    # uniqueSeries <- ls(pattern=glob2rx(searchString), pos=1)
     
     examDF <- get(glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
     
-    # add 2 new columns for the processed pneumoData
-    examDF$c_UPneumoS <- rep(0, times=nrow(examDF))
-    examDF$c_LPneumoS <- rep(0, times=nrow(examDF))
+    examStartRow <- 1
+    examEndRow <- nrow(examDF)
+    
+    # add new columns for the processed pneumo Data
+    examDF$c_UPneumoDiff <- rep(0, times=nrow(examDF))
+    examDF$c_LPneumoDiff <- rep(0, times=nrow(examDF))
+    examDF$c_PneumoDiff <- rep(0, times=nrow(examDF))
+    examDF$c_UPneumoMid <- rep(0, times=nrow(examDF))
+    examDF$c_LPneumoMid <- rep(0, times=nrow(examDF))
+    examDF$c_UPneumoInh <- rep(0, times=nrow(examDF))
+    examDF$c_LPneumoInh <- rep(0, times=nrow(examDF))
+    examDF$c_UPneumoExh <- rep(0, times=nrow(examDF))
+    examDF$c_LPneumoExh <- rep(0, times=nrow(examDF))
     
     # get the names of unique series
     uniqueSeries <- as.character(unique(examDF$seriesName))
     
     # make an empty list to hold the output
-    outputList <- NULL
+#    outputList <- NULL
     
     # loop over each unique series
-    # j=1
+    # j=3
     for(j in 1:length(uniqueSeries)) {
       
       if(showNames==TRUE) print(paste("series", uniqueSeries[j]))
       
       # get the list of time series data for the charts in the exam
-      # seriesDF <- get(uniqueSeries[j], pos=1)
       seriesDF <- examDF[examDF$seriesName==uniqueSeries[j],]
+      
+      seriesOnsetRow <- which(examDF$seriesName==uniqueSeries[j])[1]
+      seriesEndRow <- seriesOnsetRow + nrow(seriesDF) - 1
       
       # uniqueCharts <- names(seriesDF)
       uniqueCharts <- as.character(unique(seriesDF$chartName))
@@ -84,46 +99,55 @@ pneumoSigProc <- function(x=uniqueExams,
       # k=1
       for(k in 1:length(uniqueCharts)) {
         # get the data frame with the time series data for each chart in the series
-        # chartDF <- seriesDF[[k]]
-        chartDF <- examDF[examDF$chartName==uniqueCharts[k],]
+        chartDF <- seriesDF[seriesDF$chartName==uniqueCharts[k],]
         
         if(showNames==TRUE) print(uniqueCharts[k])
         
-        chartOnsetRow <- which(examDF$chartName==uniqueCharts[k])[1]
+        chartOnsetRow <- which(seriesDF$chartName==uniqueCharts[k])[1]
+        chartEndRow <- chartOnsetRow + nrow(chartDF) - 1
+        
+        #########
+        
+        chartDF$c_UPneumo <- lowPass.886(x=chartDF$c_UPneumo)
+        chartDF$c_LPneumo <- lowPass.886(x=chartDF$c_LPneumo)
         
         # apply the filter functions to the data frame columns
         
-        chartDF$c_UPneumoS <- lowPass.886(x=chartDF$c_UPneumo)
-        chartDF$c_LPneumoS <- lowPass.886(x=chartDF$c_LPneumo)
+        chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumo, y=5*cps, times=12) # was y=40, times=8 11/19/2015
+        chartDF$c_UPneumoInh <- interpolatePeaks(x=maxPeak(x=chartDF$c_UPneumo, y=40), 
+                                                 y=chartDF$c_UPneumo[maxPeak(x=chartDF$c_UPneumo, y=40)])
+        chartDF$c_UPneumoExh <- interpolatePeaks(x=minPeak(x=chartDF$c_UPneumo, y=40), 
+                                                 y=chartDF$c_UPneumo[minPeak(x=chartDF$c_UPneumo, y=40)])
+        chartDF$c_LPneumoMid <- MASmooth(x=chartDF$c_LPneumo, y=5*cps, times=12)
+        chartDF$c_LPneumoInh <- interpolatePeaks(x=maxPeak(x=chartDF$c_LPneumo, y=40), 
+                                                 y=chartDF$c_LPneumo[maxPeak(x=chartDF$c_LPneumo, y=40)])
+        chartDF$c_LPneumoExh <- interpolatePeaks(x=minPeak(x=chartDF$c_LPneumo, y=40), 
+                                                 y=chartDF$c_LPneumo[minPeak(x=chartDF$c_LPneumo, y=40)])
         
-#         chartDF$UPneumoMean <- tsMean(x=chartDF$UPneumoS)
-#         chartDF$UPneumoVar <- tsVar(x=chartDF$UPneumoS)
-#         
-#         chartDF$LPneumoMean <- tsMean(x=chartDF$LPneumoS)
-#         chartDF$LPneumoVar <- tsVar(x=chartDF$LPneumoS)
+        #########
         
-        # plot.ts()
+        chartDF$c_UPneumoDiff <- chartDF$c_UPneumoInh - chartDF$c_UPneumoExh
+        chartDF$c_LPneumoDiff <- chartDF$c_LPneumoInh - chartDF$c_LPneumoExh
         
-        # save the result to the list
-        outputList[[k]] <- chartDF
+        # chartDF$c_PneumoDiff <- chartDF$c_UPneumoMid - chartDF$c_LPneumoMid
+        chartDF$c_PneumoDiff <- chartDF$c_UPneumo - chartDF$c_LPneumo
         
-        # save the chartDF to the examDF
-        examDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
+        # save the chartDF to the seriesDF
+        seriesDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
 
-      } # end for loop over each chart in each series
+      } # end for loop over each k chart in each series
       
-      # name the data frames in the ouput list
-      names(outputList) <- uniqueCharts
-
-#       # save the list for the unique series
-#       assign(uniqueSeries[j], seriesDF, pos=1)
+      # save the seriesDF to the examDF
+      examDF[seriesOnsetRow:(seriesOnsetRow+nrow(seriesDF)-1),] <- seriesDF 
       
-    } # end loop over unique series
+    } # end loop over j unique series
 
     # save the examDF to the global environment
     assign(paste0(examName, "_Data"), examDF, pos=1)
 
-  } # end loop over unique exams
+  } # end loop over i unique exams
+  
+  if(showNames==TRUE) print(paste(i, "exams processed"))
   
   # return the last
   if(output==TRUE) return(examDF) 
@@ -133,7 +157,7 @@ pneumoSigProc <- function(x=uniqueExams,
 ####
 
 # call the function to recursively apply the filters
-pneumoSigProc(x=uniqueExams, output=FALSE, showNames=TRUE)
+# pneumoSigProc(x=uniqueExams, output=FALSE, showNames=TRUE)
 
 
 
