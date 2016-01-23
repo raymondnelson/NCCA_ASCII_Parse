@@ -92,7 +92,6 @@ pneumoSigProc <- function(x=uniqueExams,
       seriesOnsetRow <- which(examDF$seriesName==uniqueSeries[j])[1]
       seriesEndRow <- seriesOnsetRow + nrow(seriesDF) - 1
       
-      # uniqueCharts <- names(seriesDF)
       uniqueCharts <- as.character(unique(seriesDF$chartName))
       
       # loop over each chart in the series 
@@ -114,15 +113,15 @@ pneumoSigProc <- function(x=uniqueExams,
         # apply the filter functions to the data frame columns
         
         chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumo, y=5*cps, times=12) # was y=40, times=8 11/19/2015
-        chartDF$c_UPneumoInh <- interpolatePeaks(x=maxPeak(x=chartDF$c_UPneumo, y=40), 
-                                                 y=chartDF$c_UPneumo[maxPeak(x=chartDF$c_UPneumo, y=40)])
-        chartDF$c_UPneumoExh <- interpolatePeaks(x=minPeak(x=chartDF$c_UPneumo, y=40), 
-                                                 y=chartDF$c_UPneumo[minPeak(x=chartDF$c_UPneumo, y=40)])
+        chartDF$c_UPneumoInh <- interpolatePeaks(x=maxPeak(x=chartDF$c_UPneumo, y=1.333*cps), 
+                                                 y=chartDF$c_UPneumo[maxPeak(x=chartDF$c_UPneumo, y=1.333*cps)])
+        chartDF$c_UPneumoExh <- interpolatePeaks(x=minPeak(x=chartDF$c_UPneumo, y=1.333*cps), 
+                                                 y=chartDF$c_UPneumo[minPeak(x=chartDF$c_UPneumo, y=1.333*cps)])
         chartDF$c_LPneumoMid <- MASmooth(x=chartDF$c_LPneumo, y=5*cps, times=12)
-        chartDF$c_LPneumoInh <- interpolatePeaks(x=maxPeak(x=chartDF$c_LPneumo, y=40), 
-                                                 y=chartDF$c_LPneumo[maxPeak(x=chartDF$c_LPneumo, y=40)])
-        chartDF$c_LPneumoExh <- interpolatePeaks(x=minPeak(x=chartDF$c_LPneumo, y=40), 
-                                                 y=chartDF$c_LPneumo[minPeak(x=chartDF$c_LPneumo, y=40)])
+        chartDF$c_LPneumoInh <- interpolatePeaks(x=maxPeak(x=chartDF$c_LPneumo, y=1.333*cps), 
+                                                 y=chartDF$c_LPneumo[maxPeak(x=chartDF$c_LPneumo, y=1.333*cps)])
+        chartDF$c_LPneumoExh <- interpolatePeaks(x=minPeak(x=chartDF$c_LPneumo, y=1.333*cps), 
+                                                 y=chartDF$c_LPneumo[minPeak(x=chartDF$c_LPneumo, y=1.333*cps)])
         
         #########
         
