@@ -61,7 +61,7 @@ tukeyFence1 <- function(x=myPLE$c_PL, y=myMaxPeaks, z=5) {
   return(xOut)
 } # end tukeyFence1 function
 
-minPeak <- function(x, y=40) {
+minPeak <- function(x, y=1.333*cps) {
   # private function to get the response peaks from the pneumo data
   # will keep the index number of min peak samples
   # x input is a time series vector
@@ -82,7 +82,7 @@ minPeak <- function(x, y=40) {
   return(as.numeric(na.omit(xOut)))
 } # end minPeak function
 
-maxPeak <- function(x, y=40) {
+maxPeak <- function(x, y=1.333*cps) {
   # function to get the response peaks from the EDA data
   # will keep the index number of max peak samples
   # x input is a time series vector
