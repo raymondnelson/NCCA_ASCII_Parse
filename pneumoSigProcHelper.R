@@ -4,7 +4,7 @@
 # maxPeak
 # interpolatePeaks
 
-minPeak <- function(x, y=40) {
+minPeak <- function(x, y=round(1.333*cps,0)) {
   # private function to get the cyclic peaks from the pneumo data
   # will keep the index number of min peak samples
   # x input is a time series vector
@@ -25,7 +25,7 @@ minPeak <- function(x, y=40) {
   return(as.numeric(na.omit(xOut)))
 } # end minPeak function
 
-maxPeak <- function(x, y=40) {
+maxPeak <- function(x, y=round(1.333*cps,0)) {
   # function to get the cyclic peaks from the pneumo data
   # will keep the index number of max peak samples
   # x input is a time series vector
@@ -66,7 +66,7 @@ interpolatePeaks <- function(x=minIndices, y=minVals) {
 
 # was y=40, times=8
 # was y=75, times=4 
-MASmooth <- function(x=myData, y=5*cps, times=12) {
+MASmooth <- function(x=myData, y=round(5*cps,0), times=12) {
   # private function to calculate a smoothed average of the time series data
   # x input is a time series vector
   # y input is the number of offset samples
