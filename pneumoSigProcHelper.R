@@ -64,8 +64,9 @@ interpolatePeaks <- function(x=minIndices, y=minVals) {
   return(c(y[1], peakFill2))
 } # end interpolatePeaks
 
-# was y=40, times=8 11/19/2015
-MASmooth <- function(x=myData, y=75, times=4) {
+# was y=40, times=8
+# was y=75, times=4 
+MASmooth <- function(x=myData, y=5*cps, times=12) {
   # private function to calculate a smoothed average of the time series data
   # x input is a time series vector
   # y input is the number of offset samples
@@ -73,7 +74,6 @@ MASmooth <- function(x=myData, y=75, times=4) {
   # make the output vector 
   # beginning and end of the output vector are the mean of 2 * the buffer at begin and end of x
   xOut <- c(rep(mean(x[1:(2*y)]), times=y), rep(mean(x[(length(x)-(2*y)):length(x)]), times=(length(x)-y)))
-  # xOut <- c(rep(mean(x[1:(2*y)]), times=y), numeric(length=(length(x)-y)))
   # buffer will be double the offset value + 1
   input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y)) 
   # loop over the number of times to repeat the smoothing
@@ -88,7 +88,6 @@ MASmooth <- function(x=myData, y=75, times=4) {
     x <- xOut
     input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y))
   } # end loop over times
-  # xOut[(i-y):length(xOut)] <- mean(input_buffer) # 10-6-15 fill the end of the vector
   xOut[(length(x)-(y)+1):length(x)] <- xOut[(length(x)-(y)+1)]
   return(na.omit(xOut))
 } # end MASmooth function
