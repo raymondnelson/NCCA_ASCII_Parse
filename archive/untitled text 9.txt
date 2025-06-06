@@ -1,0 +1,223 @@
+# function to select the CQ for evaluation with each RQ
+# 1-24-2017
+# 2-15-2019
+# Raymond Nelson
+
+#########################################
+
+# Called by the RCScoreFn in the RCScore.R script
+
+# sourced by the workFlow ction(CQSelectInputList=CQSelectInputList) {
+                         
+selectCQFn <- function(CQSelectInputList=CQSelectInputList) {
+  # R # function to select a comparison questions
+  # for evaluation with a relevant question
+  # 1-24-2017
+  # 2-15-2019
+  # Raymond Nelson
+  ######
+  #
+  # input is a list of three items: 1) RQName, 2) chartMeasurementDF,
+  # 3) the sensorName
+  # 
+  # RQs may be alone or in pairs
+  # use the CQ preceding and subsequent to the RQ or paired RQs
+  # choose the CQ with the greater change in physiology
+  # choose the preceding CQ when there is no CQ imediately subsequent to the RQ
+  # there can be no artifacts, instructions or other questions
+  # in between the CQ and RQ
+  # if the preceding CQ is not usable then
+  # use the CQ immediately subsequent to the RQ 
+  # even if there is a single neutral question between the RQ and subsequent CQ
+  # as long as there are no artifacts, instructions or other questions 
+  # between the RQ and subsequent CQ
+  # 
+  # output is a list of 2 items: the CQValue and the CQNamthisRQName####CQSelectI###########this######
+  
+  thisRQName <- CQSelectInputList[["thisRQName"]]
+  chartMeasurementDF <- CQSelectInputList[["chartMeasurementDF"]]
+  thisSensorName <- CQSelectInputList[["thisSensorName"]]
+  
+  # View(chartMeasurementDF)
+  
+  # initialize a vector of unique events in the chart
+  uniqueQuestionsChart <- unique(chartMeasurementDF$eventLabel)
+  
+  # intitialize some things
+  {
+    precedingCQ <- NA
+    precedingCQName <- NA
+    precedingCQRows <- NA
+    precedingCQValue <- NA
+    
+    subsequentCQ <- NA
+    subsequentCQName <- NA
+    subsequentCQRows <- NA
+    subsequentCQValue <- NA
+    
+    checkPreceding <- NA
+    checkSubsequent <- NA
+    
+    CQValues <- NA
+  }
+  
+  # initialize the output variables
+  CQValues <- NA
+  CQValue <- NA
+  CQName <- NA
+  
+	# get the rows for the sensor
+  sensorRows <- chartMeasurementDF$sensorName == thisSensorName
+  
+  # get the index for the RQName
+  RQIndex <- which(uniqueQuestionsChart == RQName)
+  
+  # use a regular expression to get the indices and names for the CQs
+  CQIndices <- grep("C", uniqueQuestionsChart)
+  CQNames <- uniqueQuestionsChart[CQIndices]
+  
+  #### check the position of the preceding CQ relative to the RQ ####
+  
+  if(length(which(CQIndices < RQIndex)) > 0) {
+    # the get max index for all CQs that precede the RQ
+    precedingCQ <- CQIndices[max(which(CQIndices < RQIndex))]
+    # get the distance from the CQ to RQ
+    precedingCQDistance <- abs(RQIndex - precedingCQ)
+    # don't use CQ with distance > 2 positions
+    if(precedingCQDistance > 2) precedingCQ <- NA 
+    # for paired RQs check the position immediately preceding the RQ
+    if(!is.na(precedingCQ) & precedingCQDistance > 1) {
+      checkPreceding <- RQIndex - 1
+      if(!is.na(checkPreceding)) {
+        # make sure the interposed question is an RQ
+        # and set the precedingCQ to NA if the interposed question is not an RQ
+        # use grepl to get the boolean result
+        if(!grepl("R", uniqueQuestionsChart[checkPreceding], ignore.case=TRUE)) {
+          precedingCQ <- NA
+        }
+      }
+    }
+  }
+  
+  # we now have the index of the preceding CQ
+  # precedingCQ
+  
+  if(!is.na(precedingCQ)) {
+    # get the name of the preceding CQ
+    precedingCQName <- uniqueQuestionsChart[precedingCQ]
+    # get the value of the preceding CQ
+    precedingCQRows <- chartMeasurementDF$eventLabel == precedingCQName
+    theseRows <- which(precedingCQRows & sensorRows)
+    precedingCQValue <- chartMeasurementDF$sensorMeasurement[theseRows]
+  } 
+  
+  # we now have the name and value of the preceding CQ
+  # precedingCQName
+  # precedingCQValue
+  
+  #### check the position of the subsequent CQ relative to the RQ ####
+  
+  if(length(which(CQIndices > RQIndex)) > 0) {
+    # get the min index of all CQs subsequent to the RQ
+    subsequentCQ <- CQIndices[min(which(CQIndices > RQIndex))]
+    # get the distance from CQ to RQ
+    subsequentCQDistance <- abs(subsequentCQ - RQIndex)
+    # don't use it if the preceding CQ is more than 2 places away
+    if(subsequentCQDistance > 2) subsequentCQ <- NA
+    # for paired RQs check the position immediately subsequent to the RQ
+    if(!is.na(subsequentCQ) & subsequentCQDistance > 1) {
+      checkSubsequent <- RQIndex + 1
+      if(!is.na(checkSubsequent)) {
+        # make sure the interposed question is an RQ
+        # use grepl to get the boolean result
+        # and set the subsequentCQ to NA if the interposed question is not an RQ
+        if(!grepl("R", uniqueQuestionsChart[checkSubsequent], ignore.case=TRUE)) {
+          subsequentCQ <- NA
+        }
+      }
+    }
+  }
+  
+  # we now have the index of the subsequent CQ
+  # subsequentCQ
+  
+  if(!is.na(subsequentCQ)) {
+    # get the name of the subsequent CQ
+    subsequentCQName <- uniqueQuestionsChart[subsequentCQ]
+    # get the value of the subsequent CQ
+    subsequentCQRows <- chartMeasurementDF$eventLabel == subsequentCQName
+    theseRows <- which(subsequentCQRows & sensorRows)
+    subsequentCQValue <- chartMeasurementDF$sensorMeasurement[theseRows]
+  }
+  
+  # we now have the name and value of the subsequent CQ
+  # subsequentCQName
+  # subsequentCQValue
+  
+  #### check again for a subsequent CQ after a single neutral quesiton ####
+  
+  # if there exists a preceding CQ but the precedingCQValue is NA
+  # and there is yet no subsequent CQ Value
+  
+  if( is.na(precedingCQValue) && is.na(subsequentCQValue) ) {
+    
+    # this is the same code as above 
+    # but it now searches for an interposed neutral or irrelevant question
+    if(length(which(CQIndices > RQIndex)) > 0) {
+      # get the min index of all CQs subsequent to the RQ
+      subsequentCQ <- CQIndices[min(which(CQIndices > RQIndex))]
+      # get the distance from CQ to RQ
+      subsequentCQDistance <- abs(subsequentCQ - RQIndex)
+      # ignore if the subsequent CQ is more than 2 places away
+      if(subsequentCQDistance > 2) subsequentCQ <- NA
+      # check the position immediately subsequent to the RQ
+      if(!is.na(subsequentCQ) & subsequentCQDistance > 1) {
+        checkSubsequent <- RQIndex + 1
+        if(!is.na(checkSubsequent)) {
+          # make sure the interposed question is a neutral or irrelevant question
+          # use grepl to get the boolean result
+          # set the subsequentCQ to NA 
+          # if the interposed question is not an neutral or irrelevant question
+          if(!grepl("[NI]", uniqueQuestionsChart[checkSubsequent], ignore.case=TRUE)) {
+            subsequentCQ <- NA
+          }
+        }
+      }
+    }
+    
+    # we now have the index of the subsequent CQ
+    # subsequentCQ
+    
+    # get the name of the subsequent CQ
+    if(!is.na(subsequentCQ)) {
+      subsequentCQName <- uniqueQuestionsChart[subsequentCQ]
+      # get the value of the subsequent CQ
+      subsequentCQRows <- chartMeasurementDF$eventLabel == subsequentCQName
+      theseRows <- which(subsequentCQRows & sensorRows)
+      subsequentCQValue <- chartMeasurementDF$sensorMeasurement[theseRows]
+    }
+    
+  } # end if to check for a subsequent CQ if the preceding is not usable
+  
+  #### combine the preceding and susequent CQ values to a single vector ####
+  
+  if( !is.na(precedingCQValue) | !is.na(subsequentCQValue) ) {
+    CQValues <- c(precedingCQValue, subsequentCQValue)
+    names(CQValues) <- c(precedingCQName, subsequentCQName)
+    # which.max ignores NA values
+    CQValue <- CQValues[which.max(CQValues)]
+    CQName <- names(CQValues[which.max(CQValues)])
+    outputList <- list(CQValue=CQValue, CQName=CQName)
+  } else {
+    outputList <- list(CQValue=NA, CQName=NA)
+  }
+  
+  return(outputList)
+  
+  # end selectCQFn() function
+} 
+
+# selectCQFn(inputList=CQSelectInputList)
+
+
+

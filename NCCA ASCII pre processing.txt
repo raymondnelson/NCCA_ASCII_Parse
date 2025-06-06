@@ -1,0 +1,37 @@
+# NCAA ASCII pre processing info
+
+# preprocessing is prior to signal processing
+
+# iterate over all unique exams, 
+# within each exam, iterate over each unique series
+# within each series, iterate over each chart
+
+1) set the range to max-min arbitrary range of 20000
+(NCCA ASCII spec permits values between 1 and 999999)
+More scaling is done later for aesthetics.
+
+
+2) offset each sensor column so the initial value is 0.
+More offsetting is done later for aesthetics.
+
+3) check and fix the events data frame.
+
+Some events may not have an answer location. 
+So we use the location one sample after stimulus offset 
+
+Check for, and fix, annotations within a stimulus event.
+which create a problem of two simultaneous events, 
+or a problem of a single event that appears to start, stop, start, and stop,
+which then appears to be two events instead of one
+
+Check that events are not overlapping
+
+Check that the verbal answer point is actually after the stimulus offset 
+
+Check that the stimulus offset is actually after the stimnulus onset
+
+Check that all events are in all charts
+Check for missing events
+Check for repeated events and rename as necessary
+most algorithms require each event to have a unique name. 
+

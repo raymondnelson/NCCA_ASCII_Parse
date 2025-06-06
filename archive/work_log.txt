@@ -1,0 +1,11 @@
+###### work log
+
+# 4-9-2017
+# fixed extractMeasurements.R script
+# so that annotations are not included in the _Measurements DF
+# also exclude repeated annotations
+# but included repeated stimulus events 
+
+# 4-11-2017
+# inverted integer sign values for PLE in the chartPlot.R script
+# changed measurement lines to purple

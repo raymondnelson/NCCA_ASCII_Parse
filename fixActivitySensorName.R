@@ -1,12 +1,53 @@
-# fix activity sensor channel name
+#### fix activity sensor channel name
 
-fileNames <- list.files(pattern = "D&+")
-for (i in 1:length(fileNames)) {
-  x <- readLines(fileNames[i], encoding="latin1")
+fixSensorNameFn <- function(x=searchPattern, oldSensorName="Aux01", newSensorName="   SE") {
   
-  x[10:100] <- gsub("      Aux01", "         SE", x[10:100])
+  fileNames <- list.files(pattern = x)
   
-  writeLines(x, fileNames[i])
-}
+  oldName <- oldSensorName
+  newName <- newSensorName
+  
+  for (i in 1:length(fileNames)) {
+    x <- readLines(fileNames[i], encoding="latin1")
+    
+    x[5:150] <- gsub(oldName, newName, x[5:150])
+    
+    writeLines(x, fileNames[i])
+    
+    print(fileNames[i])
+  }
+  
+} # end fixSensorNameFn() function
+
+# fixSensorNameFn(x="D&+", oldSensorName <- "Aux01", newSensorName <- "   SE")
 
 
+# "      Aux01"
+# "         SE"
+
+
+
+
+
+#### fix bad Move1 sensor
+
+
+fixMove1Fn <- function(x=searchPattern, oldName="Move1", newName="MoveX") {
+  
+  fileNames <- list.files(pattern = x)
+  
+  for (i in 1:length(fileNames)) {
+    x <- readLines(fileNames[i], encoding="latin1")
+    
+    # increment the loop if no Move1 sensor    
+    if(!isTRUE(grepl(oldName, x[5:150]))) { next() }
+    
+    x[5:150] <- gsub(oldName, newName, x[5:150])
+    
+    writeLines(x, fileNames[i])
+  }
+  
+} # end function
+
+
+# fixMove1Fn(x=x="D&+", oldName="Move1", newName="MoveX")

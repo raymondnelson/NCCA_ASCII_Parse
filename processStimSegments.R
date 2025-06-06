@@ -29,7 +29,7 @@ measuredSeg <- 15
 
 
 
-processStimSegment<- function(x=uniqueExams, showNames=TRUE, ouput=FALSE) {
+processStimSegment<- function(x=uniqueExams, showNames=TRUE, output=FALSE) {
   # function to iterate over a vector of data frame names 
   # and add UPneumoArtifacts and LPneumoArtifacts column to the time series data frame
   #

@@ -1,0 +1,27 @@
+# lowPass.5()
+# low pass filter to improve the diagnostic coeficient of the Auto EDA data
+# will add the AutoEDA column to the data frame
+# first order Butterworth filter
+# Raymond Nelson
+####
+
+
+lowPass.5 <- function(x, GAIN = 2.008113669e+01, zplane = 0.9004040443) {
+  xv1 <- x[1]
+  yv1 <- 0
+  output <- NULL
+  for (i in 1:length(x)) {
+    xv0 <- xv1
+    xv1 <- x[i] / GAIN
+    yv0 <- yv1
+    yv1 <- (xv1 + xv0) + (zplane * yv0)
+    output <- c(output, yv1)
+  }
+  return(output)
+} # end lowPass.5 function
+
+# chartData$AutoEDA <- lowPass.5(chartData$EDA1)
+# plot.ts(chartData$AutoEDA)
+
+
+

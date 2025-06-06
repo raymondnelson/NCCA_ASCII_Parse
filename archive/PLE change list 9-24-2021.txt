@@ -1,0 +1,28 @@
+# Change list for PLE
+# Oct 4, 2021
+
+
+
+# PLESigProc.R - no changes
+
+
+# PLEExtract.R - no changes 
+
+
+# PLEMeasurement.R - no changes
+
+
+# PLE_RC_Fn.R 
+
+begining at line 45, Sept 24, 2021 
+modified to replace missing and NA values with numeric 0 for both RQ and CQ
+
+line 76, Sept 24, 2021
+modified ouput condition 2 so that the -RQValue is output when values are less than the constraint
+this may be more informative than outputing 0 or nothing 
+
+
+
+
+
+

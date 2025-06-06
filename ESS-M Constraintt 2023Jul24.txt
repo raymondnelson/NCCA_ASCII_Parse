@@ -1,0 +1,159 @@
+Feature extraction parameters
+
+July 24, 2023
+
+
+
+analysis and optimization is ongoing for many of these parameters
+
+
+
+RESPIRATION
+
+Answer buffer, excluded from analysis = +/- 1.25 seconds surrounding the
+verbal answer
+
+Resp measurement buffer = 2.5 seconds, a sliding window for which the
+the excursion is calculated as the sum of absolute differences of each
+successive sample. excrusion values are then aggregated and subjective
+to a scaling factor (currently set to 1, that allows for respiration
+values that are of similar scale to EDA and cardio, and which make for
+simpler intuition for field examiners who want to think about their
+relative strength)
+
+RLE constraints are currently set symmetrically for + and - ESS scores
+RLEMinConstraint = 1.2 RLEMaxConstraint = 1.5 These constraints were
+previously set assymetrically. Optimization is much easier when the +
+and - scores are analyzed separately, but there are
+social/emotional/comfort advantages to a symmetrical solution, and this
+works nearly as well as the previous solution.
+
+Some constraint is need to prevent attempting to score when the
+respiration data are flatlined, but none is currently in use.
+
+EDA
+
+EDA Latency = .5 seconds. More optimization work (analysis not
+conjecture) is needed on the EDA latency.
+
+ROW = starts at the latency and ends 5 seconds after verbal answer (or
+stimulus offset if not verbal answer)
+
+WOE = 15 seconds
+
+ShortWindow = 13.5 seconds
+
+WOE is extended not strict = meaning that responses that + slope
+reactions that continue outside the WOE are scored to the end of
+reaction, instead of stoping that the end of the WOE
+
+Row is extended not strict, meaning that when a response starts in the
+ROW all + slope segments in the WOE are included except those that begin
+in the ShortWindow (this prevents scoring + slope segments that begin
+late in the WOE when the using the extended ROW)
+
+SlopeChange is active (not off) using a statistical method instead of
+simple approximation. Slope change parameters include the length of two
+sliding windows and the alpha level for the z-test preSeg = 1 second
+postSeg = 1 second alpha = .0001 (about 3.07 standard deviations) The
+mean SD of each postSeg is compared to each preSeg, When significant,
+the imputed response onset is located at the end of the preSeg When a
+series of samples produces a sig value only the min is kept so that we
+maximize the peak-onset y distance
+
+The slope change rule is active even when there are normal response
+onset in the form of an onset of a + slope segment. This could be set to
+use the slope change rule only when there are no normal response onsets
+in the ROW, but analysis indicates it is optimal to keep this rule
+active at all times.
+
+response onset may be imputed statistically only when the slop is +
+
+tonicSec = 2.5 sec so that response onset will is not imputed if the
+preceeding segment is not +
+
+sChangeLat = 2.5 sec so that response onset will not be imputed during
+the first 2.5 sec after question onset
+
+The something vs nothing concept (SNC) is not used for the EDA at this
+times because there are problems and inconsistencies in the way that
+field examiners use the concept. More analysis is needed.
+
+There is no EDA rule for descending data (1/2 way or otherwise) because
+the rule is not published anywhere, and there are serious problems with
+the idea
+
+R/C Ratios are not calculated for small reactions less than 0.0025% of
+the y axis total, and are not calculated if the sum of RQ and CQ
+response is less than 1% of the y-axis. Humans can see reactions of 1%
+or less on the screen.
+
+EDAMinConstraint = 1.1 so that small differences in RQ and CQ are
+assigned an ESS score = 0
+
+
+
+CARDIO
+
+Cardio latency = .05 seconds
+
+ROW and WOE are the same as the EDA ROW = latency to 5 sec after the
+verbal answer (or stim offset if no answer) WOE = 15 seconds
+
+The length of the WOE makes very little difference after 15 seconds.
+
+ROW and WOE are both set to extended mode. Cardio reaction are scored to
+the Peak as long as the slope is + when the response starts in the ROW,
+and all + slope segments in the WOE are included when there is a usable
+response onset in the ROW.
+
+Cardio shortWindow = 13.5 seconds to prevent scoring + slope changes
+that occur late in the WOE when using the extended ROW
+
+SlopeChange is off (not active) at present for the Cardio because it
+does not seem to increase accuracy and may contribute to errors. More
+optimization work is needed on this
+
+The something vs nothing concept is not active at this time because it
+produces more errors than correct scores for the cardio. More analysis
+is needed.
+
+R/C Ratios are not calculated for small reactions less than 0.0025% of
+the y axis total, and are not calculated if the sum of RQ and CQ
+response is less than 1% of the y-axis. Humans can see reactions of 1%
+or less on the screen.
+
+CardioMinConstraint = 1.25 so that small differences in RQ and CQ are
+assigned an ESS score = 0. Cardio data is more noisy than EDA and scores
+are optimized by a stronger constraint value.
+
+
+
+
+VASOMOTOR
+
+prestimSegment = 3 seconds
+
+latency = 5 seconds (stim onset to 5 seconds after stim onset)
+
+stimulusSegment = 5 seconds beginning after the latency period
+
+measurement is the distance between the diastolic and systolic lines
+after these lines are interpolated from the systolic and diastolic peaks
+(changes in + and - slope at the syst and diast lines). This can also be
+calculated as the FPEL (y distance between the syst and diast peaks) or
+the PAE (excursion length of the vasomotor pulse line). The selected
+methods works optimally, and is more robust against artifacts such as
+fasciculations, extrasystolics, and movements.
+
+PLE constraint for R/C ratios and ESS scores = 1.1 and is applied to
+both the pre/post ratio for each question and the R/C ratio. PLE is
+interpreted as no response when the pre/post ratios is less than the
+constraint, and ESS scores are not assigned when the R/C ratio is less
+than the constraint.
+
+Some constraint is needed to prevent attempting to score the PLE when
+data are flatlined but not is currently in use.
+
+
+

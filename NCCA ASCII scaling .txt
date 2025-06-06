@@ -1,0 +1,5 @@
+# NCCA ASCII scaling and offsetting data
+
+# for aesthetics in the graphic display 
+
+
