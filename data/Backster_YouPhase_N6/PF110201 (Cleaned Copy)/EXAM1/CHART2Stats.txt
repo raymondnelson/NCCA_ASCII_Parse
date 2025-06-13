@@ -1,0 +1,28 @@
+
+
+***** DAS Statistics *****
+
+   * Id: 0
+   * Type: 4 LX-4000 DAS
+   * Version: 6
+   * Data Rate: 120
+   * Sample Size: 4
+   * Number of Sensors: 8
+      1) Sensor id: 100, Sensor Type: 2000 (LX4000 Pneumo P2)
+      2) Sensor id: 101, Sensor Type: 2001 (LX4000 Pneumo P1)
+      3) Sensor id: 102, Sensor Type: 2002 (LX4000 GSR)
+      4) Sensor id: 103, Sensor Type: 2007 (LX4000 GSR Detrended) - Virtual Sensor
+      5) Sensor id: 104, Sensor Type: 2003 (LX4000 Cardio)
+      6) Sensor id: 105, Sensor Type: 2004 (LX4000 AUX1)
+      7) Sensor id: 106, Sensor Type: 2005 (LX4000 AUX2)
+      8) Sensor id: 107, Sensor Type: 2006 (LX4000 AUX3)
+
+Recording start time:         Tuesday, February 01, 2011 13:02:05
+Recording end time:           Tuesday, February 01, 2011 13:06:16
+Recording time:               4 minutes 10.883000 seconds (250 total seconds)
+Total recorded packets:       30118, Num packets expected: 30106, difference -12
+Largest interpacket time:     156 milliseconds occurred at: 12.761000 seconds - packet #: 1529
+Smallest interpacket time:    93 milliseconds occurred at: 20.233000 seconds - packet #: 2429
+Average interpacket time:     8.329183 milliseconds
+Expected interpacket time:    8.333333 milliseconds
+Bytes read: 421508.0, bytes expected: 421483.4, diff: 24.6 (1 raw A/D values) 0.014619 seconds

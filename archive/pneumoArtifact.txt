@@ -1,0 +1,292 @@
+# R function to identify respiration artifacts 
+# 2-28-2017
+# Raymond Nelson
+# 
+##############
+
+
+# source('~/Dropbox/R/NCCA_ASCII_Parse/getSegment.R', echo=FALSE)
+
+
+source('~/Dropbox/R/NCCA_ASCII_Parse/sigProcHelper.R', echo=FALSE)
+source('~/Dropbox/R/NCCA_ASCII_Parse/tukeyFences.R', echo=FALSE)
+
+
+pneumoArtifactFn <- function(x=chartDF) {
+  # R function to identify respiration artifacts 
+  
+  chartDF <- x
+  
+  # chartDF$chartName[1]
+  
+  #################################
+  
+  # get the pneumo artifacts using the peak points
+  
+  {
+    numCycles <- 3
+    IQRMult <- 1
+    rateRatio <- 2
+    multRatio <- 2
+  }
+  
+  ####################### upper pneumo ################
+  
+  {
+    
+    ## upper respiration rate ##
+    
+    # get the peak points for the stimulus segment
+    maxPeaks <- maxPeak(x=chartDF$c_UPneumoSm, y=round(1.125*cps,0))
+    chartDF$c_UPneumoInh <- interpolatePeaks(maxPeaks, chartDF$c_UPneumoSm[maxPeaks]) 
+    # remove peak points accross consecutive samples
+    consecPeaks <- which((maxPeaks[2:length(maxPeaks)]-1)==maxPeaks[1:(length(maxPeaks)-1)])
+    if(length(consecPeaks > 0)) { maxPeaks <- maxPeaks[-consecPeaks] }
+    # remove peak changes less than 1/4 second
+    shortSegments <- which(diff(maxPeaks) <= round(.25*cps,0)) + 1
+    if(length(shortSegments) > 0) maxPeaks <- maxPeaks[-shortSegments]
+    
+    # compute the resp rate in seconds using the peaks
+    maxRate <- c(mean(diff(maxPeaks)), diff(maxPeaks)) / cps
+    
+    # compute changes in upper respiration rate
+    maxRateChange <- maxPeaks[which(!is.na(tukeyFence5(x=maxRate,buffer=3, side="both", fence="outer", innerFence=1.5, outerFence=3, expVal=1, scaleVal=1)))]
+    
+  }
+  
+  {
+    
+    ## upper respiration rate using minPeaks ##
+    
+    # get the min peaks
+    minPeaks <- minPeak(x=chartDF$c_UPneumoSm, y=round(1.125*cps,0))
+    chartDF$c_UPneumoExh <- interpolatePeaks(minPeaks, chartDF$c_UPneumoSm[minPeaks])
+    # remove peak points accross consecutive samples
+    consecPeaks <- which((maxPeaks[2:length(maxPeaks)]-1)==maxPeaks[1:(length(maxPeaks)-1)])
+    if(length(consecPeaks > 0)) { minPeaks <- minPeaks[-consecPeaks] }
+    # remove peak changes less than 1/2 second
+    shortSegments <- which(diff(minPeaks) <= round(.5*cps,0)) + 1
+    if(length(shortSegments) > 0) minPeaks <- minPeaks[-shortSegments]
+    
+    # then get the upper pneumo rate in seconds using the min Peaks
+    minRate <- c(mean(diff(minPeaks)), diff(minPeaks)) / cps
+    
+    # compute changes in upper respiration rate using minPeaks
+    minRateChange <- minPeaks[which(!is.na(tukeyFence5(x=minRate,buffer=3, side="both", fence="outer", innerFence=1.5, outerFence=3, expVal=1, scaleVal=1)))]
+    
+  }
+  
+  {
+    
+    ## changes in upper respiration amplitude ##
+    
+    maxAmp <- chartDF$c_UPneumoSm[maxPeaks] - chartDF$c_UPneumoMid[maxPeaks]
+    
+    maxAmpChange <- maxPeaks[which(!is.na(tukeyFence5(x=maxAmp,buffer=3, side="both", fence="both", innerFence=1.5, outerFence=3, expVal=1, scaleVal=1)))]
+    
+    maxAmpChange <- sort(c(maxAmpChange, maxPeaks[which(!is.na(tukeyFence5(x=maxAmp,buffer=3, side="lower", fence="inner", innerFence=1.5, outerFence=3, expVal=.5, scaleVal=1)))]))
+    
+  }
+  
+  {
+    
+    ## upper pneumo baseline ##
+    
+    minAmp <- chartDF$c_UPneumoMid[minPeaks] - chartDF$c_UPneumoSm[minPeaks]
+    
+    minAmpChange <- minPeaks[which(!is.na(tukeyFence5(x=minAmp,buffer=3, side="both", fence="both", innerFence=1.5, outerFence=3, expVal=3, scaleVal=1)))]
+    
+    minAmpChange <- sort(c(minAmpChange, minPeaks[which(!is.na(tukeyFence5(x=minAmp,buffer=3, side="lower", fence="outer", innerFence=1.5, outerFence=3, expVal=.5, scaleVal=1)))]))
+    
+  }
+  
+  {
+    
+    ## add the pneumo artifacts to the data frame ##
+    chartDF$UPneumoInh_a[maxAmpChange] <- "Artifact"
+    chartDF$UPneumoMid_a[maxRateChange] <- "Artifact"
+    chartDF$UPneumoExh_a[minAmpChange] <- "Artifact"
+    chartDF$UPneumoMid_a[minRateChange] <- "Artifact"
+    # chartDF$UPneumo_a[maxAmpChange] <- "Artifact"
+    # chartDF$UPneumo_a[maxRateChange] <- "Artifact"
+    # chartDF$UPneumo_a[minAmpChange] <- "Artifact"
+    # chartDF$UPneumo_a[minRateChange] <- "Artifact"
+    
+  }
+  
+  ######################### lower pneumo #######################
+  
+  {
+    
+    ## lower respiration rate ##
+    
+    # get the peak points for segment
+    maxPeaks <- maxPeak(x=chartDF$c_LPneumoSm, y=round(1.125*cps,0))
+    chartDF$c_LPneumoInh <- interpolatePeaks(maxPeaks, chartDF$c_LPneumoSm[maxPeaks])
+    # remove peak points accross consecutive samples
+    consecPeaks <- which((maxPeaks[2:length(maxPeaks)]-1)==maxPeaks[1:(length(maxPeaks)-1)])
+    if(length(consecPeaks > 0)) { maxPeaks <- maxPeaks[-consecPeaks] }
+    # remove peak changes less than 1/4 second
+    shortSegments <- which(diff(maxPeaks) <= round(.25*cps,0)) + 1
+    if(length(shortSegments) > 0) maxPeaks <- maxPeaks[-shortSegments]
+    
+    # then compute the resp rate in seconds using the peaks
+    maxRate <- c(mean(diff(maxPeaks)), diff(maxPeaks)) / cps
+    
+    # compute the changes in lower respiration rate
+    maxRateChange <- maxPeaks[which(!is.na(tukeyFence5(x=maxRate,buffer=3, side="both", fence="outer", innerFence=1.5, outerFence=3, expVal=1, scaleVal=1)))]
+    
+  }
+  
+  {
+  
+    ## lower respiration amplitude ##
+    
+    maxAmp <- chartDF$c_LPneumoSm[maxPeaks] - chartDF$c_LPneumoMid[maxPeaks]
+    
+    maxAmpChange <- maxPeaks[which(!is.na(tukeyFence5(x=maxAmp,buffer=3, side="both", fence="both", innerFence=1.5, outerFence=3, expVal=1, scaleVal=1)))]
+    
+    maxAmpChange <- sort(c(maxAmpChange, maxPeaks[which(!is.na(tukeyFence5(x=maxAmp,buffer=3, side="lower", fence="inner", innerFence=1.5, outerFence=3, expVal=.5, scaleVal=1)))]))
+  
+  }
+  
+  {
+  
+  ## lower respiration rate using minPeaks ##
+  
+  minPeaks <- minPeak(x=chartDF$c_LPneumoSm, y=round(1.125*cps,0))
+  chartDF$c_LPneumoExh <- interpolatePeaks(minPeaks, chartDF$c_LPneumoSm[minPeaks])
+  # remove peak points accross consecutive samples
+  consecPeaks <- which((maxPeaks[2:length(maxPeaks)]-1)==maxPeaks[1:(length(maxPeaks)-1)])
+  if(length(consecPeaks > 0)) { minPeaks <- minPeaks[-consecPeaks] }
+  # remove peak changes less than 1/2 second
+  shortSegments <- which(diff(minPeaks) <= round(.5*cps,0)) + 1
+  if(length(shortSegments) > 0) minPeaks <- minPeaks[-shortSegments]
+  
+  # then get the lower pneumo rate in seconds using the min Peaks
+  minRate <- c(mean(diff(minPeaks)), diff(minPeaks)) / cps
+  
+  # get the abdominal respiration rate using minPeaks
+  minRateChange <- minPeaks[which(!is.na(tukeyFence5(x=minRate,buffer=3, side="both", fence="outer", innerFence=1.5, outerFence=3, expVal=1, scaleVal=1)))]
+  
+  }
+  
+  {
+    
+    ## lower pneumo baseline ##
+    minAmp <- chartDF$c_LPneumoMid[minPeaks] - chartDF$c_LPneumoSm[minPeaks]
+    
+    minAmpChange <- minPeaks[which(!is.na(tukeyFence5(x=minAmp,buffer=3, side="both", fence="outer", innerFence=1.5, outerFence=3, expVal=4, scaleVal=1)))]
+    
+    minAmpChange <- sort(c(minAmpChange, minPeaks[which(!is.na(tukeyFence5(x=minAmp,buffer=3, side="lower", fence="outer", innerFence=1.5, outerFence=3, expVal=.5, scaleVal=1)))]))
+    
+  }
+  
+  {
+    
+    # add the pneumo artifacts to the data frame
+    chartDF$LPneumoInh_a[maxAmpChange] <- "Artifact"
+    chartDF$LPneumoMid_a[maxRateChange] <- "Artifact"
+    chartDF$LPneumoExh_a[minAmpChange] <- "Artifact"
+    chartDF$LPneumoMid_a[minRateChange] <- "Artifact"
+    # chartDF$LPneumo_a[maxAmpChange] <- "Artifact"
+    # chartDF$LPneumo_a[maxRateChange] <- "Artifact"
+    # chartDF$LPneumo_a[minAmpChange] <- "Artifact"
+    # chartDF$LPneumo_a[minRateChange] <- "Artifact"
+    
+  }
+  
+  ############################################
+  
+  # 5-18-2017
+  
+  # sec=5
+  # cutProp=.25
+  
+  chartDF$Pneumo_a <- 0
+  # which(chartDF$Pneumo_a != 0)
+  
+  # chartDF$c_UPneumoSm <- MASmooth(x=chartDF$c_UPneumoSm, y=round(.25*cps,0), times=1)
+  # chartDF$c_LPneumoSm <- MASmooth(x=chartDF$c_LPneumoSm, y=round(.25*cps,0), times=1)
+  
+  {
+    
+    ## compute the 3 second excursion length for the upper and lower respiration data ##
+    
+    # initialize a vector for the upper and lower
+    UPneumoExcursion <- rep(0, times=nrow(chartDF))
+    LPneumoExcursion <- rep(0, times=nrow(chartDF))
+    
+    diffVectorUP <- c(0, abs(diff(chartDF$c_UPneumoSm)))
+    
+    for (i in (sec * cps):nrow(chartDF)) {
+      UPneumoExcursion[i] <- sum(diffVectorUP[(i-(sec * cps - 1)):i])
+    }
+    
+    diffVectorLP <- c(0, abs(diff(chartDF$c_LPneumoSm)))
+    
+    for (i in (sec * cps):nrow(chartDF)) {
+      LPneumoExcursion[i] <- sum(diffVectorLP[(i-(sec * cps - 1)):i])
+    }
+    
+    # compare the upper and lower excursion
+    artifactRows <- which(exp(-abs(log(UPneumoExcursion/LPneumoExcursion))) < cutProp)
+    chartDF$Pneumo_a[artifactRows] <- "Artifact"
+    
+  }
+  
+  ###########################################
+  
+  # compare each segment to the previous
+  
+  # sec2 <- 5
+  # cutProp2 <- .1
+  
+  vectorLength <- nrow(chartDF)
+  
+  # calculate the summed diffs of UPneumo over the observation period
+  for (i in (sec2 * cps):vectorLength) {
+    UPneumoExcursion[i] <- sum(diffVectorUP[(i-(sec2 * cps - 1)):i])
+  }
+  
+  ##  make 3 vectors for comparison
+  
+  # start at beginning
+  seg1 <- UPneumoExcursion[1:(vectorLength-2*(sec2 * cps))]
+  # start at the end of the sec2
+  seg2 <- UPneumoExcursion[(sec2 * cps + 1):(vectorLength-(sec2 * cps))]
+  # start at 2xsec@
+  seg3 <- UPneumoExcursion[(2*(sec2 * cps) + 1):vectorLength]
+  
+  # should be all equal lengths
+  length(seg1)
+  length(seg2)
+  length(seg3)
+  
+  artifactRows2 <- which(exp(-abs(log(seg2/seg1))) < cutProp2) + sec2
+  chartDF$Pneumo_a[artifactRows2] <- "Artifact"
+  
+  artifactRows3 <- which(exp(-abs(log(seg2/seg3))) < cutProp2) + sec2
+  chartDF$Pneumo_a[artifactRows3] <- "Artifact"
+  
+  for (i in (5 * cps):nrow(chartDF)) {
+    LPneumoExcursion[i] <- sum(diffVectorLP[(i-(sec2 * cps - 1)):i])
+  }
+  
+  seg1 <- LPneumoExcursion[1:(vectorLength-2*(sec2 * cps))]
+  seg2 <- LPneumoExcursion[(sec2 * cps + 1):(vectorLength-(sec2 * cps))]
+  seg3 <- LPneumoExcursion[(2*(sec2 * cps) + 1):vectorLength]
+  
+  artifactRows2 <- which(exp(-abs(log(seg2/seg1))) < cutProp2) + sec2
+  artifactRows3 <- which(exp(-abs(log(seg2/seg3))) < cutProp2) + sec2
+  chartDF$Pneumo_a[artifactRows2] <- "Artifact"
+  chartDF$Pneumo_a[artifactRows2] <- "Artifact"
+  
+  
+  ###########################################
+  
+  return(chartDF)
+  
+} # end pneumoArtifactFn()
+
+

@@ -1,0 +1,142 @@
+MASmooth <- function(x=myData, y=round(7.5*cps,0), times=10) {
+  # private function to calculate a smoothed average of the time series data
+  # x input is a time series vector
+  # y input is the number of offset samples
+  # times is the number of times to recursively smooth the data
+  # make the output vector 
+  # beginning and end of the output vector are the mean of 2 * the buffer at begin and end of x
+  xOut <- c(rep(x[1], times=y), numeric(length=(length(x)-y)))
+  # xOut <- c(rep(mean(x[1:(2*y)]), times=y), numeric(length=(length(x)-y)))
+  # xOut <- c(rep(x[1], times=y), numeric(length=(length(x)-y)))
+  # buffer will be double the offset value + 1
+  input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y)) 
+  # loop over the number of times
+  for (j in 1:times) {
+    # for loop to compute the moving average
+    for (i in (y+1):(length(x)-(y))) { # starts 1 sample after y
+      xOut[i] <- mean(input_buffer) # fills the middle value of the buffer with the mean
+      input_buffer <- c(input_buffer[2:length(input_buffer)], x[i+y])
+      # input_buffer <- c(input_buffer[2:(2*y)], x[i])
+    } # end for loop for moving average
+    # re-initialize the input
+    x <- xOut
+    input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y))
+    # input_buffer <- c(x[1:y], rep(x[y+1], times=y))
+  } # end loop over times
+  # xOut[(i-y):length(xOut)] <- mean(input_buffer) # 10-6-15 fill the end of the vector
+  xOut[(length(x)-(y)+1):length(x)] <- xOut[(length(x)-(y)+1)]
+  return(na.omit(xOut))
+} # end MASmooth function()
+
+MASmooth <- function(x=myData, y=round(5*cps,0), times=12) {
+  # private function to calculate a smoothed average of the time series data
+  # x input is a time series vector
+  # y input is the number of offset samples
+  # times is the number of times to recursively smooth the data
+  # make the output vector 
+  # beginning and end of the output vector are the mean of 2 * the buffer at begin and end of x
+  xOut <- c(rep(mean(x[1:(2*y)]), times=y), rep(mean(x[(length(x)-(2*y)):length(x)]), times=(length(x)-y)))
+  # xOut <- c(rep(mean(x[1:(2*y)]), times=y), numeric(length=(length(x)-y)))
+  # xOut <- c(rep(x[1], times=y), numeric(length=(length(x)-y)))
+  # buffer will be double the offset value + 1
+  input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y)) 
+  # loop over the number of times to repeat the smoothing
+  for (j in 1:times) {
+    # for loop to compute the moving average
+    for (i in (y+1):(length(x)-(y)+1)) { # starts 1 sample after y
+      bufferMean <- mean(input_buffer)
+      xOut[i] <- bufferMean # fills the middle value of the buffer with the mean
+      input_buffer <- c(input_buffer[2:length(input_buffer)], x[i+y])
+      # input_buffer <- c(input_buffer[2:(2*y)], x[i])
+    } # end for loop for moving average
+    # re-initialize the input
+    x <- xOut
+    input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y))
+    # input_buffer <- c(x[1:y], rep(x[y+1], times=y))
+  } # end loop over times
+  xOut[(length(x)-(y)+1):length(x)] <- xOut[(length(x)-(y)+1)]
+  return(na.omit(xOut))
+} # end MASmooth function
+
+MASmooth <- function(x=myData, y=75, times=4) {
+  # private function to calculate a smoothed average of the time series data
+  # x input is a time series vector
+  # y input is the number of offset samples
+  # times is the number of times to recursively smooth the data
+  # make the output vector 
+  # beginning and end of the output vector are the mean of 2 * the buffer at begin and end of x
+  xOut <- c(rep(mean(x[1:(2*y)]), times=y), rep(mean(x[(length(x)-(2*y)):length(x)]), times=(length(x)-y)))
+  # xOut <- c(rep(mean(x[1:(2*y)]), times=y), numeric(length=(length(x)-y)))
+  # xOut <- c(rep(x[1], times=y), numeric(length=(length(x)-y)))
+  # buffer will be double the offset value + 1
+  input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y)) 
+  # loop over the number of times to repeat the smoothing
+  for (j in 1:times) {
+    # for loop to compute the moving average
+    for (i in (y+1):(length(x)-(y)+1)) { # starts 1 sample after y
+      bufferMean <- mean(input_buffer)
+      xOut[i] <- bufferMean # fills the middle value of the buffer with the mean
+      input_buffer <- c(input_buffer[2:length(input_buffer)], x[i+y])
+      # input_buffer <- c(input_buffer[2:(2*y)], x[i])
+    } # end for loop for moving average
+    # re-initialize the input
+    x <- xOut
+    input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y))
+    # input_buffer <- c(x[1:y], rep(x[y+1], times=y))
+  } # end loop over times
+  # xOut[(i-y):length(xOut)] <- mean(input_buffer) # 10-6-15 fill the end of the vector
+  xOut[(length(x)-(y)+1):length(x)] <- xOut[(length(x)-(y)+1)]
+  return(na.omit(xOut))
+} # end MASmooth function
+
+MASmoothPn <- function(x=chartData$Cardio1, y=7, times=2) {
+  # function to get the diastolic peaks from the cardio data
+  # x input is a time series vector
+  # y input is the number of offset samples 
+  # times is the number of times to recursively smooth the data
+  # buffer will be double the offset value
+  # make the output vector 
+  # beginning and end of the output vector are the mean of 2 * the buffer at begin and end of x
+  xOut <- c(rep(x[1], times=y), numeric(length=(length(x)-y)))
+  input_buffer <- c(x[1:y], rep(x[y+1], times=y)) 
+  # loop over the number of times
+  for (j in 1:times) {
+    # for loop to compute the moving average
+    for (i in (y+1):(length(x)-(2*y))) {
+      xOut[i-y] <- mean(input_buffer)
+      input_buffer <- c(input_buffer[2:(2*y)], x[i])
+    } # end for loop for moving average
+    # re-initialize the input
+    x <- xOut
+    input_buffer <- c(x[1:y], rep(x[y+1], times=y))
+  } # end loop over times
+  return(na.omit(xOut))
+} # end MASmooth function
+
+cardioSmooth1 <- function(x=chartDF$c_Cardio1, y=round(.5*cps,0), times=4) {
+  # private function to calculate a smoothed average of the time series data
+  # x input is a time series vector
+  # y input is the number of offset samples
+  # times is the number of times to recursively smooth the data
+  # make the output vector 
+  # beginning and end of the output vector are the mean of 2 * the buffer at begin and end of x
+  xOut <- c(rep(mean(x[1:(2*y)]), times=y), rep(mean(x[(length(x)-(2*y)):length(x)]), times=(length(x)-y)))
+  # xOut <- c(rep(mean(x[1:(2*y)]), times=y), numeric(length=(length(x)-y)))
+  # buffer will be double the offset value + 1
+  input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y)) 
+  # loop over the number of times to repeat the smoothing
+  for (j in 1:times) {
+    # for loop to compute the moving average
+    for (i in (y+1):(length(x)-(y)+1)) { # starts 1 sample after y
+      bufferMean <- mean(input_buffer)
+      xOut[i] <- bufferMean # fills the middle value of the buffer with the mean
+      input_buffer <- c(input_buffer[2:length(input_buffer)], x[i+y])
+    } # end for loop for moving average
+    # re-initialize the input
+    x <- xOut
+    input_buffer <- c(x[1:(y+1)], rep(x[y+1], times=y))
+  } # end loop over times
+  # xOut[(i-y):length(xOut)] <- mean(input_buffer) # 10-6-15 fill the end of the vector
+  xOut[(length(x)-(y)+1):length(x)] <- xOut[(length(x)-(y)+1)]
+  return(na.omit(xOut))
+} # end cardioSmooth1 function

@@ -1,0 +1,72 @@
+slopeChangeFn <- function(x=tsData) {
+  # helper function to find a significant change or increase in positive slope activity
+  # called by the amplitudeExtractFn() function
+  # useful to infer a response onset when the slope is already positive at stimulus onset
+  # compare each nPre seconds with the next nPost seconds
+  # x input is the vector of time series measurements for a chart
+  # including 10 prestimulus seconds and 10 additional seconds after the evaluation window
+  ### values from the global environment, set by the init script
+  # nPre is the number of pre change seconds
+  # nPost is the number of post change seconds
+  # aChange is the level of sig for the z test # currently .999
+  # p=.999 will be +3 standard deviations
+  # cps is the data sampling rate # normally 30cps 
+  ###
+  # output is a vector of 0s the same length as input and including +1 change in slope energy
+  ###
+  
+  # initialize the output vector
+  y <- rep(0, times=length(x))
+  
+  # round the nPre and nPost segments to the nearest sample
+  preLen <- round(cps * nPre, 0)
+  postLen <- round(cps * nPost, 0)
+  
+  # calculate the difference for all samples in the chart
+  xDiff <- txData[2:length(tsData)] - tsData[1:(length(tsData)-1)]
+  
+  
+  
+  
+  # iterate over the length of the output vector
+  for (i in 1:(length(y)-(preLen+postLen))) {
+  
+  	# calculate the difference for all samples in the pre change segment
+    preDiff <- diff(x[i:(i+preLen-1)])
+
+    # require 1 sec of + slope to prevent a response onset after a change in slope during latency
+    # if(all(preDiff[(length(preDiff)-(1*dataRate+1)):length(preDiff)] >= 0)) { 
+
+    # alternative solution: require the preLen segment to be all positive slope to interpret a response onset 
+    if(all(preDiff[1:length(preDiff)] >= 0)) { 
+    	# calculate the difference for all samples in the post change segment
+      postDiff <- c(diff(x[(i+preLen):(i+preLen+postLen-1)]))
+      # compare the post change mean diff to the pre change mean and SD
+      
+      
+      # z-test for a significant change in means when the data are already ascending
+      if(mean(postDiff) >= qnorm(aChng, mean=mean(preDiff), sd=sd(preDiff))) { 
+        
+        
+        # locate the onset after the end of the preLen
+        y[(i+preLen)] <- 1
+        # alternative solution: locate the onset 1/2 second after the preLen segment
+        # y[(i+preLen+(dataRate/2))] <- 1 
+      }
+    } # end if to prevent introducing an onset after a change in slope during latency
+  } # end for loop
+  
+  
+  # use a function to get the onset point of a series of significant changes in positive slope
+  y <- positiveOnset(y)
+  
+  # this is the point where a new function can be used to determine the max,
+  # in a series of significant changes 
+  
+  
+  # y is now a vector of 0s with the onset of signficant changes in slope 
+  # marked by 1
+  
+  
+  return(y)
+} # end slopeChange function

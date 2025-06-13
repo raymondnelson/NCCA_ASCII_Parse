@@ -1,0 +1,139 @@
+EDAChangeFn <- function(x=tsData) {
+  # new function to determine the max sig value in a series of significant change
+  # in positive slope onset
+  # supercedes the slopeChangeFn which selected the first sig value in a run
+  # 11-24-2016 raymond nelson
+  # called by the amplitudeExtractFn() function
+  # useful to infer a response onset when the slope is already positive at stimulus onset
+  # compare each nPre seconds with the next nPost seconds
+  ###
+  # x input is the vector of time series measurements
+  # including 10 prestimulus seconds and 10 additional seconds after the evaluation window
+  ### these parameters are set in the global environment by the init script
+  # nPre is the number of pre change seconds
+  # nPost is the number of post change seconds
+  # aChange is the level of sig for the z test # currently .999
+  # p=.999 will be +3.09 standard deviations
+  # cps is data sampling rate # normally 30cps 
+  ###
+  # output is a vector of 0s the same length as input and including +1 change in slope energy,
+  # located at the max zScore during a series of changes in nPre and nPo,
+  # that exceed the aChng level of significance
+  ###
+
+	# initialize the output vector
+  y <- rep(0, times=length(x))
+  
+  # compute the z score cutpoint from the aChng quantile
+  zCut <- qnorm(aChange)
+  
+  # round the nPre and nPost segments to the nearest sample
+  preLen <- round(cps*nPre,0)
+  postLen <- round(cps*nPost,0)
+  
+  # iterate over the length of the output vector
+  for (i in 1:(length(y)-(preLen+postLen))) {
+  
+  	# calculate the difference for all samples in the pre change segment
+    preDiff <- diff(x[i:(i+preLen-1)])
+    
+    # calculate the difference for all samples in the post change segment
+    postDiff <- c( diff( x[(i+preLen):(i+preLen+postLen-1)] ) )
+
+		# z-test for a significant change in means when the data are already ascending
+		# uses the sdp() helper function to compute the population sd
+    if(mean(postDiff) >= qnorm(aChng, mean=mean(preDiff), sd=sdp(preDiff))) { 
+      # locate the sig change onset after the end of the preLen
+      y[(i+preLen)] <- 1
+    } else {
+    if(mean(postDiff) <= qnorm((1-aChng), mean=mean(preDiff), sd=sdp(preDiff))) { 
+      # locate the sig change onset after the end of the preLen
+      y[(i+preLen)] <- 1
+    }
+
+  } # end for loop
+  
+  
+  
+  
+  # calculate the difference for all values in the x input
+  # xDiff <- c(0, diff(x))
+  
+  # initialize some vectors
+  # y <- rep(0, times=length(xDiff))
+  # preDiffMean <- rep(0, times=length(xDiff))
+  # preDiffSD <- rep(0, times=length(xDiff))
+  # postDiffMean <- rep(0, times=length(xDiff))
+  # zScore <- rep(0, times=length(xDiff))
+  
+  
+  # calculate all preDiff means
+  # for (i in preLen:length(xDiff)) {
+  #   preDiffMean[i] <- mean(xDiff[(i-preLen+1):i], na.rm=TRUE)
+  # }
+  
+  # calculate all preDiff standard deviations
+  # uses a helper function sdp() to compute the population standard deviation
+  # for (i in preLen:length(xDiff)) {
+  #   preDiffSD[i] <- sdp(xDiff[(i-preLen+1):i])
+  # }
+  
+  # calculate all postDiff means
+  # for (i in (preLen+1):(length(xDiff)-postLen+1)) {
+  #   postDiffMean[i] <- mean(xDiff[i:(i+postLen-1)], na.rm=TRUE)
+  # } 
+  
+  # compute the z-score for all posDiff means compared to the preDiff means
+  for (i in (preLen+1):(length(xDiff)-postLen+1)) {
+    # calculate the zScore for each postDiff mean,
+    # using the mean and SD from the previous sample
+    zScore[i] <- (postDiffMean[i] - preDiffMean[(i-1)]) / preDiffSD[(i-1)]
+  }
+  
+  
+  # next determine which values are significant in the zScore vector
+  zScore[which(zScore < zCut)] <- 0
+  
+  
+  # then remove zScores for non-ascending segments
+  slopeDat <- fillSlope(smoothSlope(slopeDir(x),ignore))
+  zScore[which(slopeDat != 1)] <- 0
+  
+  
+  # finally iterate over the zScore vector,
+  # to locate the max zScore in each run of non-zero values
+  # first initialize the z holding variables
+  z <- 0
+  zKeep <- NULL
+  i=323
+  for (i in 1:length(zScore)) {
+    # increment the loop if the current value is zero
+    if(zScore[i] == 0) next()
+    # set the z holding variable to the non-zero i index
+    z <- i
+    # another loop to the max index for each non-zero run,
+    # in the zScore vector
+    # cannot use which.max() because there may be,
+    # multiple non-zero runs in the zScore vector
+    for (j in (z+1):length(zScore)) {
+      # stop the for loop if the next value in the zScore vector is zero
+      if(zScore[j] == 0) break()
+      # change the z index if zScore[j] is greater than zScore[z]
+      if(zScore[j] > zScore[z]) z <- j
+    } # end inner loop
+    # keep the z index if the value is greater than the last zKeep value
+    if(is.null(zKeep)) {
+      zKeep <- c(zKeep, z)
+    } else {
+      if(zScore[z] > zScore[zKeep[length(zKeep)]]) zKeep <- c(zKeep, z)
+    }
+  } # end for loop
+  
+  
+  # add the slope change onset indices to the output vector
+  y[zKeep] <- 1
+  # y is now a vector of 0s with the onset of signficant changes in slope marked by 1
+  # output the result
+  return(y)
+} # end EDAChangeFn
+

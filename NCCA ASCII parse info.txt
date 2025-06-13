@@ -1,0 +1,85 @@
+# NCCA ASCII work flow
+
+1) locate the NCCA ASCII files in the current working directory (CwD)
+by searching for files that begin with "D&-" (Lafayette) 
+or corresponding strings for Limestone, Axciton and Stoelting files. 
+Different instruments have different sampling rates. A lot of valuable archival 
+data is in Axciton NCCA ASCII format. Some data is in Stoelting, and some Limestone. 
+The second character (&) in the string "D&-" indicates the instrument type.
+There was at least one published change in the spec for the second character. 
+Due to computer system compatibility.
+
+2) source the workFlow_init.R and NCCAASCII_init.R scripts
+These initialize the workFlow parameters (what work flow is done), 
+along with some environment parameters for signal processing, feature extraction
+and scoring
+
+3) fix problem characters in the NCCA ASCII files. 
+The are non ASCII characters and non-English characters
+
+4) check and fix the sensor names so they conform to the NCCA ASCII spec.
+Some instruments are marginally compliant. 
+For example Lafayette may output sensor names incorrectly for PPG and activity sensors.
+
+5) check and fix problem characters in the question/event tags.
+Some examiners use R1O (O instead of zero) incorrectly instead of R10 
+Also some instruments incorrectly output the sacrifice question with an "R" character.
+Any question tag with "R" is interpreted as a relevant question (RQ), and any question
+with a "C" is interpreted as a comparison question (CQ).
+This can be a problem for annotations such as "CT" (clear throat),
+or question "1C" which is a neutral question not a CQ.
+Examiners should use "TS" (tussis) instead of CT and used 1A 1B and 1D but not 1C.
+But... people. 
+
+6) Parse and import the NCCA ASCII files for each exam.
+This requires iterating over the unique exams in the CWD. 
+Each exam may consist of multiple files. Multiple files can include multiple series.
+Each series within an exam will have differen questions. 
+Each series will have multiple charts.
+Some test formats have 1 chart per series (TES/DLST),
+but these can also include a 2nd short chart. (this is a point of inconsistency 
+in field polygraph procedure that is somewhat challenging and problematic,
+though examiners may not think so because they are smart enough to figure it out).
+
+All of the charts within each series should have the same identical questions. 
+There should be no changes to the questions within each series.
+A change in questions should require a new series.
+
+But humans are inconsistent.
+TES/DLST has different rules. 
+
+And Some examiners run all charts in one single series regardless of changes in questions.
+
+Some examiners change questions during a series, which is prolematic. 
+
+Parsing the NCCA ASCII files is done by the parseUniqueExams function
+in the NCCAASCIIParse.R script.
+This relies on the NCCAASCIIParseHelperFunction.R script and a number of other functions.
+
+Parsing requires evaluating the NCCA ASCII files to identify all unique exams, 
+and also identifying the unique series within each exam, 
+along with the unique charts within each series.
+
+The parseUniqueExams function will iterate over the unique exams. 
+Within each exam the function will iterate over each unique series.
+And within each series the function will iterate over each unique chart.
+
+
+
+Parsing the NCCA ASCII files will do the following
+a) isolate the header information, and aggregate for each series
+b) check that question text is identical for all charts in each series
+c) import the time series data, and aggregate for all series and all charts
+( series and charts are sliced out later during each stage of the analysis)
+d) donwsample or upsample as necessary to put the data at 30hz
+e) initialize a table of events (onset, end, answer) locations, 
+and aggregate for all series and all charts (these are sliced out later)
+f) each of the time series sensor channels is offset,
+so that the initial value of the first sample is the value 0 (zero)
+g) can also rescale the time series data to an arbitrary range (not critical,
+because scaling is done later).
+
+
+
+
+

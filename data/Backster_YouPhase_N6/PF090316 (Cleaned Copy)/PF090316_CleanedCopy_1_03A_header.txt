@@ -1,0 +1,46 @@
+Name of this file: D&-PF090316 (Cleaned Copy)-1.03A
+Source file: PF090316 (Cleaned Copy)
+Instrument: Lafayette Windows
+Software Version: 10.0.3
+Chart Date: 31Dec69
+Time: 19:00
+Examination Number: 1
+Chart Number: 3
+Number of questions: 9
+Fastest Sample Rate (Hz): 30
+Number of samples: 7380
+Number of channels: 7
+Sample Rate (Hz)- UPneumo: 30
+Sample Rate (Hz)- LPneumo: 30
+Sample Rate (Hz)- EDA1: 30
+Sample Rate (Hz)- Cardio1: 30
+Sample Rate (Hz)- Move1: 30
+Sample Rate (Hz)- DE: 30
+Sample Rate (Hz)- Aux02: 30
+
+Event    Label Statement
+01           X X
+02          13 13
+03          25 25
+04          39 39
+05         C46 C46
+06         R33 R33
+07         C47 C47
+08         R35 R35
+09         C48 C48
+10          26 26
+11          XX XX
+
+Event    Label      Begin        End     Answer
+01           X         16        136   
+02          13        159        208        219 
+03          25        930       1089       1108 
+04          39       1695       1899       1915 
+05         C46       2474       2646       2661 
+06         R33       3243       3354       3372 
+07         C47       4009       4161       4179 
+08         R35       4855       4986       4998 
+09         C48       5621       5788       5807 
+10          26       6384       6497       6524 
+11          XX       7161       7221   
+
