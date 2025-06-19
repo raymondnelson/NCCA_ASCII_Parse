@@ -1,0 +1,450 @@
+LX Edge Requirements - MEASUREMENT TABLE - DRAFT 
+June 10, 2025 
+Raymond Nelson
+
+
+
+DEFINITIONS:
+
+1. Analysis spot
+
+An analysis spot consists of a single Relevant Question (RQ) and
+Comparison Question (CQ)  response values. ESS-M uses Analysis Spots to
+compute the log(R/C) ratios that are later transformed to an multinomial
+integer score. Most manual scoring methods make use of analysis spots to
+transform observed responses to Likert-type (subjective) scores, rank
+scores or objective septile scores. Selection of analysis spots requires
+information about the exact order of the stimulus events for each chart.
+Most computer algorithms, including OSS-3, do not require information
+about the exact order of the stimulus events.
+
+2. Chart
+
+A chart consists of all recorded time-series physiological data for all
+polygraph recording sensors, from the X announcement (start of testing)
+to the XX announcement (end of testing). A chart also includes a
+time-scale and vector of events – used to record the exact location of
+all announcements, instructions, annotations, stimulus questions, and
+verbal answers. Some polygraph test formats may consist of a single
+chart. For example, the Acquaintance Test (ACQT) – which can be analyzed
+using the Ipsative-Z and other rank scoring methods – is commonly
+conducted as a single chart. Also, the Directed-Lie Screening Test
+(DLST), also known as the Test for Espionage and Sabotage (TES) is often
+conducted as a single chart (with three “charts” within the recorded
+chart), and may also include the use of a 2nd short chart to obtain a
+fourth presentation of the test target stimuli. Many test formats
+include the use of multiple charts within a series. CQT formats commonly
+have multiple charts within a series  – typically three to five charts –
+and the order of stimulus presentation will often vary for the different
+charts within a CQT series. All charts within each series will commonly
+have the same questions. Common practice is for field examiner to
+initialize a new series whenever the test questions have changed.
+However, CIT exams may include use different question for each chart
+within a CIT series.
+
+3. Comparison Question Technique (CQT)
+
+The Comparison Question Technique (CQT) is a commonly used polygraph
+technique consisting of a test question sequence that includes relevant
+questions (RQs) and comparison questions (CQs), in addition to other
+procedural questions. CQT data are analyzed using a combination of
+ipsative methods and norm-referenced methods. Commonly CQT formats
+include the Federal Zone Comparison Test (FZCT), YouPhase/BiZone Test
+(BZCT), United States Air-Force Modified General Question Technique
+(USAF MGQT), The Directed-Lie Screening Test (DLST), and similar test
+formats developed at the University of Utah.
+
+4. Concealed Information Test (CIT)
+
+The concealed in formation test (CIT) is conceptually similar to the
+older guilty knowledge test (GKT) and peak of tension (POT) technique.
+The CIT is a diagnostic tool. It consists of a series of relevant
+questions for which only the examiner and a guilty examinee will know
+which question actually describes the details of a known problem (known
+incident or known allegation). CIT data can be subject to statistical
+analysis using integer scores and a multinomial reference model. The CIT
+includes the use of multiple charts with different questions in each
+chart. Some examiners may conduct the CIT with each list of different
+questions recorded as a separate series.
+
+6. Exam (examination)
+
+The terms “exam” and “examination” are used in this document to refer to
+all series and all charts conducted with a single examinee during a
+single scheduled examination (typically on one calendar date) including
+the polygraph interview, data acquisition, and data analysis for all
+series within the exam. For the purpose of data analysis and software
+development, the term “exam” refers to the recorded time-series data for
+all charts and all series.
+
+5. Feature extraction
+
+Feature extraction is the first part of data analysis (following an
+initial QA process to ensure that sufficient data have been acquired to
+attempt analysis). Data analysis is completed for each series, using a
+variety of methods that are intended for use with each different test
+format (CQT, CIT, etc.).
+
+6. Numerical transformation
+
+Numerical transformation occurs after identification of the exact
+location of response onset and response end for each stimulus event, and
+involves the reduction transformation of time-series data into a single
+numerical value that represents the physiological activity (or change in
+physiological activity) that occurs in response to each test stimulus
+question. Numerical transformation also refers to the reduction of
+feature extraction values for the array of recording sensors to subtotal
+scores for the test target stimuli, and grand total scores for series.
+Although computer algorithms will necessarily approach feature
+extraction and numerical transformation as distinct functions, field
+practitioners who manually score polygraph data may demonstrate
+over-learned skills in which they execute these functions quickly and
+intuitively – often while regarding of feature extraction and numerical
+transformation as a single function.
+
+7. Relevant/Irrelevant (R/I) Technique
+
+A polygraph technique consisting of relevant questions (RQs) and neutral
+(irrelevant) questions. The R/I test does not include comparison
+questions. Manual scoring methods for R/I exams are traditionally visual
+and subjective. However, some computers algorithms such as the
+Ipsative-Z method can compute a statistical classifier for R/I
+examination data. The R/I technique is conducted as a series of several
+charts in which some charts may included planned or unplanned repetition
+of some test stimuli (potentially resulting in different events with the
+same Label).
+
+8. Series
+
+A series consists of all charts with the same test stimulus questions. 
+Data for each series is stored in a separate folder within a PF. Some
+exams, consist of one single series. For example, a Concealed
+Information Test (CIT) format may have a single series with multiple
+charts. [It is also possible to conduct the CIT with each chart as a
+separate series.] Other exams may consist of multiple series. For
+example, comparison question test (CQT) formats most often require the
+use of an Acquaintance Test (ACQT) before recording the CQT charts. All
+charts within each series are scored together – though the method of
+analysis may vary, and the method of combining data for different charts
+may vary.
+
+Note: LX Software used the term “EXAM” to name the different folders for
+each series,. Each series folder was numbered: “EXAM1”, “EXAM2”,
+“EXAM3”, etc. (with no spaces in the folder name). In contrast LX Edge
+uses the term “Series” for the folders with the data for each series
+stored in a separate numbered folder: “Series 1”, “Series 2”, “Series
+3”, etc. (note the use of a space in the LX Edge series folder names).
+
+DISCUSSION:
+
+The common scenario is a CQT series with multiple charts for which the
+questions are identical, though the exact sequence of questions is
+changed for each chart. In general, examiners will start a new series
+whenever they change the questions. However, some formats may include
+the planned use of different questions for different charts. An example
+of a test format that may have different questions for different charts
+within a series is the CIT. Some examiners may conduct the CIT using a
+new series for each different list of questions. Another example of the
+use of different questions for different charts within a series can be
+observed when an examiner conducts a short chart (4th presentation) in a
+DLST exam – where the questions in the 2nd short chart will not include
+all of the questions from the longer 1st chart. Also, questions may
+differ for the charts within a CQT series as a result of ad-hoc
+(unplanned) changes during testing – such as when an examiner
+erroneously omits a question, repeats a question, or inserts an
+annotation, instruction or neutral question. Some exams may consist of
+an ACQT, along one or more CQT series, and possibly a CIT series. The
+series data is used to identify the charts within each series that are
+analyzed together.
+
+REQUIREMENTS
+
+1. A separate MeasurementsTable shall be created for each series within
+an exam.
+
+The Measurements Table can be thought of as a 2x2 table that captures
+all sensor measurements for the sequence of events for all charts for
+each series within an exam (examination). In other words, each series
+will have a different Measurements Table.
+
+2. The MeasurementsTable shall capture all information needed for
+analysis. Also captured in the MeasurementsTable is the exact order of
+presentation for all announcements, events, instructions, and
+annotations during testing.
+
+3. The MeasurementsTable shall capture information about the location of
+stimulus events within the time series data, including the sample
+indices for the beginning, end, and verbal answer associated with each
+stimulus question.
+
+Inclusion of this information facilitates error checking and
+verification of the information from feature extraction. The
+MeasurementsTable shall also capture the X (sample indices) and Y (data
+values) for analysis parameters including the Minimum Response Latency
+(MRL), Response Onset Window (ROW), and Window of Evaluation (WOE),
+along with the sample indices and data values for  the response onset
+and response peak for each stimulus event and each polygraph recording
+sensor.
+
+4. The MeasurementsTable shall be integrated with the LX Edge on-screen
+calipers, including the capability to accept a substitute a manual
+caliper measurement for the automated feature extraction.
+
+This will require over-writing the information in columns 10
+(sensorMeasurement), 16 (responseOnsetY), 17 (responseEndY), 24
+(responseOnsetX), and 25 (responseEndX) [see below] with the information
+from the caliper.
+
+5. Manual changes to the sensorMeasurements shall be tracked/audited. In
+this way the same MeasurementsTable can be used with automated feature
+extraction and Manual Scoring Calipers.
+
+VARIABLES (COLUMNS) IN THE MEASUREMENTS TABLE:
+
+1. examName
+
+Shall be used to maintain coherent association of all data for exam that
+consist of multiple series.
+
+2. seriesName
+
+Shall be used to identify all charts that are analysis together.
+
+3. chartName
+
+Shall be used to identify a complete recorded sequence of stimulus
+events within a series. Ititial stages of data analysis consists of the
+ipsative comparison of stimulus events within each chart.
+
+4. Label
+
+The ID or metadata that uniquely identifies each stimulus event within
+each chart. Polygraph field practices may sometimes permit the ad-hoc
+repetition of an event within a chart. This causes a situation in which
+2 or more events within a chart may have identical Labels – leading to
+analytic errors. The NCCA ASCII specification does not address this.
+
+5. eventLabel
+
+Used to more precisely identify each unique event within each chart.
+This information is not output in the NCCA ASCII data, and is created on
+parsing the NCCA ASCII data for analysis. A function is used to evaluate
+the Labels for each chart, searching for ad-hoc repetitions. For
+repeated events (with identical Labels) and “A” is appended to the first
+event, allowing the repeated presentation to retain the intended Label.
+For multiple repetitions a series of “A” characters is appended.
+
+6. sensorName
+
+Shall be used to identify the recording sensor used to obtain the
+information captured in the sensorMeasurement column.
+
+7. Begin
+
+Shall be used to identify the time-series sampling index where the
+stimulus onset is recorded.
+
+8. End
+
+Shall be used to identify the time-series sampling index where the
+stimulus end is recorded.
+
+9. Answer
+
+Shall be used to identify the time-series sampling index where the
+verbal answer is recorded. Note that some events may not have a verbal
+answer. For example announcements, instructions, and annotations, do not
+include a verbal answer. Also, silent answer charts may or may not
+include a verbal answer. And finally, examiners may occasionally neglect
+to enter a verbal answer. Expected verbal answer that are missing shall
+be imputed at the sample index immediately following the stimulus End
+index.
+
+10. sensorMeasurement
+
+Shall be used to capture the measured value obtained by the feature
+extraction algorithm for each recording sensor.
+
+11. preStimY
+
+Shall be used to capture the data value at the onset of a 10 second
+pre-stimulus segment. The prestimulus segment can be used to evaluate
+tonicity or baseline prior to stimulus onset.
+
+12. beginY
+
+Shall be used to capture the data value at stimulus onset.
+
+
+13. latY
+
+Shall be used to capture the data value at the end of the Minimum
+Response Latency (MRL). This can be used, together with the BeginY
+value, to evaluate if data are ascending or descending at stimulus
+onset.
+
+14. endY
+
+Shall be used to capture the data value at the stimulus End. This can be
+used, together with the BeginY value, to determine if the data are
+flat-lined or unresponsive.
+
+15. answerY
+
+Shall be used to capture the data value at the recorded point of verbal
+answer
+
+16. responseOnsetY
+
+Shall be used to capture the data value at the response onset index
+selected during feature extraction.
+
+17. responseEndY
+
+Shall be used to capture the data value at the response peak (or
+response end) index selected during feature extraction.
+
+18. rowEndY
+
+Shall be used to capture the data value at the end of the Response Onset
+Window.
+
+19. woeEndY
+
+Shall be used to capture the data value at the end of the Response Onset
+Window. This
+
+20. responseRecY
+
+Shall be used to capture the data value at the response recovery
+(half-recovery) index.
+
+21. postStimY
+
+Shall be used to capture the data value at the end of the post-stimulus
+segment (10 seconds after the WOE). This can be used to determine
+changes in tonicity. Note that the post-stimulus segment for each event
+is also the pre-stimulus segment for the next event.
+
+22. preStimX
+
+Shall be used to capture the sample index for the pre-stimulus segment 
+(10 seconds prior to stimulus onset) for each stimulus event.
+
+23. latencyEndX
+
+Shall be used to capture the sample index for the end of the MRL for
+each stimulus event.
+
+24. responseOnsetX
+
+Shall be used to capture the sample index for the response onset
+selected during feature extraction.
+
+25. responseEndX
+
+Shall be used to capture the sample index for the response peak (or
+response end) selected during feature extraction.
+
+26. ROWEndX
+
+Shall be used to capture the sample index at the end of the ROW.
+
+27. WOEEndX
+
+Shall be used to capture the sample index at the end of the WOE.
+
+28. responseRecX
+
+Shall be used to capture the sample index at the half-recovery point
+(the point at which the data have returned half-way from the
+response-peak y-value to the response onset y-value).
+
+29. postStimX
+
+Shall be used to capture the sample index at end of the post-stimulus
+segment (10 seconds after the end of the WOE).
+
+30. rankScore
+
+Shall be used to capture the Rank sensor score for each stimulus event
+(Rank 1 is the greated observed change in physiological activity).
+
+31. changeAudit
+
+Shall be used to track/audit manual changes to the automated feature
+extraction values.
+
+32. RRMScore
+
+Shall be used to capture the Relative Response Magnitude score for each
+sensor for each event. (Raskin et al., 1988)
+
+33. miritelloRankScore
+
+Shall be used to capture the Miritello Rank score for each sensor for
+each event. (Miritello, 1999)
+
+34. ipZScore
+
+Shall be used to capture the Ipsative-Z score for each sensor for each
+stimulus event. This algorithm can be used with CIT, RI, and CQT exams.
+
+35. RCScore
+
+Shall be used to capture the log(R/C) ratio computed during ESS-M
+scoring. Log(R/C) scores are used by ESS-M, and are captured only for
+RQs.
+
+36. CQName
+
+Shall be used to capture the name of the CQ selected for each RQ
+analysis spot used to compute the log(R/C) ratio. This information
+permits the examiner to inspect the analytic output.
+
+37. ESSScore
+
+Shall be used to capture the ESS-M integer score that is obtained from
+the log(R/C) ratio
+
+38. OSS3Score
+
+Shall be used to capture the standardized log(R/C) ratios that are used
+to compute OSS-3 weighted means (and p-values).
+
+39. CQMean
+
+Shall be used to capture the CQmean value used to compute the
+standardized log(R/C) ratios for OSS-3
+
+40. OSS2Score
+
+Shall be used to capture the OSS-2 integer score.
+
+41. PAScore
+
+Shall be used to capture the mean z-scores used to compute the result of
+the Probability Analysis algorithm.
+
+42. ROSSScore
+
+Shall be used to capture the integer scores from the Rank Order Scoring
+System (ROSS) – with larger rank values indicating greater changes in
+physiological activity.
+
+43. PSSScore
+
+Shall be used to capture the sensor scores for the Permutation Scoring
+System.
+
+44. bootstrapScore
+
+Shall be used to capture the sensor scores for the Bootstrap Scoring
+System.
+
+45. LXCATScore
+
+Shall be used to capture the sensor scores for the LX CAT analysis
+(ESS-M type) algorithm.
+
+

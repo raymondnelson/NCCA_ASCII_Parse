@@ -1,0 +1,44 @@
+####
+
+# 2018 LX Software Auto EDA
+
+# Butterworth low pass filter at .443Hz
+laf18"=lowPass.443(x=chartDF$c_AutoEDA)
+# used to smooth out high frequency noise
+
+# Butterworth high pass filter at .0159Hz 
+# 10 second time constant 
+# data will return 63.2% to the origin in this time
+# after 5 time constants data will return 99% to orgin
+laf18"=highPass.0159(x=chartDF$c_AutoEDA)
+
+# additional EDA smoothing in the EDASigProc.R script
+moreEDASmooth <- TRUE
+chartDF$c_AutoEDA <- MASmooth(x=chartDF$c_AutoEDA, y=8, times=2)
+# MASmoothFn is a moving average, y = number of samples, times = repetitiions of the smoothing process
+# 8 samples at 30cps = 1/4 second, passed twice through the smoothing filter
+# There may be a more elegant way of doing this but I have not taken the time to find it
+# Do this with PCASS EDA also, and also with the Manual EDA when using automated feature extraction.
+
+
+####
+
+# PCAT Auto EDA (Legacy Auto EDA)
+
+# Butterwork low pass filter at .886 Hz to reduce high freq noise
+lowPass.886 <- function(x, GAIN = 1.174704212e+01, zplane = 0.8297443748)
+
+# Butterworth high pass filter at .04 Hz to autocenter the data
+highPass.04 <- function(x, GAIN = 1.004188815e+00, zplane = 0.9916573165)
+
+
+ additional EDA smoothing in the EDASigProc.R script
+moreEDASmooth <- TRUE
+chartDF$c_AutoEDA <- MASmooth(x=chartDF$c_AutoEDA, y=8, times=2)
+# MASmoothFn is a moving average, y = number of samples, times = repetitiions of the smoothing process
+# 8 samples at 30cps = 1/4 second, passed twice through the smoothing filter
+# There may be a more elegant way of doing this but I have not taken the time to find it
+# Do this with LX Polygraph EDA also
+
+
+

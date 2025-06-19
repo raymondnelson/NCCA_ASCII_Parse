@@ -1,0 +1,301 @@
+<<<<<<< HEAD
+﻿LX Edge Requirements – MANUAL SCORING CALIPERS – DRAFT
+=======
+LX Edge Requirements – MANUAL SCORING CALIPERS – DRAFT
+>>>>>>> 8cc9f23 (added requirements for manual caliper functions)
+June 10, 2025
+Raymond Nelson 
+
+
+
+DEFINITIONS:
+
+1. Calipers (manual calipers)
+
+Manual calipers are an on-screen utility that enables an examiner to obtain a manual measurement and submit it to a Measurements Table that can then be recorded manually or submitted to an automated algorithm to complete the remainder of an analytic method. A design objective of the manual caliper is to to increase the objectivity, precision, and reliability of manual scoring procedures including feature extraction and numerical transformations. Another design objective of the manual caliper is to provide a method for users to submit a manual feature extraction value to an automated computer scoring algorithm – overriding an automated feature extraction value that may be unsatisfactory. 
+
+2. Caliper amplitude (caliper value)
+
+Caliper amplitude refers to the vertical distance (measured in dimensionless units associated with the y-axis scale) from the caliper onset to caliper peak. 
+
+<<<<<<< HEAD
+3. Caliper Analysis Spot
+
+The Caliper Analysis Spot is a function of the Manual Scoring Caliper. It enables a user to use the Manual Scoring Caliper to measure an RQ and temporarily save the information, then measure a CQ and temporarily save the information. Saved information is then used to compute an ESS-M score for the RQ. The Caliper Analysis Spot is intended to assist with, not replace, manual scoring tasks. It does not automatically select the correct CQ for the analysis spot. Selection of the CQ remains a user task. The computed ESS-M score can be submitted to the Manual Score Sheet and ESS-M Report Generator. 
+
+4. Caliper end
+
+The caliper end is the vertical caliper indicator on the right side (users right). This indicate the last time­-series sample that is include in the caliper measurement function. For respiration sensors the caliper end will coincide with the response end. For EDA and cardio sensors the caliper end will indicate the end of the caliper window – the last time-series data point for which a measurement function will attempt to locate a response response peak.
+
+5. Caliper onset
+
+The caliper onset is the lower of two horizontal caliper indicators. A user can manually locate (using mouse input device) the caliper onset indicator at the y-axis level of an observed response onset. The y-axis value of the caliper onset is used, together with the caliper peak value, to compute the caliper amplitude value. 
+
+6. Caliper peak
+
+The caliper peak is the upper of two horizontal caliper indicators. A user can manually locate (using mouse input device) the caliper peak indicator at the y-axis level of an observed response onset. The y-axis value of the caliper peak is used, together with the caliper onset value, to compute the caliper amplitude value. 
+
+7. Caliper start
+
+The caliper start is the vertical caliper indictor on the left side (user’s left). This indicates the first time-series sample that is included in the caliper function. For respiration sensors the caliper start will coincide with the response onset. For EDA and cardio sensors the caliper start will indicate the beginning of the caliper window – the first time-series data point for which a measurement function will attempt to locate a response onset. 
+
+8. Caliper width (caliper space)
+
+Caliper width refers to the distance or difference, measured in seconds, from the caliper start to the caliper end. Caliper width is analogous to the Window of Evaluation (WOE). The main difference is that a caliper can be place at any arbitrary location within the time-series data, whereas automated feature extraction always sets the onset of the WOE at the stimulus onset index.
+
+9. Caliper window
+
+Caliper window refers to the rectangular box formed on-screen by the intersection of two vertical caliper indicators (caliper start and caliper end) with two horizontal caliper indicators (caliper onset and caliper peak). Although rectangular, the caliper window should not be interpreted as square – including when it visually approximates a square shape. This is because the caliper amplitude is quantified using dimensionless units associate with the y-axis scale, while the caliper width is quantified using seconds as the unit of measurements. The visual appearance of the graphic display will be influenced by the zoom level (x-scale only), while the caliper amplitude value is influenced by manual placement of the horizontal caliper indicators with regard to the sensor gain (y-axis magnification) level. 
+
+10. Feature extraction
+
+Feature extraction is the first part of data analysis (following an initial QA process to ensure that sufficient data have been acquired to attempt analysis). Data analysis is completed for each series, using a variety of methods that are intended for use with each different test format (CQT, CIT, etc.). 
+
+11. Manual Score Sheet
+
+Within the LX Edge software the Manual Score Sheet is a table, similar to the paper score sheets that are traditionally used by field polygraph examiners, where users can enter ESS-M scores. It is important the the Manual Score Sheet conform to familiar and comfortable user expectations similar to the user experience with paper score sheets. However, a software based Manual Score Sheet will provide capabilities that are not available to paper score sheets.  
+
+12. Numerical transformation
+
+Numerical transformation occurs after identification of the exact location of response onset and response end for each stimulus event, and involves the reduction transformation of time-series data into a single numerical value that represents the physiological activity (or change in physiological activity) that occurs in response to each test stimulus question. Numerical transformation also refers to the reduction of feature extraction values for the array of recording sensors to subtotal scores for the test target stimuli, and grand total scores for series. Although computer algorithms will necessarily approach feature extraction and numerical transformation as distinct functions, field practitioners who manually score polygraph data may demonstrate over-learned skills in which they execute these functions quickly and intuitively – often while regarding of feature extraction and numerical transformation as a single function. 
+
+13. Response end (response peak)
+
+For respiration data the response onset coincides with the caliper end. For EDA and cardio data the response end is the time-series data point, following a response onset and within the caliper window, with the greatest y-axis value. This is commonly the point at which the time-series data change from from positive slope to negative slope (subsequent to a response onset). If there are multiple slope changes and multiple peaks within the caliper window, the response end is the peak with the maximum y-axis value, occurring after a response onset. The response end may coincide with the caliper end if the slope of the time-series data is positive at caliper onset and remains positive for the duration of the caliper window. 
+
+14. Response onset
+
+Response onset to the time-series data point at which a physiological response begins (in response to a test question). For respiration data the response onset coincides with the caliper start. For EDA and cardio sensors the response onset will be the lowest point (typically the point at which the time-series data change from negative slope to positive slope) prior to a response peak with a greater y-axis value. When slope of the data is positive at caliper start and remains positive through the entire caliper width the lowest point will coincide with the caliper start. 
+
+15. Response value (response amplitude)
+=======
+2. Caliper end
+
+The caliper end is the vertical caliper indicator on the right side (users right). This indicate the last time­-series sample that is include in the caliper measurement function. For respiration sensors the caliper end will coincide with the response end. For EDA and cardio sensors the caliper end will indicate the end of the caliper window – the last time-series data point for which a measurement function will attempt to locate a response response peak.
+
+4. Caliper onset
+
+The caliper onset is the lower of two horizontal caliper indicators. A user can manually locate (using mouse input device) the caliper onset indicator at the y-axis level of an observed response onset. The y-axis value of the caliper onset is used, together with the caliper peak value, to compute the caliper amplitude value. 
+
+5. Caliper peak
+
+The caliper peak is the upper of two horizontal caliper indicators. A user can manually locate (using mouse input device) the caliper peak indicator at the y-axis level of an observed response onset. The y-axis value of the caliper peak is used, together with the caliper onset value, to compute the caliper amplitude value. 
+
+3. Caliper start
+
+The caliper start is the vertical caliper indictor on the left side (user’s left). This indicates the first time-series sample that is included in the caliper function. For respiration sensors the caliper start will coincide with the response onset. For EDA and cardio sensors the caliper start will indicate the beginning of the caliper window – the first time-series data point for which a measurement function will attempt to locate a response onset. 
+
+9. Caliper width (caliper space)
+
+Caliper width refers to the distance or difference, measured in seconds, from the caliper start to the caliper end. Caliper width is analogous to the Window of Evaluation (WOE). The main difference is that a caliper can be place at any arbitrary location within the time-series data, whereas automated feature extraction always sets the onset of the WOE at the stimulus onset index.
+
+3. Caliper window
+
+Caliper window refers to the rectangular box formed on-screen by the intersection of two vertical caliper indicators (caliper start and caliper end) with two horizontal caliper indicators (caliper onset and caliper peak). Although rectangular, the caliper window should not be interpreted as square – including when it visually approximates a square shape. This is because the caliper amplitude is quantified using dimensionless units associate with the y-axis scale, while the caliper width is quantified using seconds as the unit of measurements. The visual appearance of the graphic display will be influenced by the zoom level (x-scale only), while the caliper amplitude value is influenced by manual placement of the horizontal caliper indicators with regard to the sensor gain (y-axis magnification) level. 
+
+4. Feature extraction
+
+Feature extraction is the first part of data analysis (following an initial QA process to ensure that sufficient data have been acquired to attempt analysis). Data analysis is completed for each series, using a variety of methods that are intended for use with each different test format (CQT, CIT, etc.). 
+
+5. Numerical transformation
+
+Numerical transformation occurs after identification of the exact location of response onset and response end for each stimulus event, and involves the reduction transformation of time-series data into a single numerical value that represents the physiological activity (or change in physiological activity) that occurs in response to each test stimulus question. Numerical transformation also refers to the reduction of feature extraction values for the array of recording sensors to subtotal scores for the test target stimuli, and grand total scores for series. Although computer algorithms will necessarily approach feature extraction and numerical transformation as distinct functions, field practitioners who manually score polygraph data may demonstrate over-learned skills in which they execute these functions quickly and intuitively – often while regarding of feature extraction and numerical transformation as a single function. 
+
+6. Response end (response peak)
+
+For respiration data the response onset coincides with the caliper end. For EDA and cardio data the response end is the time-series data point, following a response onset and within the caliper window, with the greatest y-axis value. This is commonly the point at which the time-series data change from from positive slope to negative slope (subsequent to a response onset). If there are multiple slope changes and multiple peaks within the caliper window, the response end is the peak with the maximum y-axis value, occurring after a response onset. The response end may coincide with the caliper end if the slope of the time-series data is positive at caliper onset and remains positive for the duration of the caliper window. 
+
+7. Response onset
+
+Response onset to the time-series data point at which a physiological response begins (in response to a test question). For respiration data the response onset coincides with the caliper start. For EDA and cardio sensors the response onset will be the lowest point (typically the point at which the time-series data change from negative slope to positive slope) prior to a response peak with a greater y-axis value. When slope of the data is positive at caliper start and remains positive through the entire caliper width the lowest point will coincide with the caliper start. 
+
+11. Response value (response amplitude)
+>>>>>>> 8cc9f23 (added requirements for manual caliper functions)
+
+Response amplitude refers to the maximum vertical distance (measured in dimensionless units associated with the y-axis scale) from response onset response peak. 
+
+DISCUSSION:
+
+Manual (on-screen) calipers consist of two sets of straight lines that are overlaid onto the chart using a color visibly distinct from the information displayed in the chart. Two of the lines are horizontal and two of the lines are vertical. The four caliper lines can be moved onscreen via mouse or keyboard. Separate and distinct caliper measurement functions are required for each polygraph sensor. 
+
+Manual Scoring Calipers serve as a bridge between automated and manual analysis, and permit a user to manually override an automated feature extraction that may be unsatisfactory. Manual calipers can provide two modes of functionality. 
+
+One mode of caliper functionality is to measure the time series data within the caliper indicators (rectangular box overlaid onto the chart) using fixed a fixed caliper width (vertical caliper indicators). For respiration data, the Respiration Line Excursion (RLE) value can be obtained for the fixed caliper width. Vasomotor log(pre/post) ratios can obtained via the automated feature extraction method while using the caliperStart index to define the prestimulus, latency, and stimulus segments. This will provide the user with the same output values as the automated feature extraction when the caliperStart is placed at the stimulus onset. For EDA and cardio data, ahe user can then click-drag the horizontal caliper indicators to the y-axis locations where they wish to indicate the caliper onset and caliper peak values that will be used to compute the caliper amplitude (shown by the vertical height of the rectangular caliper window). The caliper amplitude can be recorded manually. The caliper amplitude can also be submitted to the Measurements Table to override the automated feature extraction information, including the sensorMeaurement, responseOnsetX, responseOnsetY, responseEndX, and responseEndY values. 
+
+A second mode of caliper functionality can be provided for EDA and cardio data. Whereas the first mode of function (previously described) would obtain the amplitude measurements using the horizontal caliper indices, this second mode would use only the vertical caliper indicates (caliperStart and caliperEnd) and would call functions to automatically identify EDA and cardio responseOnset points and responsePeak points. In the event of an unsatisfactory caliper measurement, a user could coerce the caliper to make use of an examiner’s intended responseOnset and responseEnd points by moving the vertical caliper indices prior to recording the caliperAmplitude value or prior to submitting a caliperAmplitude value to the Measurements Table. 
+
+Manual scoring caliper settings include the caliper width (inherited from the WOE parameter used by the automated feature extraction functions). However, Manual scoring calipers do not include a minimum response latency (MRL) or response onset window (ROW). The reason for this is that manual scoring calipers can be used at any arbitrary  differ from automated feature extraction functions 
+
+Caliper measurements for EDA data this could be obtained using either the Auto-EDA or Manual-EDA data. Use of Auto-EDA data is recommended. For cardio data caliper measurements could be using a mid-line computed from all cardio data points, and could also use the diastolic or systolic lines. Polygraph feature development research has used the mid-line. However, software tools intended for polygraph field practice have not included functions to compute the mid-line. As a result, field polygraph examiners have traditionally used the diastolic line for analysis. Although there is substantial covariance for the diastolic, systolic, and mid-lines, use of the mid-line is more robust against artifacts and provides a slightly stronger criterion coefficient. 
+
+PERFORMANCE REQUREMENTS:
+
+1. On-screen calipers shall make use of the same data that is displayed to the examiner. This will foster trust and confidence that users are likely to obtain the same values as the calipers – that the caliper is essentially doing the same thing the user would do using the same data that that is available to the user. 
+
+2. On-screen calipers shall provide consistent measurements at all zoom and gain levels. This will ensure that R/C ratios are not influenced by the range of reasonable aesthetic display choices that different field polygraph examiners may prefer. [There may be practical limits to this when gain values are very small.]
+
+3. Manual Scoring Calipers shall output the 
+
+FUNCTIONAL REQUIREMENTS:
+
+1. Activation of the manual caliper function shall produce a visual rectangular box overlaid on the chart display.
+
+2. The caliper width (in seconds) shall not change when a user alters the zoom level (x-axis) of the chart display.
+
+3. The chart display shall instantly relocate the caliper at any question when a user clicks on a question label in the question sequence below the chart viewer.
+
+4. The caliper start indicator and caliper stop indicator shall not move with regard to the chart viewer, but do move with regard to the chart data when the user selects a different question by clicking on a question label in the question sequence below the chart viewer. 
+
+5. The caliper start indicator shall be considered “moved” if the user click-drags the chart, without moving the caliper indicators, so that the caliper start indicator is relocated to a different sample within the time series chart data.
+
+6. The caliper start indicator shall be considered “moved” if the user click-drags the caliper start indicator. 
+
+7. The caliper width shall reset to the value in the User Settings (default = 15 seconds) whenever the caliperStart index is moved.
+
+8. Relocating a caliperStart indicator a shall trigger the recalculation of caliper output values. (Relocation of the caliperStart indicator can be accomplished in three ways: 1) by clicking a question Label in the question sequence shown below the chart viewer, 2)by click-dragging the chart to align with the caliperStart indicator at a desired point, and 3), by click-dragging the caliperStart indicator.)
+
+9. Relocating the caliperEnd indicator by click-dragging the caliperEnd indicator shall trigger the recalculation fo caliper output values. (This will permit a user to first locate the caliperStart at the stimulusOnset sample for a desired question, and then coerce the correct responseOnset and responseEnd points if necessary, before recording or submitting the caliper values.) 
+
+10.  Selection of caliper mode 1 shall prompt the display of both vertical and horizontal caliper indicators.
+
+11. Selection of caliper mode 1 shall include feature extraction (measurement) of respiration and vasomotor data
+
+12. Selection of caliper mode 1 shall measure the EDA and cardio data using the horizontal caliper indicators. 
+
+13. Selection of caliper mode 2 shall prompt the display of only the vertical caliper indicators.
+
+14. Selection of caliper mode 2 shall initiate the feature extraction (measurement) of EDA and cardio data according to the requirements described below, using the vertical indicators for caliper onset and caliper end.
+
+CALIPER MEASUREMENT REQUIREMENTS:
+
+1. Time values shall be measured in seconds (not inches or millimetes).
+
+2. The y-axis scale for the chart viewer shall be 2000 units from -1000 to + 1000 with zero in the horizontal middle of the graphic display. Alternatively, zero can be located at each sensor arrow, where each sensor has a y-axis range of 2000 units.
+
+3. No suggestion or implication shall be made that the time-series physiology us measured in in physical units (inches, millimeters, pixels, ohms, siemens, etc.)
+
+RESPIRATION CALIPER REQUIREMENTS
+
+1. For respiration sensors the caliper output value (measurement) shall be expressed in dimensionless units that are proportional to the y-axis scale.
+
+2. Respiration measurements shall be obtained using an RLE method that involves a fixed WOE of 15 seconds (subject to empirical and statistical optimization) and sliding window of 3.75 seconds (approximately 1 respiration cycle at the median respiration rate of 6 cpm). The sliding window is then moved across the WOE one sample at a time. RLE (the sum of all absolute differences in y-axis values for all samples in the sliding window) is computed and recorded. An advantage of the sliding window method is that it permits a more intuitive comparison of the output values and criterion effects while varying the length of the WOE – facilitating the study and optimization of the WOE.
+
+4. The output value is the mean of the RLE values for all iterations of the sliding window during the WOE.
+
+5. An answering buffer of 1.5 seconds before and 1.5 seconds after the recorded point of verbal answer shall be excluded from measurement (this reduces the influence of common answering artifacts). This can be accomplished by setting data values to NA and then ignoring NA values during computation). Use of the answering buffer requires monitoring the Events column in the time series data to determine the presence of a verbal answer in the caliper space. 
+
+EDA CALIPER REQUIREMENTS
+
+1. EDA measurement shall be in dimensionless units proportional to the y-axis scale.
+
+2. The EDA response onset point shall be extracted from the time-series data at the point where the time-series data change from negative-slope or zero-slope to positive-slope.
+
+3. If the EDA data have positive slope and the caliper onset indicator and persist in a positive slope through the entire duration of the caliper space, the response onset point shall the extracted as the data point lowest y-axis value – coinciding with the caliper start indicator. This will permit a user to coerce the correct feature extraction by click-dragging caliper start indicator at a point of inflection within a positive slope segment. 
+
+4. The EDA response peak shall be extracted from the point of greatest y-axis value during a positive slope segment following a response onset. This might be observed as the point where the time-series data change from positive slope to negative slope, and might coincide with the caliper end indicator if the EDA data continue to ascend beyond the caliper space. 
+
+5. If the EDA data are ascending at the point of the caliper end indicator, and continue to ascend beyond the caliper end indicator, the ascending data after the caliper end indicator shall be excluded from the measured response. If necessary, a user may coerce the correct response peak extraction by click-dragging the caliper end indicator to a point that includes a late EDA response peak. [Caliper width shall be reset to 15 seconds (or default) when the caliper start indicator is moved to the next stimulus event.]
+
+6. The EDA response value shall be the y-axis difference between the response peak and preceding response onset. If there are multiple response onset points or multiple response peak points the EDA response value shall be the maximum y-axis difference between a response peak and preceding response onset. 
+
+7. The EDA caliper value shall be zero (0), and there shall be no response amplitude, if the caliper width set to less than 2 seconds. This will permit a user to submit a coerced caliper value of zero (0) to the Measurements Table – excluding an EDA segment from analysis if there is an artifact or if there is no usable response. 
+
+8. The measurement value shall be zero (0), and there shall be no response amplitude, if the EDA data have a negative slope or zero slope and there is no response onset (no point of change from negative slope or zero slope to positive slope) within the caliper space.
+
+9. When the caliper value is zero (0) their shall be no responseOnsetX or responseEndX indices, and the responseOnsetY and responseEndY values shall be empty. 
+
+CARDIO CALIPER REQUIREMENTS
+
+1. Cardio measurement shall be in dimensionless unit proportional to the y-axis scale.
+
+2. Cardio measurements shall be extracted by default from a cardio mid line that is computed as a moving average of all cardio data points. Alternatively, a user cardio measurements may be extracted from the diastolic line or systolic line.
+
+3. The cardio response onset point shall be extracted from the time-series data at the point where the time-series data change from negative-slope or zero-slope to positive-slope.
+
+4. If the cardio data have positive slope and the caliper onset indicator and persist in a positive slope through the entire duration of the caliper space, the response onset point shall the extracted as the data point lowest y-axis value – coinciding with the caliper start indicator. 
+
+5. The cardio response peak shall be extracted from the point of greatest y-axis value during a positive slope segment following a response onset. This might be observed as the point where the time-series data change from positive slope to negative slope, and might coincide with the caliper end indicator if the cardio data continue to ascend beyond the caliper space. 
+
+6. If the cardio data are ascending at the point of the caliper end indicator, and continue to ascend beyond the caliper end indicator, the ascending data after the caliper end indicator shall be excluded from the measured response. If necessary, a user may coerce the correct response peak extraction by click-dragging the caliper end indicator to a point that includes a late cardio response peak. [Caliper width shall be reset to 15 seconds (or default) when the caliper start indicator is moved to the next stimulus event.]
+
+7. The cardio response value shall be the y-axis difference between the response peak and preceding response onset. If there are multiple response onset points or multiple response peak points the cardio response value shall be the maximum y-axis difference between a response peak and preceding response onset. 
+
+8. The cardio caliper value shall be zero (0), and there shall be no response amplitude, if the caliper width set to less than 2 seconds. This will permit a user to submit a coerced caliper value of zero (0) to the Measurements Table – excluding a cardio segment from analysis if there is an artifact or if there is no usable response.
+
+9. The measurement value shall be zero (0), and there shall be no response amplitude, if the EDA data have a negative slope or zero slope and there is no response onset (no point of change from negative slope or zero slope to positive slope) within the caliper space.
+
+10. When the caliper value is zero (0) their shall be no responseOnsetX or responseEndX indices, and the responseOnsetY and responseEndY values shall also be empty.
+
+VASOMOTOR CALIPER REQUIREMENTS
+
+1. Vasomotor measurements shall be in dimensionless unit proportional to the y-axis scale.
+
+2. The vasomotor response feature shall be the suppression of vasomotor pulse amplitude, beginning after stimulus onset and after a vasomotor response latency period, relative to the pulse amplitude during the prestimulus segment.
+
+3. The vasomotor pulse amplitude shall be measured by first interpolating the peak-to-peak lines for the vasomotor systolic and diastolic points, and then computing the difference between each pair of samples in the vasomotor systolic and diastolic lines.
+
+4. The response value for the vasomotor sensor shall be a log(pre/stim) ratio that is computed from the three (3) second prestimulus period (3 seconds immediately preceding stimulus onset) and a five (5) second stimulus segment beginning after a five (5) second vasomotor response latency period. Larger numerical values signify greater changes in physiological activity. Negative numbers signify and absence of a usable response and can either be discarded for retained. 
+
+CALIPER INFORMATION DISPLAY
+
+1. Caliper information shall be displayed to the user when the caliper function is active. 
+
+2. Caliper information shall include the pulse rate and respiration rate for the caliper segment, and for the entire chart.
+
+3. Caliper information shall include the RLE response value – computed while excluding the period surrounding the recorded point of verbal answer – for the thoracic and abdominal respiration sensors.
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8cc9f23 (added requirements for manual caliper functions)
+4. Caliper information shall also include the thoracic and abdominal response values without exclusion of the period surrounding the point of verbal answer. This will permit the visualization of the effect of common answering distortions, and will also permit the study and optimization of the answer distortion buffer.
+
+4. Caliper information shall include the EDA amplitude value, measured in dimensionless units proportional to the y-axis scale. 
+
+5. Caliper information shall include the Cardio amplitude value, measured in dimensionless units proportional to the y-axis scale. 
+
+6. Caliper information shall include the Vasomotor pre/post ratio, measured in dimensionless units proportional to the y-axis scale.
+
+CALIPER OUTPUT REQUIREMENTS:
+
+1. A user shall, using either the mouse input device or keyboard shortcuts, be able to save the caliper display information for a selected stimulus segment to a Manual Caliper Table that can be saved a .CSV file. 
+
+2. The Manual Caliper Table shall include the following data columns: <>
+
+<<<<<<< HEAD
+3. A user shall be able to submit  ESS-M scores from the Caliper Analysis Spot to the Manual Score Sheet in LX Edge. 
+
+=======
+>>>>>>> 8cc9f23 (added requirements for manual caliper functions)
+3. A user shall be able to manually submit values from the caliper information to the Measurements Table (submitted to automated scoring algorithms) for a selected stimulus event – overriding the automated feature extraction information.
+
+4. The software shall audit all values that are manually input to the Measurements Table (submitted to automated scoring algorithms), and the audit flags shall indicated manual/override values on all automated algorithm output reports. 
+
+CALIPER ANALYSIS SPOT
+
+1. Manual scoring caliper shall include the capability to select an analysis spot, consisting of a single RQ and a single CQ.
+
+2. The user shall be able to assign the caliper information for a caliper selection to the Caliper Analysis Spot RQ Slot using mouse input device or keyboard shortcut.
+
+3. The user shall be able to assign the caliper information for a caliper selection to the Caliper Analysis Spot CQ Slot using mouse input device or keyboard shortcut.
+
+4. When the caliper function is active and when both the RQ Slot and CQ Slot are populated, the software shall compute the log(R/C) ratio and recommended ESS-M score.
+
+5. A user shall, using either the mouse input device or keyboard shortcuts, be able to save the computed information from the Caliper Analysis Spot to a Manual Scoring Table that can be saved as a .CSV file. This will enable a user to use the calipers to manually score ESS-M and output the results (though the table format will differ from a traditional manual score sheet.
+
+6. The output table for Manual Caliper Analysis Spots shall include the following columns: <>
+
+CALIPER ESS-M CONSTRAINTS
+
+1. Manual scoring calipers shall make use of the same ESS-M ratio constraints as the automated ESS-M algorithm.
+
+2. ESS-M ratio constraints shall be included in user preferences for ESS-M.
+
+CALIPER PREFERENCES/SETTINGS REQUIREMENTS:
+
+1. Ratio constraints for the Caliper Analysis Spot shall be inherited from the ESS-M preferences (settings).
+
+2. The default caliper width shall be 15 seconds.
+
+
+
+
