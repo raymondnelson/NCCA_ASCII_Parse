@@ -41,14 +41,14 @@ library(stringr)
 ####
 
 {
-  # dataReduceFn needs another function for the time scale
-  source(paste0(RPath, 'toMinSec.R'), echo=FALSE)
-  
   # source a script to load the addColumnsFn() function
   source(paste0(RPath, 'addColumns.R'), echo=FALSE)
   
   # source a script for the dataReduceFn()
   source(paste0(RPath, 'dataReduce.R'), echo=FALSE)
+  
+  # dataReduceFn needs another function for the time scale
+  source(paste0(RPath, 'toMinSec.R'), echo=FALSE)
 }
 
 
@@ -1076,6 +1076,9 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
       # chartDF$Label[which(chartDF$Label != "")]
       chartDF$Label <- toupper(chartDF$Label)
       
+      # 2025 June 19 # fix the question labels in the chartDF
+      chartDF$Label <- fixTagsFn(x=chartDF$Label)
+      
       chartDF$Time <- str_trim(chartDF$Time, side="both")
       chartDF$Time <- str_sub(paste0("0", chartDF$Time), -8, -1)
       
@@ -1116,6 +1119,10 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
       chartDF <- chartDF[which(!is.na(chartDF$Sample)),]
       
       # chartDF$Label <- as.character(chartDF$Label)
+      
+      # 2025 June 19 # fix the question labels in the chartDF
+      chartDF$Label <- fixTagsFn(x=chartDF$Label)
+      # unique(chartDF$Label)
       
     } # end if is FALSE  useAlternate
     
@@ -1178,6 +1185,7 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
       if(stopXXX) {
         if(any(!(c("X", "XX") %in% chartLabels))) {
           print("missing X and/or XX")
+          # stop()
           next()
         }
       }
@@ -1984,6 +1992,15 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("XX_XX", "XX", x)
   x <- gsub("XXX", "XX", x)
   x <- gsub("XXXX", "XX", x)
+  
+  x <- gsub("SR_Sa1", "SA", x)
+  x <- gsub("SA1", "SA", x)
+            
+  x <- gsub("N_N", "N", x)
+  x <- gsub("R_R", "R", x)
+  x <- gsub("C_C", "C", x)
+  
+  x <- gsub("N_4KEY", "4KEY", x)
   
   x <- gsub("RELEVANT", "R", x)
   x <- gsub("RELEVA", "R", x)

@@ -417,6 +417,22 @@ print("init parameters for the NCCA ASCII work flow")
 
     }
     
+    {
+      # reconfig E for STOELTING LAB CASES
+      removeAnnotations <- FALSE
+      trimExcessTime <- TRUE
+      stopXXX <- TRUE
+
+      EDAFilt="none"
+
+      fixNonASCIICharacters <- TRUE
+      fixSensorNames <- TRUE
+
+      # DRule <- "TSR"
+      DRule <- "SSR"
+      
+    }
+    
     
   }
   
@@ -515,6 +531,7 @@ print("init parameters for the NCCA ASCII work flow")
   getBootstrapScores <- TRUE
   
   getPCATScores <- TRUE
+  getPCATScores <- FALSE
   
   # PCASS2bootSize <- 1000
 

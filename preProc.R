@@ -3,7 +3,7 @@
 # 4/23/2016
 # Raymond Nelson
 
-# contains 3 helper fuctions 
+# contains 3 helper functions 
 
 # fixTagsFn()
 # setColRangeFn()
@@ -227,7 +227,7 @@ setColRangeFn <- function(DAT, y=30000, firstRow=firstEvent, lastRow=lastEventEn
   # y is the max range value 
   ###
   # get the current data range
-  rangeVal <- max(DAT[firstRow:lastRow]) - min(DAT[firstRow:lastRow])
+  rangeVal <- max(DAT[firstRow:lastRow], na.rm=TRUE) - min(DAT[firstRow:lastRow], na.rm=TRUE)
   rangeCoef <- y / rangeVal
   # in case there is a dead sensor with no activity
   ifelse(rangeVal < 5,
@@ -239,10 +239,10 @@ setColRangeFn <- function(DAT, y=30000, firstRow=firstEvent, lastRow=lastEventEn
   ## Mar 7, 2025 - modification to fix data drops (Axciton charts in the 2002 DodPI archive) ##
   {
     xMed <- median(DAT)
-    x25th <- quantile(DAT, .25)
-    x75th <- quantile(DAT, .75)
-    x99th <- quantile(DAT, .99)
-    x01th <- quantile(DAT, .01)
+    x25th <- quantile(DAT, .25, na.rm = TRUE)
+    x75th <- quantile(DAT, .75, na.rm = TRUE)
+    x99th <- quantile(DAT, .99, na.rm = TRUE)
+    x01th <- quantile(DAT, .01, na.rm = TRUE)
     xIQR <- x75th - x25th
     xLimitLow <- xMed - (1 * xIQR)
     xLimitHigh <- xMed - (1 * xIQR)
@@ -527,7 +527,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
           # start at column 11 because that is the first data column in chartDF
           for (l in 11:lastDataCol) {
             # use a function to center the data
-            chartDF[,l + lastDataCol - 10] <- centerColumn(chartDF[,l])
+            chartDF[,l + lastDataCol - 10] <- centerColumn(x=chartDF[,l])
           } # end loop over l columns to center data
           
           # View(chartDF)
@@ -538,17 +538,17 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
         
         {
         
-          # first source the sigProcHelper.R script
-          # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-          
-          firstLastEvents <- getFirstLastEventFn(x=chartDF)
-          firstEvent <- firstLastEvents[1]
-          lastEventEnd <- firstLastEvents[2] - 450
-          # in case of short charts
-          if(lastEventEnd < 1) lastEventEnd <- nrow(chartDF)
-          # assign("firstLastEvents", firstLastEvents, pos=1)
-          print(firstEvent)
-          print(lastEventEnd)
+          # # first source the sigProcHelper.R script
+          # # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+          # 
+          # firstLastEvents <- getFirstLastEventFn(x=chartDF)
+          # firstEvent <- firstLastEvents[1]
+          # lastEventEnd <- firstLastEvents[2] - 450
+          # # in case of short charts
+          # if(lastEventEnd < 1) lastEventEnd <- nrow(chartDF)
+          # # assign("firstLastEvents", firstLastEvents, pos=1)
+          # print(firstEvent)
+          # print(lastEventEnd)
           
         }
         
@@ -556,20 +556,20 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
         
         {
           
-          print("  set the range for the time series data")
-          
-          # first source the sigProcHelper.R script
-          
-          # start at the first data column 11
-          useCols <- ((11 + (lastDataCol - 10)):((lastDataCol + 1) + (lastDataCol - 11)))
-          m=17
-          for (m in min(useCols):max(useCols)) {
-            # use a function for each data column
-            # colRange is set in the init
-            if(!exists("colRange", envir=.GlobalEnv)) colRange=30000
-            chartDF[,m] <- setColRangeFn(DAT=chartDF[,m], y=colRange, firstRow=firstEvent, lastRow=lastEventEnd)
-            # plot.ts(chartDF[,m])
-          } 
+          # print("  set the range for the time series data")
+          # 
+          # # first source the sigProcHelper.R script
+          # 
+          # # start at the first data column 11
+          # useCols <- ((11 + (lastDataCol - 10)):((lastDataCol + 1) + (lastDataCol - 11)))
+          # m=17
+          # for (m in min(useCols):max(useCols)) {
+          #   # use a function for each data column
+          #   # colRange is set in the init
+          #   if(!exists("colRange", envir=.GlobalEnv)) colRange=30000
+          #   chartDF[,m] <- setColRangeFn(DAT=chartDF[,m], y=colRange, firstRow=firstEvent, lastRow=lastEventEnd)
+          #   # plot.ts(chartDF[,m])
+          # } 
           
         }
         
@@ -932,6 +932,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
             uniqueEvents <- chartDF$Label
             # 3-23-2017
             # uniqueEvents <- chartDF$eventLabel
+            # tail(uniqueEvents)
             
             # use a loop to keep a single index for each unique event end
             l=1
@@ -940,7 +941,9 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
               # if(chartDF$eventLabel[l] == chartDF$eventLabel[l+1]) uniqueEvents[l] <- ""
             } # end for loop over uniqueEvents
             
+            # uniqueEvents[which(uniqueEvents != "")]
             stimQuestionEnd <- which(uniqueEvents != "")
+            # uniqueEvents[stimQuestionEnd]
             
             # Oct 2, 2023 removed "Y" and "N" because "Y" is an annotation
             answerWords <- c("YES", "NO", "ANS")
@@ -948,6 +951,9 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
             # exclude verbal answers YES, NO and ANS
             stimQuestionEnd <- 
               stimQuestionEnd[which(!(chartDF$Label[uniqueEvents!=""] %in% answerWords))]
+            # uniqueEvents[stimQuestionEnd]
+            
+            stimQuestionEnd <- stimQuestionEnd[!is.na(stimQuestionEnd)]
             
             missingQuestions  <- which(!(chartDF$Label[stimQuestionEnd] %in% stimQuestions))
             if(length(missingQuestions > 0)) {
@@ -1170,6 +1176,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
           # need to build a new eventDF
           # newEventDF was initialized earlier in the i loop
           newEventDF <- rbind(newEventDF, chartEventsDF)
+          # View(chartEventsDF)
           # View(newEventDF)
           
           # check that the first event onset is before the end
@@ -1209,7 +1216,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
             
           } # end if for nrow(chartEventsDF) >= 2
             
-            # add the data to the new columns in the chart data frame
+          # add the data to the new columns in the chart data frame
           {
             chartDF$Events[chartEventsDF$Begin] <- "onsetRow"
             chartDF$Events[chartEventsDF$End] <- "offsetRow"
@@ -1228,7 +1235,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
             chartDF$eventLabel <- fixTagsFn(chartDF$eventLabel)
           }
           
-          # add the info to the eventLable stimText and Answer colums
+          # add the info to the eventLabel stimText and Answer columns
           # in the chartDF
           {
             # add the event label to the onset row for each stimulus event
@@ -1252,6 +1259,45 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
         
         } # end build new corrected eventDF
         
+        #### get the first and last events for this chart ####
+        
+        {
+          
+          # first source the sigProcHelper.R script
+          # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+          
+          firstLastEvents <- getFirstLastEventFn(x=chartDF)
+          firstEvent <- firstLastEvents[1]
+          lastEventEnd <- firstLastEvents[2] - 450
+          # in case of short charts
+          if(lastEventEnd < 1) lastEventEnd <- nrow(chartDF)
+          # assign("firstLastEvents", firstLastEvents, pos=1)
+          print(firstEvent)
+          print(lastEventEnd)
+          
+        }
+        
+        #### scale the range for this chart ####
+        
+        {
+          
+          print("  set the range for the time series data")
+          
+          # first source the sigProcHelper.R script
+          
+          # start at the first data column 11
+          useCols <- ((11 + (lastDataCol - 10)):((lastDataCol + 1) + (lastDataCol - 11)))
+          m=17
+          for (m in min(useCols):max(useCols)) {
+            # use a function for each data column
+            # colRange is set in the init
+            if(!exists("colRange", envir=.GlobalEnv)) colRange=30000
+            chartDF[,m] <- setColRangeFn(DAT=chartDF[,m], y=colRange, firstRow=firstEvent, lastRow=lastEventEnd)
+            # plot.ts(chartDF[,m])
+          } 
+          
+        }
+        
         #### save the chartDF to the seriesDF ####
         
         {
@@ -1259,9 +1305,9 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
           # seriesDF[chartOnsetRow:(nrow(chartDF)+chartOnsetRow-1),] <- chartDF
           
           # save the chartDF directly to the examDF instead
-          # useRows <- (chartOnsetRow + seriesOnsetRow - 1):(chartEndRow + seriesOnsetRow - 1)
-          useRows <- which(examDF$chartName == chartName & examDF$seriesName == seriesName)
-          examDF[useRows,] <- chartDF
+          # useChartRows <- (chartOnsetRow + seriesOnsetRow - 1):(chartEndRow + seriesOnsetRow - 1)
+          useChartRows <- which(examDF$chartName == chartName & examDF$seriesName == seriesName)
+          examDF[useChartRows,] <- chartDF
           
           # assign(paste0(examName, "_Data"), examDF, pos=1)
           
@@ -1276,6 +1322,8 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
         }
         
         ####
+        
+        # <>
         
       } # end for loop over each k chart
       

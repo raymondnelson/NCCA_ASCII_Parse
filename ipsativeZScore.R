@@ -148,7 +148,7 @@ ipsativeZFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   #### iterate over the charts ####
   
-  i=3
+  i=1
   for(i in 1:length(uniqueCharts)) {
     
     {

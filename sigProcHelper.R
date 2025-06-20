@@ -531,12 +531,12 @@ scaleDataFn <- function(x=chartDF$c_UPneumoSm,
   
   if(dataLength <= (45 * cps)) {
     # for short charts less than 45 seconds
-    if(max(x) == min(x)) {
+    if(max(x, na.rm=TRUE) == min(x, na.rm=TRUE)) {
       # for flatline data
       dataRange <- 1
     } else {
       # use the entire vector
-      dataRange <- max(x) - min(x)
+      dataRange <- max(x, na.rm=TRUE) - min(x, na.rm=TRUE)
     } # end else
     scaleVal <- yRange / dataRange
     # scale the output vector
@@ -605,7 +605,7 @@ scaleDataFn <- function(x=chartDF$c_UPneumoSm,
       # View(DF) 
       
       # make a function to get the range from the DF rows
-      dfRangeFn <- function(x) { max(x)-min(x) }
+      dfRangeFn <- function(x) { max(x, na.rm=TRUE)-min(x, na.rm=TRUE) }
       # apply the range function to each row of the DF to get the range of each row
       # apply is vectorized and needs no loop
       dfRange <- apply(DF, 1, dfRangeFn)
@@ -635,31 +635,32 @@ scaleDataFn <- function(x=chartDF$c_UPneumoSm,
     # scale the output vector
     xOut <- x * scaleVal
     # get the offset max value and offset the data if necessary
-    offsetMaxVal <- maxY - max(xOut[firstRow:lastRow])
+    offsetMaxVal <- maxY - max(xOut[firstRow:lastRow], na.rm=TRUE)
     # 12-31-2016 change this to + offsetVal
     if(offsetMaxVal < 0) { xOut <- xOut + offsetMaxVal }
     # get the offset min value and offset the data if necessary
-    offsetMinVal <- minY - min(xOut[firstRow:lastRow])
+    offsetMinVal <- minY - min(xOut[firstRow:lastRow], na.rm=TRUE)
     if(offsetMinVal > 0) { xOut <- xOut + offsetMinVal }
     # check the range again
-    newRange <- max(xOut[firstRow:lastRow]) - min(xOut[firstRow:lastRow])
+    newRange <- 
+      max(xOut[firstRow:lastRow], na.rm=TRUE) - min(xOut[firstRow:lastRow], na.rm=TRUE)
     # initialize the default rescale value for this else condition
     rescaleVal <- 1
     # rescale the data if the range exceeds the maxY and minY values
     # if(newRange > ( maxY - (minY + (.4 * yRange))) ) { 
     # adjust the maxY
-    if(max(xOut[firstRow:lastRow]) > maxY) {
-      maxOffset <- maxY - max(xOut[firstRow:lastRow])
+    if(max(xOut[firstRow:lastRow], na.rm=TRUE) > maxY) {
+      maxOffset <- maxY - max(xOut[firstRow:lastRow], na.rm=TRUE)
       xOut <- xOut + maxOffset
     }
     # adjust the minY
-    if(min(xOut[firstRow:lastRow]) < minY) {
+    if(min(xOut[firstRow:lastRow], na.rm=TRUE) < minY) {
       rescaleVal <- ( maxY - minY ) / newRange
       xOut <- xOut * rescaleVal
     }
     # check the max again
-    if(max(xOut[firstRow:lastRow]) > maxY) {
-      maxOffset <- maxY - max(xOut[firstRow:lastRow])
+    if(max(xOut[firstRow:lastRow], na.rm=TRUE) > maxY) {
+      maxOffset <- maxY - max(xOut[firstRow:lastRow], na.rm=TRUE)
       xOut <- xOut + maxOffset
     }
     
@@ -730,33 +731,37 @@ offsetDataFn <- function(x=chartDF$c_Cardio1,
     
     # Nov 18, 2023 improvement to prevent occasional odd placement of EDA
     # offsetVal2 <- y - xOut[firstRow]
-    # offsetAdjust2 <- offsetVal2 - quantile(c(x), .25)
+    # offsetAdjust2 <- offsetVal2 - quantile(c(x), .25, na.rm=TRUE)
     
     # max(xOut)
     # min(xOut)
     # plot.ts(xOut)
     # summary(xOut)
     
-    offsetAdjust2 <- y - quantile(xOut, .2)
+    offsetAdjust2 <- y - quantile(xOut, .2, na.rm=TRUE)
     xOut <- xOut + offsetAdjust2
     
     # plot.ts(xOut)
     
+    # June 20, 2025
+    Xmax <- max(xOut[firstRow:lastRow], na.rm=TRUE)
+    Xmin <- min(xOut[firstRow:lastRow], na.rm=TRUE)
+    
     # check to ensure that the data to not exceed the difference between maxY and minY
-    if(max(xOut[firstRow:lastRow]) - min(xOut[firstRow:lastRow]) > maxY-minY) {
+    if(Xmax - Xmin > maxY-minY) {
       # compute a new scale value from the difference between max and min values
-      newScaleVal <- (maxY-minY) / (max(xOut[firstRow:lastRow]) - min(xOut[firstRow:lastRow]))
+      newScaleVal <- (maxY-minY) / (Xmax - Xmin)
       # rescale the data
       xOut <- xOut * newScaleVal
     } 
-    # check to ensure that the data do not exceed yMax or yMin
+    # re-check to ensure that the data do not exceed yMax or yMin
     newOffsetAdjust <- 0
-    if(min(xOut[firstRow:lastRow]) < minY) {
-      newOffsetAdjust <- minY - min(xOut[firstRow:lastRow])
+    if(min(xOut[firstRow:lastRow], na.rm=TRUE) < minY) {
+      newOffsetAdjust <- minY - min(xOut[firstRow:lastRow], na.rm=TRUE)
       xOut <- xOut + newOffsetAdjust
     }
-    if(max(xOut[firstRow:lastRow]) > maxY) {
-      newOffsetAdjust <- maxY - max(xOut[firstRow:lastRow])
+    if(max(xOut[firstRow:lastRow], na.rm=TRUE) > maxY) {
+      newOffsetAdjust <- maxY - max(xOut[firstRow:lastRow], na.rm=TRUE)
       xOut <- xOut + newOffsetAdjust
     } 
   } else { 
@@ -765,21 +770,24 @@ offsetDataFn <- function(x=chartDF$c_Cardio1,
     # use the median of x instead of the onset of the first event
     offsetAdjust <- y - offsetVal
     xOut <- x + offsetVal
+    # June 20, 2025
+    Xmax <- max(xOut[firstRow:lastRow], na.rm=TRUE)
+    Xmin <- min(xOut[firstRow:lastRow], na.rm=TRUE)
     # check to ensure that the data to not exceed the difference between maxY and minY
-    if(max(xOut[firstRow:lastRow]) - min(xOut[firstRow:lastRow]) > maxY-minY) {
+    if(Xmax - Xmin > maxY-minY) {
       # compute a new scale value from the difference between max and min values
-      newScaleVal <- (maxY-minY) / (max(xOut[firstRow:lastRow]) - min(xOut[firstRow:lastRow]))
+      newScaleVal <- (maxY-minY) / (Xmax - Xmin)
       # rescale the data
       xOut <- xOut * newScaleVal
     } 
-    # check to ensure that the data do not exceed yMax or yMin
+    # re-check to ensure that the data do not exceed yMax or yMin
     newOffsetAdjust <- 0
-    if(min(xOut[firstRow:lastRow]) < minY) {
-      newOffsetAdjust <- minY - min(xOut[firstRow:lastRow])
+    if(min(xOut[firstRow:lastRow], na.rm=TRUE) < minY) {
+      newOffsetAdjust <- minY - min(xOut[firstRow:lastRow], na.rm=TRUE)
       xOut <- xOut + newOffsetAdjust
     } 
-    if(max(xOut[firstRow:lastRow]) > maxY) {
-      newOffsetAdjust <- maxY - max(xOut[firstRow:lastRow])
+    if(max(xOut[firstRow:lastRow], na.rm=TRUE) > maxY) {
+      newOffsetAdjust <- maxY - max(xOut[firstRow:lastRow], na.rm=TRUE)
       xOut <- xOut + newOffsetAdjust
     }
   } # end short charts < 30 seconds
@@ -798,7 +806,7 @@ centerColumn <- function(x) {
   # x is a data column from a data frame of recorded time series data
   # output is a vector of centered values
   if(x[1] == -9.9) { return(x) }
-  ifelse(max(x)==min(x),
+  ifelse(max(x, na.rm=TRUE)==min(x, na.rm=TRUE),
          x <- x*0,
          x <- x - x[1]
   )
@@ -825,7 +833,7 @@ setColRange <- function(DAT, y=30000, firstRow=firstEvent, lastRow=lastEventEnd)
   #        )
   # )
   # deadRows <- which(x == -.9.9)
-  rangeVal <- max(DAT[firstRow:lastRow]) - min(DAT[firstRow:lastRow])
+  rangeVal <- max(DAT[firstRow:lastRow], na.rm=TRUE) - min(DAT[firstRow:lastRow], na.rm=TRUE)
   rangeCoef <- y / rangeVal
   # in case there is a dead sensor with no activity
   ifelse(rangeVal<5,
@@ -835,10 +843,10 @@ setColRange <- function(DAT, y=30000, firstRow=firstEvent, lastRow=lastEventEnd)
   DAT <- DAT - DAT[firstRow]
   {
     xMed <- median(DAT)
-    x25th <- quantile(DAT, .25)
-    x75th <- quantile(DAT, .75)
-    x99th <- quantile(DAT, .99)
-    x01th <- quantile(DAT, .01)
+    x25th <- quantile(DAT, .25, na.rm=TRUE)
+    x75th <- quantile(DAT, .75, na.rm=TRUE)
+    x99th <- quantile(DAT, .99, na.rm=TRUE)
+    x01th <- quantile(DAT, .01, na.rm=TRUE)
     xIQR <- x75th - x25th
     xLimitLow <- xMed - (1 * xIQR)
     xLimitHigh <- xMed - (1 * xIQR)

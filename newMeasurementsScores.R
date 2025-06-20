@@ -105,7 +105,7 @@ newMeasurementsScoresFn <- function(uniqueExams=uniqueExams,
     
     #### iterate over each unique series ####
     
-    j=2
+    j=1
     for (j in 1:length(uniqueSeries)) {
       
       {
@@ -149,7 +149,8 @@ newMeasurementsScoresFn <- function(uniqueExams=uniqueExams,
                            useSensors=useSensors,
                            decimals=2,
                            makeDF=makeDF,
-                           saveCSV=(isTRUE(saveCSV) && isTRUE(measurementTable)),
+                           # saveCSV=(isTRUE(saveCSV) && isTRUE(measurementTable)),
+                           saveCSV=saveCSV,
                            transpose=transpose )
         
         # can be easily opened in Excel or other spreadsheet

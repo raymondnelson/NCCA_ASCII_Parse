@@ -68,7 +68,7 @@
   source(paste0(RPath, 'toMinSec.R'), echo=FALSE)
   
   # initialize the function to write the NCCA ASCII files
-  source(paste0(RPath, 'NCCAASCII_writer.R'), echo=FALSE)
+  source(paste0(RPath, 'NCCAASCII_WRITER.R'), echo=FALSE)
   
 }
 
@@ -180,6 +180,20 @@ if(getOption("warn") !=2) {
     fixQuestionLength <- FALSE
     fixAnswerDistance <- FALSE
     fixMissingAnswers <- FALSE
+  }
+  
+  {
+    # June 20, 2025 re-write Stoelting DLST exams
+    fixLabels <- FALSE
+    fixRQRotation <- FALSE
+    fixCQRotation <- FALSE
+    fixRotation <- FALSE
+    fixQuestionLength <- FALSE
+    fixAnswerDistance <- FALSE
+    fixMissingAnswers <- FALSE
+    
+    fixDuplicates <- TRUE
+    
   }
   
 }
@@ -491,22 +505,22 @@ if(isTRUE(writeNCAAASCII_LAF)) {
   ######## set the output sensors ########
   
   {
-    if(!exists("outputSensors")) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "Move1", "PPG1")
-    if(is.null(outputSensors)) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "Move1", "PPG1")
+    if(!exists("outputSensors")) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "c_Move1", "c_PPG1")
+    if(is.null(outputSensors)) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "c_Move1", "c_PPG1")
     
     # inclPPG <- FALSE
     if(!exists("inclPPG")) inclPPG <- TRUE
     
     if(inclFC && !("FC" %in% outputSensors)) {
-      outputSensors <- c(outputSensors, "FC")
+      outputSensors <- c(outputSensors, "c_FC")
     }
     
     if(!inclPPG) {
-      outputSensors <- outputSensors[outputSensors != "PPG1"]
+      outputSensors <- outputSensors[outputSensors != "c_PPG1"]
     }
     
     if(!inclMove1) {
-      outputSensors <- outputSensors[outputSensors != "Move1"]
+      outputSensors <- outputSensors[outputSensors != "c_Move1"]
     }
     
     print(paste("output sensors:", paste(outputSensors, collapse=" ")))
@@ -530,7 +544,7 @@ if(isTRUE(writeNCAAASCII_LAF)) {
   # source('~/Dropbox/R/NCCA_ASCII_Parse/NCCAASCII_writer.R')
   # this function will call another function from the NCCAASCII_writer.R script
   
-  stop()
+  # stop()
   
   i=1
   for(i in 1:length(uniqueExams)) {
@@ -717,19 +731,23 @@ if(isTRUE(writeNCAAASCII_LAF)) {
         
         {
           
-          # a vector of sensors to be included in the NCCA ASCII output
-          # outputSensors2 <- c("UPneumo", "LPneumo", "EDA1", "Cardio1", "Move1", "PPG1")
-          outputSensors2 <- outputSensors
-          
-          if(isTRUE(inclMove1)) {
-            outputSensors2 <- c(outputSensors2, "Move1")
+          {
+            
+            # a vector of sensors to be included in the NCCA ASCII output
+            # outputSensors2 <- c("UPneumo", "LPneumo", "EDA1", "Cardio1", "Move1", "PPG1")
+            outputSensors2 <- outputSensors
+            
+            if(isTRUE(inclMove1)) {
+              outputSensors2 <- unique(c(outputSensors2, "c_Move1"))
+            }
+            
+            if(isTRUE(inclPPG)) {
+              outputSensors2 <- unique(c(outputSensors2, "c_PPG1"))
+            }
+            
+            outputSensors2 <- unique(outputSensors2)
+            
           }
-          
-          if(isTRUE(inclPPG)) {
-            outputSensors2 <- c(outputSensors2, "PPG1")
-          }
-          
-          outputSensors2 <- unique(outputSensors2)
           
           {
             
@@ -744,7 +762,7 @@ if(isTRUE(writeNCAAASCII_LAF)) {
             # remove the Activity sensor if not present
             if(!("Move1" %in% names(chartDF))) {
               # outputSensors2 <- outputSensors2[ -(which(outputSensors2 == "Move1")) ]
-              outputSensors2 <- outputSensors[outputSensors != "Move1"]
+              outputSensors2 <- outputSensors[outputSensors != "c_Move1"]
             }
             
             # use the input parameter to exclude the PPG
@@ -756,7 +774,7 @@ if(isTRUE(writeNCAAASCII_LAF)) {
             # remove the PLE sensor if not present
             if(!("PPG1" %in% names(chartDF))) {
               # outputSensors2 <- outputSensors[c(1, 2, 3, 4, 5)]
-              outputSensors2 <- outputSensors[outputSensors != "PPG1"]
+              outputSensors2 <- outputSensors[outputSensors != "c_PPG1"]
             }
             
           }
@@ -786,11 +804,21 @@ if(isTRUE(writeNCAAASCII_LAF)) {
           # slice the chart data frame to work with
           # the first 10 cols are exam, series, chart and event info
           thisChartDF <- chartDF[,c(1:10, theseSensorCols2)]
+          # View(thisChartDF)
+          
+          thisChartDFNames <- c(names(thisChartDF[1:10]), 
+                                c("UPneumo", "LPneumo", "EDA1", "Cardio1") )
+          if(inclMove1) {
+            thisChartDFNames <- c(thisChartDFNames, "Move1")
+          }
+          
+          if(inclPPG) {
+            thisChartDFNames <- c(thisChartDFNames, "PPG1")
+          }
           
           # names(thisChartDF) <- c(names(thisChartDF[1:10]), 
           #                               c("UPneumo", "LPneumo", "EDA1", "Cardio1", "Move1", "PPG1") )
-          names(thisChartDF) <- c(names(thisChartDF[1:10]), 
-                                  c("UPneumo", "LPneumo", "EDA1", "Cardio1") )
+          names(thisChartDF) <- thisChartDFNames
           
           assign("thisChartDF", thisChartDF, envir=.GlobalEnv)
           # View(thisChartDF)
@@ -956,3 +984,4 @@ if(isTRUE(writeNCAAASCII_LAF)) {
 
 
 # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N60/NCCA_ASCII_OSS3_holdoutN60/NCCAASCIIOutputLAF")
+

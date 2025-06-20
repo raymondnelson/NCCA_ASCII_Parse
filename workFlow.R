@@ -519,6 +519,8 @@ if(!exists("fixFileNames")) fixFileNames <- FALSE
 
 if(fixFileNames==TRUE) {
   
+  # fixFileNames <- TRUE
+  
   # fixFileNames is initialized in the workFlow_init.R script
   
   print("fix problem characters in the file and directory names")
@@ -570,6 +572,8 @@ if(fixFileNames==TRUE) {
   
   print(uniqueExamNames)
   
+  fixFileNames <- FALSE
+  
 }
 
 
@@ -580,6 +584,8 @@ if(fixFileNames==TRUE) {
 if(!exists("fixStrings")) fixStrings <- FALSE
 
 if(isTRUE(fixStrings)) {
+  
+  # fixStrings <- TRUE
   
   # fixStrings is set in the workFlow_init.R script
   
@@ -1118,6 +1124,34 @@ if(isTRUE(removeAnnotations)) {
 
 
 
+######## fix DLST/TES question labels ######## 
+
+
+
+if(!exists("fixDLSTLabels")) fixDLSTLabels <- FALSE
+# fixDLSTLabels <- TRUE
+
+
+
+if(isTRUE(fixDLSTLabels)) {
+  
+  # call a function to fix the DLST/TES question labele
+  # 1C1, 1R1, 1R2, 1C2, 2R1, 2R2, 2C1, 3R1, 3R2, 2C2, 4R1, 4R2, 3C1
+  # necessary when examiners use simple question labels 
+  # C1, R1, R1, C2, R1, R2, C1, R1, R2, C2, R1, R2, C1
+  
+  
+  source(paste0(RPath, 'fixDLSTLabels.R'), echo=FALSE)
+  
+  
+  fixDLSTLabelsFn(x="*_Data$", y="_Stimuli$")
+  
+  fixDLSTLabels <- FALSE
+  
+}
+
+
+
 ######## trim excess time from data ######## 
 
 
@@ -1313,7 +1347,7 @@ if(loadRDA1==TRUE) {
   
   # make a function to make a list of unique exams in the global environment
   if(!exists("getUniqueExams")) {
-    # getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
+    getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
   }
   
   print("make a list of unique exams in the global environment")
@@ -1460,7 +1494,9 @@ if(isTRUE(writeNCCAASCII_LAF)) {
   
   # sourcing this file will export the data to Lafayette NCCA ASCII format
   # without calling a function
-  source(paste0(RPath, 'NCCAASCIIOutput.R'), echo=FALSE)
+  source(paste0(RPath, 'NCCAASCII_OUTPUT.R'), echo=FALSE)
+  
+  writeNCCAASCII_LAF <- FALSE
 
 }
 
@@ -1995,6 +2031,11 @@ if(saveRDA2==TRUE) {
   # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
   
   # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  
+  # make a function to make a list of unique exams in the global environment
+  if(!exists("getUniqueExams")) {
+    getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
+  }
   
   if(length(getUniqueExams(x="*_Data$")) == 0) loadRDA2 <- TRUE
   

@@ -127,7 +127,8 @@ dataReduceFn <- function(chartDF=chartDF, newRate=30) {
     # head(secondsVc)
     # tail(secondsVc)
     
-    dataRate <- round(1 / (chartTime / length(secondsVc)))
+    # commented out June 19, 2025 because this prevented the data reductions
+    # dataRate <- round(1 / (chartTime / length(secondsVc)))
     
     newDataLength  <- length(secondsVc)
     # max(secondsVc)
@@ -450,7 +451,7 @@ dataReduceFn <- function(chartDF=chartDF, newRate=30) {
     
     # look for and clear the extant answers and annotations before replacing them
     {
-      newSampleIndices <- c(newSampleIndices, newSampleIndices + c(1:3))
+      # newSampleIndices <- c(newSampleIndices, newSampleIndices + c(1:3))
       
       # use the outer join function to select rows after the selected sample indices
       postRows <- sort(unique((outer(newSampleIndices, c(1:3), "+"))))
@@ -476,7 +477,7 @@ dataReduceFn <- function(chartDF=chartDF, newRate=30) {
     newChartDF$Label[newSampleIndices] <- saveEventTxt
     
     # fix the sample indices 
-    newChart$DF$Sample <- c(1:nrow(newChartDF))
+    newChartDF$Sample <- c(1:nrow(newChartDF))
     
   } # end resample type != "NONE"
   

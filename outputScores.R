@@ -32,7 +32,7 @@ measurementTableFn <- function(RqCqDFSeries=RqCqDFSeries,
                                decimals=2,
                                makeDF=TRUE,
                                saveCSV=FALSE,
-							   transpose=FALSE ) {
+                               transpose=FALSE ) {
   # make a data frame for all measurements in the series
   # all charts
   # all RQs
@@ -45,7 +45,10 @@ measurementTableFn <- function(RqCqDFSeries=RqCqDFSeries,
   # saveCSV
   ####
   
+  options(warn=2)
+  
   {
+    # View(RqCqDFSeries)
     ## reduce the input data frame to RQs and CQs ##
     RqCqSeriesRows <- grep("[CR]+", RqCqDFSeries$eventLabel)
     if(length(RqCqSeriesRows) != 0) {
@@ -65,6 +68,7 @@ measurementTableFn <- function(RqCqDFSeries=RqCqDFSeries,
       # get the event lables from the eventLabels column
       workingEvents <- RqCqDFSeries$eventLabel[RqCqSeriesRows]
       workingEvents <- unique(workingEvents)
+      if(length(workingEvents) <= 1) return("insufficient number of events")
       # replace the working events with the Labels column
       workingEvents <- 
         RqCqDFSeries$Label[RqCqDFSeries$eventLabel %in% 
@@ -139,7 +143,7 @@ measurementTableFn <- function(RqCqDFSeries=RqCqDFSeries,
     thisChart <- measurementsDF[i,1]
     thisSensor <- measurementsDF[i,2]
     # iterate over the questions
-    j=3 # colum 3 is the first question
+    j=3 # column 3 is the first question
     for(j in 3:ncol(measurementsDF)) {
       thisQuestion <- names(measurementsDF)[j]
       # get the RqCQDFSeries row
@@ -155,7 +159,7 @@ measurementTableFn <- function(RqCqDFSeries=RqCqDFSeries,
   } # end i loop ofver measurementsDF rows
   # View(measurementsDF)
   
-  # May 13, 20201
+  # May 13, 2021
   measurementsDF <- cbind(seriesName=as.character(seriesName), measurementsDF)
   measurementsDF <- cbind(examName=as.character(examName), measurementsDF)
   

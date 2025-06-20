@@ -522,11 +522,13 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         assign("RqCqDFSeries", RqCqDFSeries, pos=1)
         # View(RqCqDFSeries)
         
+        if(nrow(RqCqDFSeries) <= 20) next()
+        
       }
       
       #### next series if the RqCqDFSeries has no rows ####
       
-      if(length(RqCqDFSeries)==0) return()
+      if(nrow(RqCqDFSeries)==0) return()
       
       #### exclude the pneumo measurements using a parameter ####
       
@@ -1095,7 +1097,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         
       }
       
-      #### calculate PCAT Algorithm results ####
+      #### calculate LXCAT Algorithm results ####
       
       if(isTRUE(getPCATScores) && all(c("AutoEDA",  "PLE") %in% uniqueSensors)) {
         
@@ -1125,7 +1127,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         # stop()
         
         RqCqDFSeries <- 
-          PCATScoresFn(RqCqDFSeries=RqCqDFSeries,
+          LXCATScoresFn(RqCqDFSeries=RqCqDFSeries,
                        PCATPrior=.5,
                        # PCATSensors=c("AutoEDA", "PLE"),
                        # PCATSensors=c("UPneumo", "LPneumo", "AutoEDA", "Cardio", "PLE"),

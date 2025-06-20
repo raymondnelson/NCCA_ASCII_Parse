@@ -688,7 +688,7 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               # scale the PLE data 
               # chartDF$c_PPG1 <- scaleDataFn(chartDF$c_PPG1, sec=30, times=8, ignore=2, yRange=scaleVals['ple'], maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEventEnd))
               # chartDF$c_PPG1 <- scaleDataFn(chartDF$c_PPG1, sec=30, times=8, ignore=3, yRange=scaleVals['ple'], maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEventEnd))
-              chartDF$c_PPG1 <- scaleDataFn(chartDF$c_PPG1, sec=30, times=8, ignore=3, yRange=gainRangePLE, maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_PPG1 <- scaleDataFn(x=chartDF$c_PPG1, sec=30, times=8, ignore=3, yRange=gainRangePLE, maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEventEnd))
               
               # offset the PLE data
               chartDF$c_PPG1 <- offsetDataFn(x=chartDF$c_PPG1, y=yOffset['ple'], maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEventEnd))

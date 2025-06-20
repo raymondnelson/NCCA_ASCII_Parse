@@ -171,7 +171,7 @@
     }
     
     showShadedAreas <- TRUE
-    # showShadedAreas <- FALSE
+    showShadedAreas <- FALSE
     
     # also changes the showMeasurements (lines)
     
@@ -204,11 +204,11 @@
     
     ## cardio rate caliper
     showCardioRateCaliperVals <- TRUE
-    # showCardioRateCaliperVals <- FALSE
+    showCardioRateCaliperVals <- FALSE
     
     ## respiration caliper values
     showRespirationCalipers <- TRUE
-    # showRespirationCalipers <- FALSE 
+    showRespirationCalipers <- FALSE
 
     if(!(showScores)) showQuestionIntervals <- showScores
     
@@ -2425,7 +2425,7 @@ for(i in 1:length(uniqueExams)) {
         ##############    cardio calipers   May 15, 2025  ##################
         
         showCardioRateCaliperVals <- FALSE
-        showCardioRateCaliperVals <- TRUE
+        # showCardioRateCaliperVals <- TRUE
         
         if(showCardioRateCaliperVals) {
           
@@ -2471,7 +2471,7 @@ for(i in 1:length(uniqueExams)) {
         ##############    pneumo calipers   May 16, 2025  ##################
         
         showRespirationCalipers <- TRUE
-        # showRespirationCalipers <- FALSE
+        showRespirationCalipers <- FALSE
         
         if(showRespirationCalipers) {
           
@@ -2539,6 +2539,7 @@ for(i in 1:length(uniqueExams)) {
         }
         
         showAmplitudeCalipers <- TRUE
+        showAmplitudeCalipers <- FALSE
         
         if(showAmplitudeCalipers) {
           
@@ -2616,6 +2617,7 @@ for(i in 1:length(uniqueExams)) {
         }
           
         showRLECalipers <- TRUE
+        showRLECalipers <- FALSE
         
         if(showRLECalipers) {
         
