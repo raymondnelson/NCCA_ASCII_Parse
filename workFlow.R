@@ -462,7 +462,11 @@ if(getOption("warn") !=2) {
 ######## fix non ASCII characters in the text files ######## 
 
 
+
 if(!exists("fixNonASCIICharacters")) fixNonASCIICharacters <- FALSE
+# fixNonASCIICharacters <- TRUE
+
+
 
 if(fixNonASCIICharacters==TRUE) {
   
@@ -516,6 +520,9 @@ if(fixNonASCIICharacters==TRUE) {
 
 
 if(!exists("fixFileNames")) fixFileNames <- FALSE
+# fixFileNames <- TRUE
+
+
 
 if(fixFileNames==TRUE) {
   
@@ -577,11 +584,15 @@ if(fixFileNames==TRUE) {
 }
 
 
+
 ######## fix problem character strings in the NCCA ASCII files ######## 
 
 
 
 if(!exists("fixStrings")) fixStrings <- FALSE
+# fixStrings <- TRUE
+
+
 
 if(isTRUE(fixStrings)) {
   
@@ -631,11 +642,14 @@ if(isTRUE(fixStrings)) {
 
 
 
-######## fix the sensor names if necessary ######## 
+######## fix the sensor names in the NCCA ASCII text files if necessary ######## 
 
 
 
 if(!exists("fixSensorNames")) fixSensorNames <- FALSE
+# fixSensorNames <- TRUE
+
+
 
 if(fixSensorNames==TRUE) {
 
@@ -787,6 +801,9 @@ if(fixSensorNames==TRUE) {
 
 
 if(!exists("NCCAASCIIParse")) NCCAASCIIParse <- TRUE
+# NCCAASCIIParse <- FALSE
+
+
 
 if(NCCAASCIIParse == TRUE) {
   
@@ -1002,14 +1019,19 @@ if(preProcessData == TRUE) {
 
 
 
-# fix repeated questions by appending to the name of the repetition 
-# for each chart in the exam data frame
+if(!exists("preProcessData")) fixDuplicateTags <- TRUE
+# fixDuplicateTags <- FALSE
 
-# first source the NCCAASCII_ParseHelperFunctions.R script to load the fixDupFn() function
-source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
 
 
 if(fixDuplicateTags == TRUE) {
+  
+  # fix repeated questions by appending to the name of the repetition 
+  # for each chart in the exam data frame
+  
+  # first source the NCCAASCII_ParseHelperFunctions.R script to load the fixDupFn() function
+  source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
+  
   
   # then source the fixDup.R script 
   # to call the fixDupFn() 
@@ -1560,18 +1582,18 @@ if(processArtifacts == TRUE) {
 
 
 
-# if(processArtifacts == TRUE && activityArtifacts == TRUE) {
-# 
-#   # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-#   # source(paste0(RPath, 'activityCheck.R'), echo=FALSE)
-#   # 
-#   # print("check for activity sensor artifacts")
-#   # chartFUN <- activityCheck
-#   # getExamFn(x=uniqueExams)
-#   # 
-#   # # source(paste0(RPath, 'chartPlot.R'), echo=FALSE)
-# 
-# }
+if(processArtifacts == TRUE && activityArtifacts == TRUE) {
+
+  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # source(paste0(RPath, 'activityCheck.R'), echo=FALSE)
+  #
+  # print("check for activity sensor artifacts")
+  # chartFUN <- activityCheck
+  # getExamFn(x=uniqueExams)
+  #
+  # # source(paste0(RPath, 'chartPlot.R'), echo=FALSE)
+
+}
 
 
 
@@ -1579,32 +1601,32 @@ if(processArtifacts == TRUE) {
 
 
 
-# if(processArtifacts == TRUE && edaArtifacts == TRUE) {
-#   
-#   source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-#   
-#   source(paste0(RPath, 'dataCheck.R'), echo=FALSE)
-#   
-#   print("check for unresponsive EDA data")
-#   chartFUN <- dataCheckFn
-#   getExamFn(x=uniqueExams)
-#   
-#   # reset the warnings
-#   # assign("last.warning", NULL, envir = baseenv())
-#   
-#   source(paste0(RPath, 'nonstimArtifacts.R'), echo=FALSE)
-#   
-#   print("check for non-specific EDA responses")
-#   chartFUN=nonStimArtifactFn
-#   getExamFn(x=uniqueExams)
-#   
-#   source(paste0(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
-#   
-#   print("check for finger movement artifacts in the EDA data")
-#   chartFUN=EDAMvtArtifactFn
-#   getExamFn(x=uniqueExams)
-#   
-# }
+if(processArtifacts == TRUE && edaArtifacts == TRUE) {
+
+  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # 
+  # source(paste0(RPath, 'dataCheck.R'), echo=FALSE)
+  # 
+  # print("check for unresponsive EDA data")
+  # chartFUN <- dataCheckFn
+  # getExamFn(x=uniqueExams)
+  # 
+  # # reset the warnings
+  # # assign("last.warning", NULL, envir = baseenv())
+  # 
+  # source(paste0(RPath, 'nonstimArtifacts.R'), echo=FALSE)
+  # 
+  # print("check for non-specific EDA responses")
+  # chartFUN=nonStimArtifactFn
+  # getExamFn(x=uniqueExams)
+  # 
+  # source(paste0(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
+  # 
+  # print("check for finger movement artifacts in the EDA data")
+  # chartFUN=EDAMvtArtifactFn
+  # getExamFn(x=uniqueExams)
+
+}
 
 
 
@@ -1612,35 +1634,35 @@ if(processArtifacts == TRUE) {
 
 
 
-# if(processArtifacts == TRUE && pneumoArtifacts == TRUE) {
-#   
-#   sec <- .5
-#   cutProp <- .25
-#   # sec=3 cutProp=.5 works well 3-18-2017
-#   # sec=1 cutProb=.25 also works ok
-#   
-#   
-#   # sec2=4 cutProp2=.5 works well 3-19-2017
-#   sec2 <- 3
-#   cutProp2 <- .01
-#   
-#   source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-# 
-#   source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
-#   source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-#   source(paste0(RPath, 'tukeyFences.R'), echo=FALSE)
-# 
-#   print("check for unresponsive respiration data")
-#   chartFUN <- pneumoCheckFn
-#   getExamFn(x=uniqueExams)
-# 
-#   source(paste0(RPath, 'pneumoArtifact.R'), echo=FALSE)
-# 
-#   print("respiration artifacts")
-#   chartFUN=pneumoArtifactFn
-#   getExamFn(x=uniqueExams)
-#   
-# }
+if(processArtifacts == TRUE && pneumoArtifacts == TRUE) {
+
+  # sec <- .5
+  # cutProp <- .25
+  # # sec=3 cutProp=.5 works well 3-18-2017
+  # # sec=1 cutProb=.25 also works ok
+  # 
+  # 
+  # # sec2=4 cutProp2=.5 works well 3-19-2017
+  # sec2 <- 3
+  # cutProp2 <- .01
+  # 
+  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # 
+  # source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
+  # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  # source(paste0(RPath, 'tukeyFences.R'), echo=FALSE)
+  # 
+  # print("check for unresponsive respiration data")
+  # chartFUN <- pneumoCheckFn
+  # getExamFn(x=uniqueExams)
+  # 
+  # source(paste0(RPath, 'pneumoArtifact.R'), echo=FALSE)
+  # 
+  # print("respiration artifacts")
+  # chartFUN=pneumoArtifactFn
+  # getExamFn(x=uniqueExams)
+
+}
 
 
 
@@ -1648,16 +1670,16 @@ if(processArtifacts == TRUE) {
 
 
 
-# if(processArtifacts == TRUE && cardioArtifacts == TRUE) {
-#   
-#   source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-#   source(paste0(RPath, 'cardioArtifact.R'), echo=FALSE)
-#   
-#   # print("check for artifacts in the cardio data")
-#   # chartFUN=cardioArtifactFn
-#   # getExamFn(x=uniqueExams)
-#   
-# }
+if(processArtifacts == TRUE && cardioArtifacts == TRUE) {
+  # 
+  #   source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  #   source(paste0(RPath, 'cardioArtifact.R'), echo=FALSE)
+  # 
+  #   # print("check for artifacts in the cardio data")
+  #   # chartFUN=cardioArtifactFn
+  #   # getExamFn(x=uniqueExams)
+  # 
+}
 
 
 
@@ -1665,16 +1687,16 @@ if(processArtifacts == TRUE) {
 
 
 
-# if(processArtifacts == TRUE && pleArtifacts == TRUE) {
-#   
-#   source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-#   source(paste0(RPath, 'pleArtifact.R'), echo=FALSE)
-#   
-#   # print("PLE artifacts")
-#   # chartFUN=pleArtifactFn
-#   # getExamFn(x=uniqueExams)
-#   
-# }
+if(processArtifacts == TRUE && pleArtifacts == TRUE) {
+  # 
+  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # source(paste0(RPath, 'pleArtifact.R'), echo=FALSE)
+  # 
+  # # print("PLE artifacts")
+  # # chartFUN=pleArtifactFn
+  # # getExamFn(x=uniqueExams)
+  # 
+}
 
 
 
@@ -2053,9 +2075,9 @@ if(loadRDA2==TRUE) {
   # load the str_sub() function used by getUniqueExams()
   library(stringr)
   
-  if(!exists("getUniqueExams")) {
-    getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
-  }
+  # if(!exists("getUniqueExams")) {
+  #   getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
+  # }
   
   # if(!exists("RPath")) RPath <- "~/Dropbox/"
   # RPath <- "~/Dropbox/"

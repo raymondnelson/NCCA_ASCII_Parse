@@ -171,7 +171,7 @@
     }
     
     showShadedAreas <- TRUE
-    showShadedAreas <- FALSE
+    # showShadedAreas <- FALSE
     
     # also changes the showMeasurements (lines)
     

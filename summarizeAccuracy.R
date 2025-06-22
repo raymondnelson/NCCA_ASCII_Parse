@@ -78,6 +78,18 @@
 
 {
   
+  
+  
+}
+
+
+
+######## get the ANALYSIS lists in the CWD #############
+
+
+
+{
+  
   uniqueExams <- getUniqueExams(x="*_Data$")
   
   
@@ -111,6 +123,7 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   rm(myRdaNames)
   rm(i)
   
+  
   uniqueExams <- getUniqueExams(x="*_Data$")
   
   
@@ -119,9 +132,10 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   # exclude cases that consist only of the ACQT
   analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
   
-  examNames <- str_sub(analysisLists, 2, -11)
+  examNames <- str_sub(analysisLists, 2, -10)
   
-  
+  # cases that are missing an ANALYSIS list
+  uniqueExams[which(!(str_sub(uniqueExams, 2, -1) %in% examNames))]
   
 }
 
@@ -129,6 +143,7 @@ if(length(ls(pattern="ANALYSIS"))==0) {
 #################################################
 
 ############# set up the summary ################
+
 
 
 {
@@ -148,13 +163,14 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   # RQNames <- c("R1", "R2", "R3", "R4")
   RQNames <- c("R5", "R7", "R10", "none")
   # RQNames <- c("R5", "R8", "R11", "NA")
+  RQNames <- c("R2", "R2", "none", "none")
   
   # seriesTotalsDF <- as.data.frame(matrix(ncol=(5+(1*length(RQNames))), 
   #                                        nrow=length(seriesTotalFiles)))
   
   
-  DRule <- "TSR"
-  # DRule <- "SSR"
+  # DRule <- "TSR"
+  DRule <- "SSR"
   
   ESSMDecisionRule <- ifelse(DRule=="TSR", "TSR", "SSR")
   # ESSMDecisionRule <- "SSR"

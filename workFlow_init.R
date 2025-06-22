@@ -350,17 +350,21 @@ print("init parameters for the NCCA ASCII work flow")
     #   # DRule <- "SSR"
     # }
     
-    # {
-    #   # reconfig B for LAFAYETTE RESEARCH CASES
-    #   removeAnnotations <- FALSE
-    #   fixDuplicateTags <- FALSE
-    #   trimExcessTime <- TRUE
-    #   stopXXX <- FALSE
-    # 
-    #   fixNonASCIICharacters <- FALSE
-    # 
-    #   EDAFilt="laf18"
-    # }
+    {
+      # reconfig B for LAFAYETTE RESEARCH CASES
+      removeAnnotations <- FALSE
+      fixDuplicateTags <- TRUE
+      trimExcessTime <- TRUE
+      stopXXX <- TRUE
+
+      fixNonASCIICharacters <- FALSE
+      fixFileNames <- FALSE
+
+      EDAFilt="laf18"
+
+      DRule <- "TSR"
+      # DRule <- "SSR"
+    }
     
     # {
     #   # reconfig F for LAFAYETTE EDA Problems
@@ -414,23 +418,21 @@ print("init parameters for the NCCA ASCII work flow")
       # 
       # DRule <- "TSR"
       # # DRule <- "SSR"
-
     }
     
     {
-      # reconfig E for STOELTING LAB CASES
-      removeAnnotations <- FALSE
-      trimExcessTime <- TRUE
-      stopXXX <- TRUE
-
-      EDAFilt="none"
-
-      fixNonASCIICharacters <- TRUE
-      fixSensorNames <- TRUE
-
-      # DRule <- "TSR"
-      DRule <- "SSR"
-      
+      # # reconfig F for STOELTING LAB CASES
+      # removeAnnotations <- FALSE
+      # trimExcessTime <- TRUE
+      # stopXXX <- TRUE
+      # 
+      # EDAFilt="none"
+      # 
+      # fixNonASCIICharacters <- TRUE
+      # fixSensorNames <- TRUE
+      # 
+      # # DRule <- "TSR"
+      # DRule <- "SSR"
     }
     
     
@@ -496,7 +498,7 @@ print("init parameters for the NCCA ASCII work flow")
 
 
 
-######## scores and algorithms ######## 
+######## SCORES and algorithms ######## 
 
 
 
@@ -659,6 +661,15 @@ if(!exists("uniqueExams")) uniqueExams <- getUniqueExams()
 
 
 
+####### remove an exam from a the global envir #########
+
+removeExamFn <- function(x) {
+  # remove an exam from the global envir
+  for(i in 1:length(x)) {
+    rm(list=ls(pattern=x[i],, envir=.GlobalEnv), envir=.GlobalEnv)
+  }
+  return(paste("Removed", length(x), "exams from the global environment."))
+}
 
 
 

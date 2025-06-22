@@ -182,10 +182,43 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("10R", "R10", x)
   x <- gsub("R10R", "R10", x)
   
+  # stoelting DLC questions
+  x <- gsub("C1DLC1", "1C1", x)
+  x <- gsub("C1DLC2", "1C2", x)
+  x <- gsub("C2DLC1", "2C1", x)
+  x <- gsub("C2DLC2", "2C2", x)
+  x <- gsub("C3DLC1", "3C1", x)
+  x <- gsub("C3DLC2", "3C2", x)
+  x <- gsub("C1DLC3", "1C3", x)
+  x <- gsub("C1DLC4", "1C4", x)
+  x <- gsub("C2DLC3", "2C3", x)
+  x <- gsub("C2DLC4", "2C4", x)
+  x <- gsub("C3DLC3", "3C3", x)
+  x <- gsub("C3DLC4", "3C4", x)
+  
+  x <- gsub("R_R1", "R1", x)
+  x <- gsub("R_R2", "R2", x)
+  x <- gsub("R_R3", "R3", x)
+  x <- gsub("R_R4", "R4", x)
+  
+  # DLST tags that were messed up by the previous lines
+  x <- gsub("C31", "3C1", x)
+  x <- gsub("C32", "3C2", x)
+  x <- gsub("C33", "3C3", x)
+  x <- gsub("C34", "3C4", x)
+  x <- gsub("C35", "3C5", x)
+  x <- gsub("C36", "3C6", x)
+  x <- gsub("R41", "4R1", x)
+  x <- gsub("R42", "4R2", x)
+  x <- gsub("R43", "4R3", x)
+  x <- gsub("R44", "4R4", x)
+  x <- gsub("R45", "4R5", x)
+  x <- gsub("R46", "4R6", x)
+  
   x <- gsub("3E", "E3", x)
   x <- gsub("8E", "E8", x)
   
-  # ACTQ KEY QUESTIONS
+  # ACQT KEY QUESTIONS
   x <- gsub("4KEY", "4K", x)
   x <- gsub("4Key", "4K", x)
   x <- gsub("4KeyR", "4K", x)

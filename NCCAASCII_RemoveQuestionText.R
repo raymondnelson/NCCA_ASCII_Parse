@@ -29,7 +29,7 @@ library("stringr")
 
 print("search the working directory for NCCA ASCII text output")
 # Lafayette uses the &
-searchString <- "^D\\$+"
+searchString <- "^D&+"
 
 # Stoelting #
 # 2010 changed to !
@@ -85,7 +85,7 @@ if(removeText) {
       
     # thisChartName <- gsub("\\\\$", "\$", thisChartName)
     
-    # read the lines from each file
+    # read all lines from each file
     dataLines <- readLines(thisChartName, n = -1L, ok = TRUE, warn = FALSE, encoding = "UTF-8")
     
     # fix invalid multibyte strings
@@ -114,16 +114,31 @@ if(removeText) {
     }
     
     # get the number of events
-    numberEvents <- as.numeric(strtrim(dataLines[eventsHeaderEndLine], width=2))
+    # numberEvents <- as.numeric(strtrim(dataLines[eventsHeaderEndLine], width=2))
+    # recalculate the number of events
+    numberEvents <- eventsHeaderEndLine - eventsHeaderStartLine + 1
+    
+    # renumber the events
+    newEventNumbers <- str_pad(c(1:numberEvents), width=2, side="left", pad="0")
+    eventsTable <- dataLines[eventsHeaderStartLine:eventsHeaderEndLine]
+    for(j in 1:length(eventsTable)) {
+      eventsTable[j] <- 
+        paste0(newEventNumbers[j], str_sub(eventsTable[j], 3, -1))
+    }
+    dataLines[eventsHeaderStartLine:eventsHeaderEndLine] <- eventsTable
+    
+    ## fix line 9 for the number of questions ##
+    dataLines[9] <- paste0("Number of questions: ", numberEvents)
     
     # get the replacement text for the text header section
-    # this method will remove extra lines that when the question text is line-wrapped
+    # uses the events lines
+    # this method will remove extra lines that are created when the question text is line-wrapped
     replaceText <- strtrim(dataLines[eventsHeaderStartLine:eventsHeaderEndLine], width=14)
     
     # use the question ID as the question text
     newText <- str_sub(strtrim(dataLines[eventsHeaderStartLine:eventsHeaderEndLine], width=14), start=10, end=14)
     newText <- str_trim(newText, side="both")
-    replaceText <- paste0(replaceText, " ", newText)
+    replaceText <- paste0(replaceText, " ", newText, " ")
     
     # replace the question text
     # dataLines[questionTextHeaderStartLine:questionTextHeaderEndLine] <- replaceText
@@ -140,7 +155,7 @@ if(removeText) {
     
     print(i)
     
-  }
+  } # end i loop over NCCA ASCII charts
   
   print(paste("Finished:", "question text removed from", i, "charts"))
   
