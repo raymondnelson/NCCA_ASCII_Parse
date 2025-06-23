@@ -641,13 +641,17 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               
               chartDF$c_FCMid <- MASmooth(x=chartDF$c_FC, y=round(.5*cps,0), times=3)
               
-              chartDF$c_FCMA <- MASmooth(x=chartDF$c_FC, y=round(1.5*cps,0), times=3)
+              # used for feature extraction 2025June23
+              # chartDF$c_FCMA <- MASmooth(x=chartDF$c_FC, y=round(1.5*cps,0), times=3)
+              # 
+              # # chartDF$c_FCMA <- MASmooth(x=chartDF$c_FCMA, y=round(.5*cps,0), times=2)
+              # 
+              # chartDF$c_FCMA <- MASmooth(x=chartDF$c_FC, y=round(1.5*cps,0), times=1)
+              # chartDF$c_FCMA <- MASmooth(x=chartDF$c_FCMA, y=round(1*cps,0), times=1)
+              # chartDF$c_FCMA <- MASmooth(x=chartDF$c_FCMA, y=round(.5*cps,0), times=1)
               
-              # chartDF$c_FCMA <- MASmooth(x=chartDF$c_FCMA, y=round(.5*cps,0), times=2)
-              
-              chartDF$c_FCMA <- MASmooth(x=chartDF$c_FC, y=round(1.5*cps,0), times=1)
-              chartDF$c_FCMA <- MASmooth(x=chartDF$c_FCMA, y=round(1*cps,0), times=1)
-              chartDF$c_FCMA <- MASmooth(x=chartDF$c_FCMA, y=round(.5*cps,0), times=1)
+              # testing this 2025Jun23
+              chartDF$c_FCMA <- MASmooth(x=chartDF$c_FC, y=round(1.5*cps,0), times=5)
               
               
               cardioRate <- ratePerMin(chartDF$c_FC,buffer=9,peaks="upper",lowPass=TRUE)

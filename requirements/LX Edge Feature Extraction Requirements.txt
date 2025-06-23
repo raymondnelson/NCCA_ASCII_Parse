@@ -1,0 +1,181 @@
+﻿LX Edge Requirements – FEATURE EXTRACTION – DRAFT
+June 10, 2025
+Raymond Nelson 
+
+
+
+DEFINITIONS:
+
+1. Feature extraction
+
+Feature extraction is the first part of data analysis (following an initial QA process to ensure that sufficient data have been acquired to attempt analysis). The other parts of data analysis include, numerical transformation and data reduction, use of a likelihood function to compute a statistical value for the observed data, and the interpretation of analytic results. Data analysis in polygraph testing is completed for each series, using a variety of methods that are intended for use with each different test format (CQT, CIT, RI etc.). Feature extraction is a process of identifying usable/interpretable information within recorded data. Virtually all data is a combination of signal (useful information) and noise (information that is not useful, and which may complicate accessing and using useful signals). Feature extraction can be thought of as intended so separate signal and noise. In practical terms, feature extraction involves the identification of response onset and response end points with the recorded time-series polygraph data. Each different recording sensor will have different feature extraction procedures, based on knowledge obtained through feature development research activities. Feature extraction can be executed manually (with some limits to reliability), and can also be executed via automated algorithm. Automated feature extraction methods differ from on-screen caliper function in that calipers can be placed at any arbitrary location within the time-series data, whereas feature extraction functions are called only in response to each presentation of the test stimuli. 
+
+2. Measured segment
+
+For each polygraph recording sensor, the measured segment is the data from response onset to response end. Each of the different recording sensors have different procedures for the identification of response onset and response end. Measured responses are obtained from the measured segments. 
+
+3. Minimum response latency (MRL)
+
+Minimum response latency (MRL) refers to a period of time at the onset of the WOE during which an onset of a positive slope segment is not interpreted as a response onset because it has occurred too quickly within the ROW. Responses that begin during the MRL are thought to me more likely caused by factors other than the test stimuli. No MRL is published for the respiration data. Studies have described the use of a MRL period of 0.5 seconds for EDA data. For vasomotor data the MRL has been described in published studies as 5 seconds. The MRL, together with the ROW and WOE is used to determine if observed changes in physiological activity are timely with a test questions (and can therefore be attributed to the test question if no other possible cause, such as observable behaviors or environmental distractions, is observed). 
+
+4. Numerical transformation
+
+Numerical transformation occurs after identification of the exact location of response onset and response end for each stimulus event, and involves the reduction or transformation of time-series data in the measured segment into a single numerical value that represents the physiological activity (or change in physiological activity) that occurs in response to each polygraph stimulus questions. Numerical transformation also refers to the reduction of feature extraction values for the array of recording sensors, and for all repetitions of the test questions (question sequence), to subtotal scores for the test target stimuli, and grand total scores for series. Although computer algorithms will necessarily approach feature extraction and numerical transformation as distinct functions, field practitioners who manually score polygraph data may demonstrate over-learned skills in which they execute these functions quickly and intuitively – often while perceiving extraction and numerical transformation activities as a single function. 
+
+5. Response end (response peak)
+
+For respiration data the response end coincides end of the measured segment and also coincides with the end of the WOE. For EDA and cardio data the response end is the highest point of positive slope segment in the time-series data following a response onset point within the ROW. This is commonly the point at which the time-series data change from from positive slope to negative slope or zero slope. If there are multiple slope changes and multiple peaks within the caliper window, the response end is the sample with the maximum y-axis distance from a response onset during the ROW. 
+
+6. Response onset
+
+Response onset is the time-series data point at which a usable change in physiological activity begins (in response to a test question). For respiration data the response onset coincides with the onset of the WOE. For EDA and cardio sensors the response onset will be the lowest point (typically the point at which the time-series data change from negative slope or zero slope to positive slope) following a minimum response latency period, and prior to a response peak with a greater y-axis value. 
+
+7. Response Onset Window (ROW)
+
+The response onset window (ROW) is a period of time at the onset of the WOE during which a response onset is extracted. Response onsets are not extracted after the ROW. The response onset window has been described in published studies and instructional materials as extending from the MRL to a point 5 seconds after the recorded verbal answer. The ROW, together with the MRL and WOE is used to determine if observed changes in physiological activity are timely with a test questions (and can therefore be attributed to the test question if no other possible cause, such as observable behaviors or environmental distractions, is observed). 
+
+8. Response value (response amplitude)
+
+Response amplitude refers to the maximum vertical distance (measured in dimensionless units associated with the y-axis scale) from response onset response peak. For respiration data the response value is taken from the onset of the WOE to the end of the WOE. For EDA and cardio data the response value is the maximum difference between a response peak within the WOE and a preceding response onset during the the ROW. 
+
+9. Window of Evaluation (WOE)
+
+The window of evaluation is a fixed period of time during which feature extraction occurs, including the identification of response onset, response end and response value. The WOE must be sufficient in length to capture information that is correlated with the criterion of interest (deception and truth-telling), and also sufficiently brief to reduce vulnerability to behavioral and environmental distractions that might occur outside the WOE. The MRL, together with the ROW and WOE is used to determine if observed changes in physiological activity are timely with a test questions (and can therefore be attributed to the test question if no other possible cause, such as observable behaviors or environmental distractions, is observed). 
+
+DISCUSSION: 
+
+Feature extraction algorithms are intended to obtain measurements for the Kircher Features. These are common polygraph scoring features developed at the University of Utah, and also supported by research at Johns Hopkins University. They are the primary features described in the Federal 7-position and 3-position methods for manual scoring. Kircher feature are used when manually scoring ESS, ESS-M, and Federal ESS. A number of automated computer algorithms have used these features, including Probability Analysis, OSS1/2, OSS-3, Permutation Scoring, Bootstrap Scoring, Rank Order Scoring, Ipsative-Z, Relative Response Magnitude, Miritello Rank, and others. 
+
+Automated feature extraction functions for automated scoring algorithms are similar to manual scoring calipers but differs in some aspects related to the fact that feature extraction is executed at the stimulus events whereas manual scoring calipers can be called at any arbitrary location in the recorded time-series data. In practical terms, both manual scoring calipers and automated feature extraction functions use a WOE. However, manual scoring calipers cannot include the use of a ROW or MRL because calling the manual caliper function at an arbitrary location may not include a stimulus onset, stimlus end, or verbal answer. The WOE, ROW and MRL parameters are used by the automated feature extraction functions to determine if an observed response is timely with presentation of a test stimulus. In the absence of a response onset and verbal answer the MRL and ROW parameters are not available to a manual scoring caliper. Both the manual scoring caliper and automated feature extraction functions can make use of a WOE. Despite these differences, manual scoring calipers and automated feature extraction functions will provide similar response values. 
+
+PERFORMANCE REQUREMENTS:
+
+1. Feature extraction functions shall make use of the same data that is displayed to the examiner. This will foster trust and confidence that users are likely to obtain the same values as the calipers – that the caliper is essentially doing the same thing the user would do using the same data that that is available to the user. 
+
+2. Feature extraction functions shall provide consistent measurements at all zoom and gain levels. This will ensure that R/C ratios are not influenced by the range of reasonable aesthetic display choices that different field polygraph examiners may prefer. [There may be practical limits to this when gain values are very small.]
+
+MEASUREMENT REQUIREMENTS:
+
+1. Time values shall be measured in seconds (not inches or millimetes).
+
+2. The y-axis scale for the chart viewer shall be 2000 units from -1000 to + 1000 with zero in the horizontal middle of the graphic display. Alternatively, zero can be located at each sensor arrow, where each sensor has a y-axis range of 2000 units.
+
+3. No suggestion or implication shall be made that the time-series physiology us measured in in physical units (inches, millimeters, pixels, ohms, seimens, etc.)
+
+RESPIRATION FEATURE REQUIREMENTS
+
+1. For respiration sensors the caliper output value (measurement) shall be expressed in dimensionless units that are proportional to the y-axis scale.
+
+2. Respiration measurements shall be obtained using an RLE method that involves a fixed WOE of 15 seconds (subject to empirical and statistical optimization) and sliding window of 3.75 seconds (approximately 1 respiration cycle at the median respiration rate of 6 cpm). The sliding window is then moved across the WOE one sample at a time. RLE (the sum of all absolute differences in y-axis values for all samples in the sliding window) is computed and recorded. An advantage of the sliding window method is that it permits a more intuitive comparison of the output values and criterion effects while varying the length of the WOE – facilitating the study and optimization of the WOE.
+
+3. An answering buffer of 1.5 seconds before and 1.5 seconds after the recorded point of verbal answer shall be excluded from measurement (this reduces the influence of common answering artifacts). This can be accomplished by setting data values to NA and then ignoring NA values during computation). Use of the answering buffer requires monitoring the Events column in the time series data to determine the presence of a verbal answer in the caliper space. 
+
+4. The output value is the mean of the RLE values for all iterations of the sliding window, except for NA values surrounding the verbal answer distortion, during the WOE.
+
+5. Automated respiration feature extraction measurement values are identical to measurement values obtained via the manual scoring caliper only if the manual scoring caliper includes and answer distortion buffer. This requires that the manual scoring caliper monitor the events column for a recorded verbal answer (“NO” “YES” “ANS”) within the caliper window. 
+
+EDA CALIPER REQUIREMENTS
+
+1. EDA measurement shall be in dimensionless units proportional to the y-axis scale.
+
+2. The EDA response onset point shall be extracted from the time-series data  at the point after MRL and before the end of the ROW where the data change from negative-slope or zero-slope to positive-slope. [This differs from Caliper Feature Extraction method, which does not have an MRL or ROW.]
+
+3. If the EDA data have a positive slope at stimulus onset and persist in a positive slope throughout the ROW, the response onset shall be be extracted from a point of inflection after MRL and during the ROW, where the frequency or energy of positive slope activity increases substantially (observed visually as an increase in the acuity of the positive slope angle). The inflection shall be extracted using a z-test approximation for a statistical t-test, by comparing the variance of the difference between successive sample in two adjacent moving windows of 1 second each with alpha = .001. If an EDA response onset that is identified via inflection point provides a greater response value than a subsequent EDA response onset identified as a change from negative slope or zero-slope the inflection onset (greater response value) shall be selected. [This differs from Caliper Feature Extraction method, which does not have an MRL or ROW.]
+
+4. The EDA response peak shall be extracted from the point of greatest y-axis value during a positive slope segment within the WOE following a response onset. This can be observed as the point where the time-series data change from positive slope to negative slope or zero slope. If the EDA data exhibit multiple changes in slope during the WOE, following a response onset that is selected during the ROW, the response peak shall be selected from the peak point that provides the greatest response values, except that response peaks (changes from positive slope) that occur after the data have descended below the y-axis origin (response onset) value shall be excluded. No other rules shall be created pertaining to the rate or degree of descent of the EDA data. [This differs from Caliper Feature Extraction method, which does not have an ROW or WOE.] 
+
+5. If the slope of the EDA data remains positive at the end of the WOW, the response peak shall be selected from within the 10 second post-stimulus period (following the WOE) if the a usable response onset is extracted withing the ROW and the data have not descended below the y-axis value of the response onset and if the positive slope segment leading to the late response peak began withing 13.5 second from stimulus onset. [This differs from Caliper Feature Extraction method, which does not have an ROW or WOE.] 
+
+6. The EDA response value shall be the y-axis difference between the response peak and preceding response onset. If there are multiple response onset points or multiple response peak points the EDA response value shall be the maximum y-axis difference between a response peak and preceding response onset. [This differs from Caliper Feature Extraction method, in that a response peak may be selected from outside the WOE if the response began in the ROW and continues outside the WOE.] 
+
+7. The EDA response value shall be zero (0), and there shall be no response amplitude, if the EDA data have a negative slope or zero slope and there is no response onset (no point of change from negative slope or zero slope to positive slope) within the ROW.
+
+8. When the caliper value is zero (0) their shall be no responseOnsetX or responseEndX indices, and the responseOnsetY and responseEndY values shall be empty. 
+
+CARDIO CALIPER REQUIREMENTS
+
+1. Cardio measurement shall be in dimensionless unit proportional to the y-axis scale.
+
+2. Cardio measurements shall be extracted by default from a cardio mid line that is computed as a moving average of all cardio data points. Alternatively, a user cardio measurements may be extracted from the diastolic line or systolic line.
+
+3. The cardio mid line shall be be computed by passing the cardio data five times through a moving average filter of 1.5 seconds.
+
+4. The cardio diastolic and systolic lines shall be computed by first locating the systolic and diastolic peak indices and then interpolating the line between the systolic peaks and diastolic peaks.
+
+5. The Cardio response onset point shall be extracted from the time-series data  at the point after MRL and before the end of the ROW where the data change from negative-slope or zero-slope to positive-slope. [This differs from Caliper Feature Extraction method, which does not have an MRL or ROW.]
+
+6. The inflection rule shall be OFF by default until evidence from scientific studies supports its contribution in increase accuracy effects.
+
+7. The Cardio response peak shall be extracted from the point of greatest y-axis value during a positive slope segment within the WOE following a response onset. This can be observed as the point where the time-series data change from positive slope to negative slope or zero slope. If the Cardio data exhibit multiple changes in slope during the WOE, following a response onset that is selected during the ROW, the response peak shall be selected from the peak point that provides the greatest response values, except that response peaks (changes from positive slope) that occur after the data have descended below the y-axis origin (response onset) value shall be excluded. No other rules shall be created pertaining to the rate or degree of descent of the Cardio data. [This differs from Caliper Feature Extraction method, which does not have an ROW or WOE.]
+
+8. If the slope of the Cardio data remains positive at the end of the WOW, the response peak shall be selected from within the 10 second post-stimulus period (following the WOE) if the a usable response onset is extracted withing the ROW and the data have not descended below the y-axis value of the response onset and if the positive slope segment leading to the late response peak began withing 13.5 second from stimulus onset. [This differs from Caliper Feature Extraction method, which does not have an ROW or WOE.] 
+
+9. The Cardio response value shall be the y-axis difference between the response peak and preceding response onset. If there are multiple response onset points or multiple response peak points the Cardio response value shall be the maximum y-axis difference between a response peak and preceding response onset. [This differs from Caliper Feature Extraction method, in that a response peak may be selected from outside the WOE if the response began in the ROW and continues outside the WOE.] 
+
+10. The Cardio response value shall be zero (0), and there shall be no response amplitude, if the Cardio data have a negative slope or zero slope and there is no response onset (no point of change from negative slope or zero slope to positive slope) within the ROW.
+
+11. When the caliper value is zero (0) their shall be no responseOnsetX or responseEndX indices, and the responseOnsetY and responseEndY values shall be empty.
+
+VASOMOTOR CALIPER REQUIREMENTS
+
+1. Vasomotor measurements shall be in dimensionless unit proportional to the y-axis scale.
+
+2. The vasomotor response feature shall be the suppression of vasomotor pulse amplitude, beginning after stimulus onset and after a vasomotor response latency period, relative to the pulse amplitude during the prestimulus segment.
+
+3. The vasomotor pulse amplitude shall be measured by first interpolating the peak-to-peak lines for the vasomotor systolic and diastolic points, and then computing the difference between each pair of samples in the vasomotor systolic and diastolic lines.
+
+4. The response value for the vasomotor sensor shall be a log(pre/stim) ratio that is computed from the three (3) second prestimulus period (3 seconds immediately preceding stimulus onset) and a five (5) second stimulus segment beginning after a five (5) second vasomotor response latency period. Larger numerical values signify greater changes in physiological activity. Negative numbers signify and absence of a usable response and can either be discarded for retained.
+
+5. Automated vasomotor feature extraction shall be identical to manual scoring caliper measurement when the manual scoring caliper onset is located at a stimulus onset index. 
+
+OUTPUT REQUIREMENTS:
+
+1. Feature extraction functions shall output the measured values to a Measurements Table that can be exported as a .CSV for research activities and submitted to automated computer algorithms for analysis.
+
+RESPIRATION USER SETTINGS REQUIREMENTS 
+
+1. Respiration WOE length (15 seconds).
+
+2. Respiration answer distortion buffer length (1.5 seconds before and after each recorded verbal answer index).
+
+3. Respiration buffer (ON/off)
+
+4. Respiration moving window [can be a hidden parameter] (3.75 seconds)
+
+EDA USER SETTINGS REQUIREMENTS
+
+1. EDA WOE (15 seconds)
+
+2. EDA MRL (0.5 seconds)
+
+3. EDA ROW (from MRL to 5 seconds after the verbal answer)
+
+4. EDA response onset inflection rule  (ON/off)
+
+5. Late EDA response peaks (ON/off)
+
+6. Un-named parameter for the onset of late positive slope segments and late peaks (13.5 seconds)
+
+CARDIO USER SETTINGS REQUIREMENTS
+ 
+1. Cardio WOE (15 seconds)
+
+2. Cardio MRL (0.5 seconds)
+
+3. Cardio ROW (from MRL to 5 seconds after the verbal answer)
+
+4. Cardio response onset inflection rule  (of/OFF)
+
+5. Late Cardio response peaks (ON/off)
+
+6. Un-named parameter for the onset of late positive slope segments and late peaks (13.5 seconds)
+
+VASOMOTOR USER SETTINGS REQUIREMENTS
+
+1. Vasomotor prestimulus window (3 seconds)
+
+2. Vasomotor latency (5 seconds)
+
+3. Vasomotor response segment (5 seconds)
+
+
