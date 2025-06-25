@@ -2050,6 +2050,8 @@ if(saveRDA2==TRUE) {
     # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
   }
   
+  library(stringr)
+  
   # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
   
   # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)

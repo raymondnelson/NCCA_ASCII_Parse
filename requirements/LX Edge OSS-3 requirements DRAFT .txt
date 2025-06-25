@@ -1,0 +1,180 @@
+﻿LX Edge Requirements – OSS-3 – DRAFT
+June 24, 2025
+Raymond Nelson 
+
+
+
+DEFINITIONS:
+
+1. Feature extraction
+
+Feature extraction is the first part of data analysis (following an initial QA process to ensure that sufficient data have been acquired to attempt analysis). The other parts of data analysis include, numerical transformation and data reduction, use of a likelihood function to compute a statistical value for the observed data, and the interpretation of analytic results. Data analysis in polygraph testing is completed for each series, using a variety of methods that are intended for use with each different test format (CQT, CIT, RI etc.). Feature extraction is a process of identifying usable/interpretable information within recorded data. Virtually all data is a combination of signal (useful information) and noise (information that is not useful, and which may complicate accessing and using useful signals). Feature extraction can be thought of as intended so separate signal and noise. In practical terms, feature extraction involves the identification of response onset and response end points with the recorded time-series polygraph data. Each different recording sensor will have different feature extraction procedures, based on knowledge obtained through feature development research activities. Feature extraction for OSS-3 is executed automatically, though users may exclude or override an automated measurement that is incorrect. 
+
+2. Numerical transformation
+
+Numerical transformation occurs after identification of the exact location of response onset and response end for each stimulus event, and involves the reduction or transformation of time-series data in the measured segment into a single numerical value that represents the physiological activity (or change in physiological activity) that occurs in response to each polygraph stimulus questions. Numerical transformation also refers to the reduction of feature extraction values for the array of recording sensors, and for all repetitions of the test questions (question sequence), to subtotal scores for the test target stimuli, and grand total scores for series. Although computer algorithms will necessarily approach feature extraction and numerical transformation as distinct functions, field practitioners who manually score polygraph data may demonstrate over-learned skills in which they execute these functions quickly and intuitively – often while perceiving extraction and numerical transformation activities as a single function. 
+
+3. Likelihood function (OSS-3 reference model)
+
+The OSS-3 reference model was computed from a large sample of confirmed field cases submitted to the Department of Defense Polygraph Institute (DoDPI, now called the National Center for Credibility Assessment, NCCA), using linear discriminate analysis. The model could also be computed using logistic regression. The goal of the discriminate function is to selected the sensor weighting coefficients optimize the separation of numerical values for confirmed guilty and confirmed innocent cases, and to maximize the number of correct classifications for unconfirmed cases. The OSS-3 reference model includes means and standard deviations (computed through bootstrap resampling of the training data) for the individual sensor scores (prior to aggregation) and also includes reference distributions for the combined (weighted mean) sensor scores after aggregation. Because the aggregation method is through averaging (weighted averaging), the OSS-3 reference distributions can be used for both grand total, with no changes in location when varying numbers of questions and charts. The practical objective of a likelihood function is to compute a statistical classifier (a statistical value use to support a categorical conclusion). The statistical classifier for OSS-3 is a p-value, computed on a Gaussian-Gaussian signal discrimination model based on signal detection theory. In addition to categorical test results, another function of interpretation involves narrative discussion and explanation of test result (how a result was achieved, and what a result can means) so that others can understand and make informed practical use of a test result without reliance on erroneous assumptions or misinformation. 
+
+4. Interpretation
+
+Interpretation is a process of explaining the meaning of a test result. It can be thought of as a process of translating numerical and statistical results into human language concepts that can guide the practical decisions that are to be made by a referring professional. In practical terms, interpretation of scientific test results will often result in categorical statements. For example, the terms positive and negative are categorical terms used to describe whether a test has or has not observed a phenomena of interest. Very often test data and test results are a matter of degree. That is, test results are a matter of whether the numerical and statistical values have achieved a required threshold or cutscore. The terms significant (statistically significant) and not significant (not statistically significant) are categorical terms to describe whether the strength of an observed statistical result is sufficient for a particular categorical conclusion. In polygraph, the terms DI/SR and NDI/NSR are a contextual allegory for the more common scientific terms positive and negative, based on whether numerical and statistical information is statistically significant or not statistically significant.  
+
+DISCUSSION: 
+
+The OSS-3 is a norm-referenced evidence-based open-source computer algorithm for analyzing comparison question polygraph test data. It was developed from 2006 to 2008, using data made available from the Department of Defense Polygraph Institute (DoDPI, now called the National Center for Credibility Assessment, NCCA) confirmed case archive from 2002 (managed by Andrew Dollins at that time). The development data included 300 confirmed field cases, along with a holdout confirmation sample of 60 confirmed field cases. These samples were used previously in the development of OSS and OSS-2. 
+
+Whereas OSS and OSS-2 were initially intended as manual scoring methods (and where subsequently automated), OSS-3 was never intended for manual scoring. Manual scoring methods are traditionally limited to very simple numerical methods involving integer values that are aggregated through summation. A limitation of those early methods was that changes in location were expected based on the number of relevant questions (RQs) and the number of polygraph charts. This meant that neither the data aggregation methods nor the reference models could generalize to test formats used for multiple issue screening polygraphs, nor could they generalize to polygraph test formats that did not include exactly three RQs or exactly three charts. In practical terms, it was not possible to compute the optimal cutscores that would enable field polygraph examiners and polygraph program managers to conduct examinations with reasonable expectations for achieving a known level of precision or known rates of error. Instead, selection of cutscore would be a process of either stochastic experimentation or arbitrary reliance on tradition. 
+
+Because the numerical transformations for OSS-3 involved averaging, and other statistical processes, OSS-3 reference models are more easily generalizable to a wider variety of polygraph test formats and testing circumstances including both single-issue and multiple issue exams, examinations with 2, 3, or 4 RQs, and examinations with 3, 4, or 5 charts. A limitation of the OSS-3 algorithm is that computation of OSS-3 numerical values is mathematically intensive (involving weighted averaging, logarithms, and z-score) and inconvenient to perform manually. Instead, it was intended that OSS-3 computations would always be accomplished via automated computer algorithm.
+
+In addition to the use of an automated computer algorithm for OSS-3 numerical transformations and data reduction, feature extraction for the OSS-3 was also intended to be completed via computer algorithm. OSS-3 scoring features were developed at the University of Utah, and are referred to as the Kircher Features. These scoring features were also described in polygraph feature development research at Johns Hopkins University. The scoring features include respiratory suppression (measured as a reduction of respiration line excursion), electrodermal amplitude (measured, after stimulus onset, as the change from response onset to response peak , and cardio amplitude (measured, after stimulus onset, as the change in relative blood pressure, from response onset to response peak). The OSS-3 reference model does not include the vasomotor sensor because the sensor was not used by the examiners who conducted the examinations included in the OSS-3 development samples. 
+
+At the time of development, OSS-3 scoring features were extracted from the confirmed field cases using a computer program called “Extract.EXE” that was developed at Johns Hopkins University for the Department of Defense. Although effective, the scoring features used during development were not highly nuanced in ways that experienced polygraph field examiners prefer. Limitations included an inability to identify and reject artifacts (deep breaths, apnea, physical movements), no defined parameters for minimum latency or response onset windows, and the use of the lowest y-axis data point (stimulus onset) as a response onset when the slope of the data is positive prior to stimulus onset (and remains consistently positive throughout the scoring window). OSS-3 feature extraction in the LX Software was subject to similar limitations. Improved feature extraction algorithms have been developed for LX Edge, with highly nuanced functional capabilities and improved parameterization of the scoring window. Because these nuances make little practical difference, and pertain mostly to user confidence and the similarity of automated feature extraction with highly experienced polygraph experts, no difference is expected in the OSS-3 reference model or accuracy effects with improved feature extraction. 
+
+PERFORMANCE REQUREMENTS:
+
+1. The LX Edge OSS-3 shall employ the same calculations and produce the same output as the OSS-3 prototypes (Excel and R), including numerical transformations, decision rules, statistical corrections for cumulative error effects, and categorical results for the examination and examination questions for both single issue exams and multiple issue polygraph exams.
+
+NON-FUNCTIONAL REQUIREMENTS
+
+1. The LX Edge OSS-3 shall obtain measured values from the same Measurements Table that is submitted to the ESS-M agorithm 
+
+
+OSS-3 FUNCTIONAL REQUIREMENTS 
+
+1. Users shall have the capability to observe and accept/reject feature extraction values prior to the computation of OSS-3 results.
+
+2. The software shall automatically select charts for scoring with the OSS-3 algorithm (CQT charts with 2 or more RQs and 2 or more CQs.) All charts are scored together with each exam series. 
+
+3. Users shall have the capability to manually select (include/exclude) chart from the alalysis.
+
+4. The software shall automatically select RQs and CQs for analysis within each chart. (Each event shall have a unique ID).
+
+5. Users shall have the capability to manually select (include/exclude) events for analysis.
+
+6. The software shall automatically select all sensors (abdominal and thoracic respiration, electrodermal, and cardio) for analysis.
+
+7. The software shall make use of Auto EDA data when it is available.
+
+8. Users shall have the capability to manually select (include/exclude) sensors for analysis.
+
+9. The software shall allow the user to proceede with computations or coerce test results to INC when the Test of Proportions is significant.
+
+10. OSS-3 output reports that are produced without visual review and affirmation of feature extraction (including the automated or manual rejection of artifacts) shall include a warning (“without visual review”)
+
+OSS-3 REPORT OUTPUT REQUIREMENTS:
+
+1. PF name
+
+2. Examine name
+
+3. Examiner name
+
+4. Analysis date. 
+
+5. Categorical results for the examination (DI/SR, NDI/NSR)
+
+6. meaning of the categorical result
+
+7. Decision rule
+
+8. p-value
+
+9. alpha (all alpha values)
+
+10. RQ text and answers
+
+11. RQ results (parsed correctly via decision rules)
+
+12. Measurement table (sorted)
+
+13. Table of Log(R/C) ratios
+
+14. Subtotal means
+
+15. Grand total mean
+
+16. Test of proportions (p-value)
+
+17. Test of proportions result
+
+18. Meaning of the test of proportions
+
+19. OSS-3 discriminate function (channel weights)
+
+20. OSS-3 channel contributions (for quality control)
+
+21. Printout of user settings
+
+22. OSS-3 narrative summary 
+
+OSS-3 USER SETTINGS REQUIREMENTS 
+
+1. Alpha - single issue DI (.05)
+
+2. Alpha - single issue NDI (.05)
+
+3. Alpha - multiple issue SR (.05)
+
+4. Alpha - multiple issue NSR (.05)
+
+5. Default decision rule – single issue (TSR) [other decision rules: GTR, SSR, FZR, UT4, TES, SCR]
+
+6. Default decision rule – multiple issue (SCR) [other decision rules: GTR, SSR, FZR, UT4, TES, TSR]
+
+7. Alpha – Test of Proportions (.05)
+
+8. Use Test of Proportions (Yes)
+
+9. Allow SR result when ToP is significant (Yes)
+
+10. Channell contributions QA (Yes)
+
+11. Minimum number of charts to score (3)
+
+12. Minimum number of CQs to score (2)
+
+13. Minimum required number of CQs per channel (2)
+
+14. Minimum number of RQs to score (2)
+
+15. Minimum requirement for useable RQ presentations (2)
+
+16. Minimum number of usable RQs (2)
+
+17. Include narrative summary in output report (Yes)
+
+18. Include examinee name in output report (Yes)
+
+19. Include examine name in output report (Yes)
+
+20. Include analysis date in output report (Yes)
+
+NARRATIVE SUMMARY REQUIREMENTS
+
+1. The narrative summary shall describe the analysis for a single series, and shall not attempt to integrate the analytic results from multiple series. 
+
+2. The output report shall describe the test data analysis and analytic result in natural language that is formulated in complete and coherent sentences.
+
+3. The narrative summary shall provide sufficient information to reproduce the analytic result using the LX Edge OSS-3.
+
+4. The narrative summary shall describe the examination format in sufficient detail to justify the analysis method and decision rule.
+
+5. The narrative summary shall briefly inform readers about the OSS-3 algorithm.
+
+6. The narrative summary shall inform readers about all analysis parameters that have influenced the analytic result (alpha, decision rules, use of statistical corrections, channel contributions etc.)
+
+7. The narrative summary shall include both categorical test results and statistical information that describes the strength of the analytic result.
+
+8. The narrative summary shall include an unambiguous  and complete sentence that describes the categorical result (presented in ALL CAPS) using categorical terminologies commonly used by field polygraph examiner and accessible to non-polygraph professionals (i.e., SIGNIFICANT REACTIONS INDICATIVE OF DECEPTION or NO SIGNIFICANT REACTIONS INDICATIVE OF DECEPTION).
+
+9. The narrative summary shall not attempt to interpret or imply additional implication or differentiation of the meaning of categorical results that do not indicate truth or deception. In other words no implied information shall be convey by the terms INCONCLUSIVE and NO OPINION and these shall used used synonymously by the OSS-3 narrative summary and output report.
+
+
+
+
+
+

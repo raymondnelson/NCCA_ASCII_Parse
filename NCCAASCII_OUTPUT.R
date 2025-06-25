@@ -619,6 +619,8 @@ if(isTRUE(writeNCAAASCII_LAF)) {
     
     {
       
+      if(!exists("cps")) cps <- 30
+      
       # these will be varied later
       
       # these lengths are used only if fixRQLengths == TRUE
