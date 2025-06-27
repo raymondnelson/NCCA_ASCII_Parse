@@ -1,0 +1,153 @@
+﻿LX Edge Requirements – GRAPHIC DISPLAY OF FEATURE EXTRACTION - DRAFT
+June 23, 2025
+Raymond Nelson 
+
+
+
+DEFINITIONS:
+
+1. Amplitude response pointer
+
+Amplitude response pointers include two arrows connected at a right angle. It is superimposed on the EDA and Cardio data to visually inform a user about the data points selected by the automated feature extraction functions. The horizontal leg points to the left, and terminates at the point of response within the ROW of a stimulus segment. The vertical leg points up, starting at the y-axis value of the horizontal arrow (y-axis value of response onset) and terminates at the highest point of of a positive slope segment to indicate response peak (response end) within the WOE (or at the first peak outside the WOE if the data continue to have a positive slope at the end of the WOE, if the first peak outside the WOE produces a greater response amplitude than the highest response peak inside the WOE). The horizontal response pointer indicates the y-axis value and x-axis location of response onset. The x-axis location of the vertical arrow indicates the x-axis location of response peak. The y-axis length of the vertical arrow indicated the measured response value (feature extraction value). 
+
+2. Answer Distortion Buffer
+
+The answer distortion buffer is a short period of time surrounding the recorded point of verbal answer, during which an answering distortion is commonly observed (due to the physical activity involved in speaking a verbal answer). The answer distortion buffer is excluded from each RLE measurement, and the answer distortion buffer is illustrated on the time series plot to document and inform a user of the data excluded from measurement. 
+
+3. Minimum response latency (MRL)
+
+MRL refers to a period of time following stimulus onset during which extraction of a response onset is prohibited because of insufficient time to support confident assumptions that an observed response onset can be attributed to the stimulus. MRL is used to assure that measured responses are timely with the stimulus, and to increase the correlation between the measured responses and the criterion stated of deception or truth-telling. Selection of the length of the MRL period is a matter of empirical and statistical optimization. 
+
+4. Response amplitude
+
+For EDA and Cardio data, response amplitude refers to the y-axis difference between response peak and response onset. Response onset is selected as the point of onset of a positive slope segment (or the point at which a significant change in the variance of a positive slope segment is observed), following the MRL and within the ROW. If multiple response onset points or multiple response peak points are observed, the response onset and response peak are selected to achieve the maximum response amplitude.  
+
+5. Response onset window (ROW)
+
+ROW refers to the period of time following stimulus onset during which a response onset can be extracted. The ROW is used to ensure that measured response are timely with the test stimuli, and to increase the correlation coefficients between measured responses and the criterion of interest. 
+
+6. Respiratory suppression
+
+Respiratory suppression is measured as the reduction of respiration line excursion (RLE) for both thoracic and abdominal respiration. RLE is measured at both the relevant question (RQ) and comparison question (CQ) for each analysis spot. Suppression of respiration is then computed as the natural log of the RQ/CQ ratio. A respiratory response is extracted if the RQ measurement is greater than the CQ measurement, where the log(RQ/CQ) ratio is greater than zero. 
+
+7. Vasomotor constriction
+
+Vasomotor constriction refers to a a reduction of the y-axis difference between a vasomotor systolic line (interpolated across the vasomotor systolic peaks) and he vasomotor diastolic line (interpolated across the vasomotor diastolic peaks). Vasomotor constriction is measured natural log of the pulse amplitude during the vasomotor prestimlus segment and the pulse amplitude during the vasomotor stimulus segment. A vasomotor response is extracted where the the log(pre/stim) ratio exceeds a minimum constraint value. 
+
+8. Vasomotor latency period
+
+The vasomotor latency period is the period at stimulus onset, between the vasomotor prestimulus segment and vasomotor response segment, during which te vasomotor pulse amplitude is not measured.
+
+9. Vasomotor prestimulus segment
+
+The vasomotor prestimulus segment is the period immediately preceding stimulus onset. The vasomotor pulse amplitude during this period is compared with the pulse amplitude in the vasomotor response segment.
+
+10. Vasomotor response segment
+
+The vasomotor response segment is the period, following the vasomotor latency, during which the vasomotor response amplitude is measured. The pulse amplitude during this period is compared with the pulse amplitude in the vasomotor prestimulus segment.
+
+11. Window of evaluation (WOE)
+
+WOE refers to the period of time during which both response onset and response peak are observed. The WOE is used to ensure that responses are timely with the test stimuli, and to increase the correlation coefficients between measured responses and the criterion of interest. The WOE informs a user about the onset and end of the data segment that is used during automatic feature extraction. Additionally. All data points in the WOE are used for the RLE measurement. For EDA and Cardio data the data within the WOE is passed to functions that automated the identification of response onset and response end points. 
+
+DISCUSSION: 
+Graphical information can be superimposed onto time series polygraph charts (data plots) to inform a user about feature extraction parameters such as the MRL, ROW, and WOE. Inclusion of graphic feature extraction information will  provide opportunity a user to scrutinize and inspect the details and output of automated feature extraction functions. This can increase user confidence in automated feature extraction software functions, leading to greater uptake and reliance among field polygraph examiners, and can provide an opportunity for field polygraph examiners to use their expertise as a quality control layer when using automated feature extraction functions. Visual inspection of automated feature extraction ensures that the examiner is ultimately in charge of the data analysis (scoring) process while increasing the reliability of polygraph scores. Graphic information can provide users with intuitive information about the parameters used for automated feature extraction (MRL, ROW, WOE, etc.) along with response onset and response end points, use to achieve the values output to the Measurements Table and data analysis algorithms. 
+
+NON-FUNCTIONAL REQUIREMENTS
+
+1. LX Edge feature extraction graphics shall make use of the same data that are shown to the user. The same data shall be used for automated feature extraction, and manual scoring calipers.
+
+2. The vasomotor systolic line shall be interpolated from the vasomotor systolic points prior to feature extraction using all vasomotor systolic points in the time series data.
+
+3. The vasomotor diastolic line shall be interpolated from the vasomotor diastolic points prior to feature extraction using all vasomotor diastolic points in the time series data.
+
+4. The cardio mid line, cardio systolic line, and cardio diastolic line shall be computed from all cardio data points prior to feature extraction.
+
+FUNCTIONAL REQUIREMENTS
+
+1. The ANSWER DISTORTION BUFFER shall be shown to the user for each stimulus event subject to automated feature extraction, for both abdominal and thoracic data, as a line superimposed on the time series plots, beginning at the y-axis data point 1.5 seconds prior to the recorded verbal answer and interpolated to the point 1.5 seconds after the recorded verbal answer. Values within the buffer are excluded from RLE measurement.
+
+2. The MRL SHADING shall be indicated on graphical plots of the polygraph time series data by a semi-transparent yellow shading beginning at stimulus onset and ending at 0.5 seconds after stimulus onset for each stimulus event during a chart. The MRL shading shall not be red or green. The MRL shading shall extend for the entire y-axis range, from the top to the bottom of the polygraph chart. The MRL shading shall be shown for all stimulus events except verbal answers, annotations, announcements, and in-test instructions. 
+
+3. The ROW SHADING shading shall be shown on graphic plots of the polygraph time series data by a semi-transparent blue shading (can be underneath the question shading and MRL shading) from stimulus onset  to 5.0 seconds after the recorded verbal answer. The ROW shading color shall not be red or green and shall be distinct from the MRL, and WOE. The ROW shading shall be distinctly less transparent than the WOE, either due to layer of ROW and WOE shadings or other method. The ROW shading shall extend for the entire y-axis range, from the top to the bottom of the polygraph chart, and shall be shown for all stimulus events except verbal answers, annotations, announcements, and in-test instructions. 
+
+4. The WOE SHADING shall be shown on graphic plots of the polygraph time series data by a semi-transparent blue shading (can be underneath the question shading, MRL shading and ROW shading) from stimulus onset to 15.0 seconds after stimulus onset. The WOE shading color shall not be red or green, and shall be distinct from the MRL and ROW. The WOE shading shall be distinctly more transparent than the ROW. The WOE shading shall extend for the entire y-axis range, from the top to the bottom of the polygraph chart, and shall be shown for all stimulus events except verbal answers, annotations, announcements, and in-test instructions. 
+
+5. The VASOMOTOR LATENCY PERIOD shall be explicitly shown as the x-axis distance between stimulus onset (end of the vasomotor prestimulus segment) and the onset of the vasomotor stimulus segment. Display of the vasomotor latency using a shaded box would add no additional information to the graphic polygraph chart. 
+
+6. The VASOMOTOR PRESTIMULUS POINTER shall be shown as a semi-transparent purple colored rectangular box, with slightly distinct borders, superimposed on the vasomotor time-series plot during the prestimulus segment. The x-axis location of the vasomotor prestimulus pointer shall be the 3.0 second period from 3.0 seconds prior to stimulus onset to the point of stimulus onset. The y-axis location of the vasomotor prestimulus pointer shall be from the mean value of all data points in the vasomotor systolic line within the vasomotor prestimulus segment to the mean mean value of all data points in the vasomotor diastolic line within the vasomotor prestimlus segment. The mathematical difference between y-axis mean systolic and mean diastolic values shall define the vertical height of the vasomotor prestimulus pointer, permitting intuitive visual comparison with the vertical height of the vasomotor response pointer. 
+
+7. The VASOMOTOR RESPONSE POINTER shall be shown as a semi-transparent purple colored rectangular box, with slightly distinct borders, superimposed on the vasomotor time-series plot during the vasomotor response segment. The x-axis location of the vasomotor response pointer shall be the 5.0 second period from 5.0 seconds after stimulus onset to 10.0 seconds after stimulus onset. The y-axis location of the vasomotor response pointer shall be from the mean value of all data points in the vasomotor systolic line within the vasomotor response segment to the mean mean value of all data points in the vasomotor diastolic line within the vasomotor response segment. The mathematical difference between y-axis mean systolic and mean diastolic values shall define the vertical height of the vasomotor prestimulus pointer, permitting intuitive visual comparison with the vertical height of the vasomotor response pointer. 
+
+8. The CARDIO RESPONSE POINTER shall include two arrows that are connected at a right angle and superimposed onto the Cardio time-series plot. The horizontal arrow shall point to the left, and shall terminate at the x-axis sample to indicated the Cardio response onset within the ROW of a stimulus segment. The y-axis value of the horizontal arrow shall correspond to the y-axis value of the Cardio mid line at the point of response onset selected by the automated feature extraction function. The horizontal arrow shall begin at the x-axis sample that corresponds with the response peak selected by the automated feature extraction function. The vertical leg shall point up, starting at the y-axis value of the horizontal arrow (y-axis value of response onset). The vertical arrow shall terminate at the y-axis value of the highest point of a positive slope segment using the Cardio mid line, indicating a response peak (response end) within the WOE(or at the first peak outside the WOE if the data continue to have a positive slope at the end of the WOE, if the first peak outside the WOE produces a greater response amplitude than the highest response peak inside the WOE).
+
+9. The Cardio response pointer (and Cardio feature extraction) shall make use of the Cardio mid line, and may use the Cardio diastolic line or Cardio systolic line depending on a user preferences setting. 
+
+10. The EDA RESPONSE POINTER shall include two arrows that are connected at a right angle and superimposed onto the EDA time-series plot. The horizontal arrow shall point to the left, and shall terminate at the x-axis sample to indicated the EDA response onset within the ROW of a stimulus segment. The y-axis value of the horizontal arrow shall correspond to the y-axis value of the response onset selected by the automated feature extraction function. The horizontal arrow shall begin at the x-axis sample that corresponds with the response peak selected by the automated feature extraction function. The vertical leg shall point up, starting at the y-axis value of the horizontal arrow (y-axis value of response onset). The vertical arrow shall terminate at the y-axis value of the highest point of of a positive slope segment, indicate response peak (response end) within the WOE(or at the first peak outside the WOE if the data continue to have a positive slope at the end of the WOE, if the first peak outside the WOE produces a greater response amplitude than the highest response peak inside the WOE).
+
+11. The EDA response pointer (and EDA feature extraction) shall make use of the Auto EDA data when available, and may use the Manual EDA data if Auto EDA is not available. 
+
+USER SETTINGS REQUIREMENTS 
+
+1. Show MRL (Yes)
+
+2. MRL color (Yellow)
+
+3. MRL transparency (75%)
+
+4. Show ROW shading (Yes)
+
+5. ROW color (Blue)
+
+6. ROW transparency (20%)
+
+7. Show WOE shading (Yes)
+
+8. WOE color (Blue)
+
+9. WOE transparency (10%)
+
+10. Show Respiration Answer Distortion Buffer (Yes)
+
+11. Answer Distortion Buffer color (black)
+
+12. Respiration Answer Distortion Buffer transparency (75%)
+
+13. Show EDA response pointers (Yes)
+
+14. EDA response pointer color (Purple) 
+
+15. EDA response pointer transparency (75%)
+
+16. Show Cardio response pointers (Yes)
+
+17. Cardio response pointer color (Purple) 
+
+18. Cardio response pointer transparency (75%)
+
+19. Cardio response pointer color (Purple)
+
+20. Show Vasomotor prestim and stimulus segment amplitude boxes (Yes)
+
+21. Vasomotor prestim segment amplitude and response segment amplitude fill color (Purple)
+
+22. Vasomotor prestim segment amplitude and response segment amplitude fill color response pointer transparency (25%)
+
+23. Show vasomotor latency period (No)
+
+24. Vasomotor latency box fill color (Yellow)
+
+25. Vasomotor latency box transparency (25%)
+
+26. Select EDA data (Auto EDA) [Auto EDA, Manual EDA]
+
+27. Select cardio data line (Cardio mid line) [Cardio mid line, Cardio diastolic line, Cardio systolic line]
+
+
+
+
+
+
+
+
+
