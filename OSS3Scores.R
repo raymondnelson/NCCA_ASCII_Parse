@@ -99,15 +99,17 @@ OSS3ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   ####
   
   {
+    # june 9, 2025 used to run OSS-3 alone 
+    
     # initialize a list to hold the output
     
-    if(!exists("analysisListName")) analysisListName <- NULL
-    if(is.null(analysisListName)) analysisListName <- paste0(examName, "OSS3_ANALYSIS")
-    
-    if(length(ls(pattern=analysisListName)) == 0) { 
-      # May 31, 2025 to handle things correctly when running OSS-3 alone
-      assign(analysisListName, NULL, envir=.GlobalEnv)
-    }
+    # if(!exists("analysisListName")) analysisListName <- NULL
+    # if(is.null(analysisListName)) analysisListName <- paste0(examName, "OSS3_ANALYSIS")
+    # 
+    # if(length(ls(pattern=analysisListName)) == 0) { 
+    #   # May 31, 2025 to handle things correctly when running OSS-3 alone
+    #   assign(analysisListName, NULL, envir=.GlobalEnv)
+    # }
   }
   
   #### identify the charts, sensors and questions for the series ####
@@ -1919,19 +1921,12 @@ OSS3ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   ###### save the analysis output list to the global env as a .txt as as side effect ######
   
   # use this to save the output list directly to the global env
-  # save the list to the globad env as a side effect
+  # save the list to the global env as a side effect
   # assign(outputListName, OSS3OutputList, env=.GlobalEnv)
   
   if(saveAnalysisTXT) {
     
     # June 5, 2025
-    
-    analysisResultList <- get(analysisListName, envir=.GlobalEnv)
-    seriesListName <- paste("series", seriesName, sep="_")
-    outputListName <- "OSS3Output"
-    analysisResultList[[seriesListName]][[outputListName]] <- 
-      OSS3OutputList
-    assign(analysisListName, analysisResultList, envir=.GlobalEnv)
     
     # May 31, 2025 write the OSS-3 output information to a text file
     outputFileName <- paste0(examName,
@@ -1943,6 +1938,21 @@ OSS3ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
     # use capture.output to create the text file
     capture.output(OSS3OutputList, file = outputFileName )
+    
+  }
+  
+  {
+    
+    # Jul 3, 2025
+    # fix problem when report is saved to txt the analysis list is reset
+    # causing previous analysis to be lost
+    
+    analysisResultList <- get(analysisListName, envir=.GlobalEnv)
+    seriesListName <- paste("series", seriesName, sep="_")
+    outputListName <- "OSS3Output"
+    analysisResultList[[seriesListName]][[outputListName]] <- 
+      OSS3OutputList
+    assign(analysisListName, analysisResultList, envir=.GlobalEnv)
     
   }
   
