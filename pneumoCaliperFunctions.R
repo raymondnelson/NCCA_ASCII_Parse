@@ -126,6 +126,7 @@ lowPass2hz.2ndFn <- function(x, GAIN = 2.97868961737845e+001, zplane0 = -0.55326
 getAnswerIndicesFn <- function(x=chartDF$Label, ansBuffLen=pneumoAnsBuff, buffer=FALSE) {
   # R function to get the verbal answer indices for an NCCA ASCII chart
   # May 13, 2025
+  # located in the pneuomoCaliperFunctions.R script
   # Raymond Nelson
   # x is the label column from chartDF, obtained from the NCCA ASCCI time series data
   # ansBuffLen is the length of the buffer zone surrounding a verbal answer
@@ -136,7 +137,8 @@ getAnswerIndicesFn <- function(x=chartDF$Label, ansBuffLen=pneumoAnsBuff, buffer
   ####
   # get the answer indices
   answerIndices <- which(x %in% c("ANS", "YES", "NO", "no", "yes", "ans", "Ans", "Yes", "No"))
-  if(isTRUE(buffer)) {
+  if(length(answerIndices)==0) return("")
+   if(isTRUE(buffer)) {
     # cps is an environment variable that is set in the NCCASCII_init.R script
     if(!exists("cps", envir=.GlobalEnv)) cps=30
     bufferStartLocs <- answerIndices - (cps * ansBuffLen)

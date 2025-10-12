@@ -137,6 +137,8 @@ RCToESSFn <- function(thisScore, thisSensor) {
     posPLELow <- log(1.05)
     negPLELow <- -log(1.05)
     
+    PLEConstraint <- log(1.1) # [1] [1] 0.09531018
+    
     posPLELow <- PLEConstraint
     negPLELow <- -PLEConstraint
     

@@ -297,7 +297,7 @@ print("init parameters for the NCCA ASCII work flow")
       
       # append an "a" to each repeated question
       fixDuplicateTags <- FALSE
-      fixDuplicateTags <- TRUE
+      # fixDuplicateTags <- TRUE
       
       # used in the workflow to remove excess time before X and after XX
       trimExcessTime <- FALSE
@@ -332,62 +332,73 @@ print("init parameters for the NCCA ASCII work flow")
     }
     
     
-    # {
-    #   # reconfig A for LAFAYETTE FIELD CASES
-    #   removeAnnotations <- FALSE
-    #   trimExcessTime <- FALSE
-    #   stopXXX <- FALSE
-    #   
-    #   fixNonASCIICharacters <- TRUE
-    #   fixNonASCIICharacters <- FALSE
-    #   
-    #   fixSensorNames <- TRUE
-    #   
-    #   EDAFilt="laf18"
-    #   
-    #   # used to expedite the selection of algorithm decision rules in this script
-    #   DRule <- "TSR"
-    #   # DRule <- "SSR"
-    # }
-    
     {
-      # reconfig B for LAFAYETTE RESEARCH CASES
+      # reconfig A for LAFAYETTE FIELD CASES
       removeAnnotations <- FALSE
-      fixDuplicateTags <- TRUE
-      trimExcessTime <- TRUE
-      stopXXX <- TRUE
+      
+      trimExcessTime <- FALSE
+      # trimExcessTime <- TRUE
+      
+      stopXXX <- FALSE
 
+      fixNonASCIICharacters <- TRUE
       fixNonASCIICharacters <- FALSE
-      fixFileNames <- FALSE
+      
+      fixDuplicateTags <- FALSE
+      fixDuplicateTags <- TRUE
+
+      fixSensorNames <- TRUE
 
       EDAFilt="laf18"
 
+      # used to expedite the selection of algorithm decision rules in this script
       DRule <- "TSR"
-      # DRule <- "SSR"
+      DRule <- "SSR"
     }
     
-    # {
-    #   # reconfig F for LAFAYETTE EDA Problems
-    #   removeAnnotations <- FALSE
-    #   fixDuplicateTags <- TRUE
-    #   trimExcessTime <- TRUE
-    #   stopXXX <- FALSE
-    # 
-    #   fixNonASCIICharacters <- TRUE
-    # 
-    #   EDAFilt="lafX"
-    #   EDAFilt="laf18"
-    # }
+    {
+      # # reconfig B for LAFAYETTE RESEARCH CASES
+      # removeAnnotations <- FALSE
+      # trimExcessTime <- TRUE
+      # stopXXX <- TRUE
+      # 
+      # fixDuplicateTags <- TRUE
+      # fixDLSTLabels <- FALSE
+      # 
+      # fixNonASCIICharacters <- FALSE
+      # fixFileNames <- FALSE
+      # fixSensorNames <- FALSE
+      # fixStrings <- FALSE
+      # 
+      # EDAFilt="laf18"
+      # EDAFilt="none"
+      # 
+      # DRule <- "TSR"
+      # # DRule <- "SSR"
+    }
+    
+    {
+      # # reconfig F for LAFAYETTE EDA Problems
+      # removeAnnotations <- FALSE
+      # fixDuplicateTags <- TRUE
+      # trimExcessTime <- TRUE
+      # stopXXX <- FALSE
+      # 
+      # fixNonASCIICharacters <- TRUE
+      # 
+      # EDAFilt="lafX"
+      # EDAFilt="laf18"
+    }
     
     
-    # {
-    #   # reconfig C for LXCAT exams
-    #   removeAnnotations <- FALSE
-    #   trimExcessTime <- FALSE
-    #   stopXXX <- FALSE
-    # 
-    #   EDAFilt="leg" # Lafayette (.04/.886)
-    # }
+    {
+      # # reconfig C for LXCAT exams
+      # removeAnnotations <- FALSE
+      # trimExcessTime <- FALSE
+      # stopXXX <- FALSE
+      # 
+      # EDAFilt="leg" # Lafayette (.04/.886)
+    }
     
     {
       # # reconfig D for AXCITON RESEARCH SAMPLES
@@ -396,10 +407,17 @@ print("init parameters for the NCCA ASCII work flow")
       # trimExcessTime <- TRUE
       # stopXXX <- TRUE
       # 
+      # fixDuplicateTags <- TRUE
+      # fixDLSTLabels <- FALSE
+      # 
       # EDAFilt="none"
+      # 
+      # reduceSampleRate <- TRUE
       # 
       # fixNonASCIICharacters <- FALSE
       # fixSensorNames <- FALSE
+      # fixFileNames <- FALSE
+      # fixStrings <- FALSE
       # 
       # DRule <- "TSR"
       # # DRule <- "SSR"
@@ -426,10 +444,17 @@ print("init parameters for the NCCA ASCII work flow")
       # trimExcessTime <- TRUE
       # stopXXX <- TRUE
       # 
-      # EDAFilt="none"
+      # fixDuplicateTags <- TRUE
+      # 
+      # fixDLSTLabels <- TRUE
+      # 
+      # # EDAFilt="none"
+      # EDAFilt="laf18"
       # 
       # fixNonASCIICharacters <- TRUE
+      # fixFileNames <- TRUE
       # fixSensorNames <- TRUE
+      # fixStrings <- TRUE
       # 
       # # DRule <- "TSR"
       # DRule <- "SSR"
@@ -516,8 +541,8 @@ print("init parameters for the NCCA ASCII work flow")
   
   # rank methods for all exam, not limited to CQTs
   getRankScores <- TRUE
-  getRRMScores <- FALSE
-  getMiritelloRankScores <- FALSE
+  getRRMScores <- TRUE
+  getMiritelloRankScores <- TRUE
   getIpsativeZScores <- TRUE
   
   # ESSM scores require the rank score and R/C score
@@ -668,6 +693,7 @@ removeExamFn <- function(x) {
   for(i in 1:length(x)) {
     rm(list=ls(pattern=x[i],, envir=.GlobalEnv), envir=.GlobalEnv)
   }
+  assign("uniqueExams", unique(str_sub(ls(pattern="*_Data$", envir=.GlobalEnv),1, -6)), envir=.GlobalEnv)
   return(paste("Removed", length(x), "exams from the global environment."))
 }
 

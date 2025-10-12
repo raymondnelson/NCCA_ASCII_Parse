@@ -621,14 +621,14 @@ featureExtraction <- function(x=uniqueExams,
           
           ############# pneumo RLE extraction #############
           
-          assign("extract.params", extract.params, pos=1)
-          assign("chartDF", chartDF, envir=.GlobalEnv)
-          assign("segmentDF", segmentDF, pos=1)
-          assign("segmentName", segmentName, pos=1)
+          # assign("extract.params", extract.params, pos=1)
+          # assign("chartDF", chartDF, envir=.GlobalEnv)
+          # assign("segmentDF", segmentDF, pos=1)
+          # assign("segmentName", segmentName, pos=1)
           # assign("sensorName", sensorName, pos=1)
           
-          if(exists("UPMeasurement")) assign("tRate", UPMeasurement, pos=1) 
-          if(exists("UPMeasurement")) assign("aRate", LPMeasurement, pos=1)
+          if(exists("UPMeasurement", envir=.GlobalEnv)) assign("tRate", UPMeasurement, pos=1) 
+          if(exists("UPMeasurement", envir=.GlobalEnv)) assign("aRate", LPMeasurement, pos=1)
           
           # if(all(i == 1, seriesName == "X", chartName == "01A" && segmentName == "C6")) {
           #   assign("extract.params", extract.params, pos=1)
@@ -671,13 +671,13 @@ featureExtraction <- function(x=uniqueExams,
         
           ##### *experimental* pneumo pattern extraction #####
           
-          # if(chartName == "01A" && segmentName == "4K") {
+          # if(all(examName == "DX259I1", chartName == "01A", segmentName == "R5")) {
           #   assign("segmentDF", segmentDF, pos=1)
           #   assign("extract.params", extract.params, pos=1)
           #   stop()
           # }
           
-          if(all(isTRUE(extractPneumoPatterns), segmentDF$UPneumo[1] != -9.9, rateRatio >=.9)) {
+          if( all(isTRUE(extractPneumoPatterns), segmentDF$UPneumo[1] != -9.9, rateRatio >=.9) ) {
 
             print("  pneumo pattern extraction")
 
@@ -688,10 +688,10 @@ featureExtraction <- function(x=uniqueExams,
             pnPatternDF <- pneumoPatternsFn(segmentDF=segmentDF,
                                             extract.params=extract.params,
                                             # verbalAnswer,
-                                            rateDiff=.05,
-                                            ampDiff=.05,
-                                            baseDiff=.05,
-                                            constrained=FALSE)
+                                            rateDiff=.1,
+                                            ampDiff=.1,
+                                            baseDiff=.1,
+                                            constrained=FALSE )
 
             # append the pattern output for each stimulus event
 
@@ -729,11 +729,11 @@ featureExtraction <- function(x=uniqueExams,
           #   # segmentDF$AutoEDAPrestim[301]
           # }
           
-          assign("segmentDF", segmentDF, pos=1)
-          assign("extract.params", extract.params, pos=1)
-          assign("cardioRate", cardioRate, envir=.GlobalEnv)
-          assign("rbpfMsg", rbpfMsg, envir=.GlobalEnv)
-          assign("segmentName", segmentName, pos=1)
+          # assign("segmentDF", segmentDF, pos=1)
+          # assign("extract.params", extract.params, pos=1)
+          # assign("cardioRate", cardioRate, envir=.GlobalEnv)
+          # assign("rbpfMsg", rbpfMsg, envir=.GlobalEnv)
+          # assign("segmentName", segmentName, pos=1)
           
           if(all(extractCardio==TRUE, segmentDF$Cardio1[1] != -9.9)) {
             print("  cardio feature extraction")
@@ -841,8 +841,21 @@ featureExtraction <- function(x=uniqueExams,
       # pass the seriesDF to the examDF
       examDF[seriesOnsetRow:seriesEndRow,] <- seriesDF
       
-      # save the pattern recognition data for respiration sensors
-      write.csv(respPatternsDF, file=paste0(examName,"_",seriesName,"_", "respPatternsDF.csv") , row.names=FALSE)
+      if(!exists("respPatternsDF") || is.null(respPatternsDF)) {
+        
+        # respPatternsDF <- as.data.frame("")
+        
+        respPatternsDF <- as.data.frame(c(examName=examName, seriesName=seriesName, chartName=chartName, 
+          eventLabel=NA, rRateUP=NA, rRateLP=NA, ampChangeUP=NA, ampChangeLP=NA, 
+          baseChangeUP=NA, baseChangeLP=NA, RLEUp=NA, RLELp=NA ) )
+        
+      }
+      
+      if(exists("respPatternsDF") ){
+        # save the pattern recognition data for respiration sensors
+        # write.csv(respPatternsDF, file=paste0(examName,"_",seriesName,"_", "respPatternsDF.csv") , row.names=FALSE)
+        write_csv(respPatternsDF, file=paste0(examName,"_",seriesName,"_", "respPatternsDF.csv"))
+      }
       
     } # end loop over j series
     

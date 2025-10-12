@@ -250,9 +250,11 @@ sigProc <- function(uniqueExams=uniqueExams,
           
           if(showNames==TRUE) print("  pneumo signal processing - upper and lower")
           
+          # source("~/Dropbox/R/NCCA_ASCII_Parse/pneumoSigProc.R", echo = FALSE)
+          
           # firstEvent and lastEventEnd do not include the X and XX announcements
           chartDF <- pneumoSigProcFn(x=chartDF, 
-                                     PneumoL=PnLow, 
+                                     PneumoL=PnLow, # filter switch
                                      first=firstEvent, 
                                      last=lastEventEnd )
           

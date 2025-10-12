@@ -305,9 +305,11 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             answerBufferIndices <- getAnswerIndicesFn(x=chartDF$Label, ansBuffLen=pneumoAnsBuff, buffer=TRUE)
             
             # set the answer distortion buffers to NA
-            chartDF$c_UPneumoExcursion0[answerBufferIndices] <- NA
-            chartDF$c_LPneumoExcursion0[answerBufferIndices] <- NA
-            
+            if(answerBufferIndices[1] != "") {
+              # July 16, 2025 protected against problems when there are no answers
+              chartDF$c_UPneumoExcursion0[answerBufferIndices] <- NA
+              chartDF$c_LPneumoExcursion0[answerBufferIndices] <- NA
+            }
             
             # # offset the respiration excursion data
             # UPOffset <- 950 - max(chartDF$c_UPneumoExcursion)
@@ -448,7 +450,7 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             ### second EDA 2 sensor ###
             
             # Jan 17, 2023
-            if(sum(pmatch(names(chartDF), "c_EDA2", nomatch=0)) != 0) {
+            if( sum(pmatch(names(chartDF), "c_EDA2", nomatch=0)) != 0 ) {
               
               # chartDF$c_ManualEDA2 <- scaleDataFn(x=chartDF$c_ManualEDA2, sec=60, times=6, ignore=1, yRange=scaleVals['eda'], maxY=(yMaxVals['eda']+250), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd))
               # chartDF$c_ManualEDA2 <- scaleDataFn(x=chartDF$c_ManualEDA2, sec=30, times=6, ignore=3, yRange=scaleVals['eda'], maxY=(yMaxVals['eda']+250), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd))

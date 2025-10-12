@@ -241,8 +241,8 @@ parseUniqueExams <- function(uniqueExamNames=uniqueExamNames,
       # initialize a data frame for each exam
       print("  parse the chart data vectors to a single data frame")
       
-      # assign("dataNames", dataNames, envir=.GlobalEnv)
-      # assign("thisExamName", thisExamName, envir=.GlobalEnv)
+      assign("dataNames", dataNames, envir=.GlobalEnv)
+      assign("thisExamName", thisExamName, envir=.GlobalEnv)
       # stop()
       
       # call the dataParse function from the NCCAASCII_ParseHelperFunctions.R script

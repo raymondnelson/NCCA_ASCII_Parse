@@ -111,10 +111,10 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
     # check if activity sensor data are available
     if("Move1" %in% names(thisChartDF) || inclMove1) {
       inclMove1 <- TRUE
-      outputSensors2 <- unique(c(outputSensors2, "Move1"))
+      outputSensors2 <- unique(c(outputSensors2, "c_Move1"))
     } else {
       inclMove1 <- FALSE
-      outputSensors2 <- outputSensors2[outputSensors2 != "Move1"]
+      outputSensors2 <- outputSensors2[outputSensors2 != "c_Move1"]
     }
     
     if(!exists("inclAutoEDA")) inclAutoEDA <- FALSE
@@ -138,10 +138,10 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
     # exclude the PPG column if PPG data is not present
     if("PPG1" %in% names(thisChartDF) || inclPPG) {
       inclPPG2 <- TRUE
-      outputSensors2 <- unique(c(outputSensors2, "PPG1"))
+      outputSensors2 <- unique(c(outputSensors2, "c_PPG1"))
     } else {
       inclPPG2 <- FALSE
-      outputSensors2 <- outputSensors2[outputSensors2 != "PPG1"]
+      outputSensors2 <- outputSensors2[outputSensors2 != "c_PPG1"]
     }
     
     if(isTRUE(inclAutoEDA)) outputSensors2 <- c(outputSensors2, "EDA2")
@@ -237,7 +237,7 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
     for(l in 11:ncol(thisChartDF)) {
       thisChartDF[,l] <- 
         setColRange(DAT=thisChartDF[,l], 
-                    y=10000, 
+                    y=250000, 
                     firstRow=firstEvent, 
                     lastRow=lastEventEnd)
     }
@@ -247,7 +247,7 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
       # offsetVal <- 25000 - median((thisChartDF[,l]))
       # offsetVal <- 10000 - min(thisChartDF[,l] )
       # offsetVal <- 25000 - min(thisChartDF[,l] )
-      offsetVal <- 10000 - min(thisChartDF[,l][firstEvent:lastEventEnd] )
+      offsetVal <- 30000 - min(thisChartDF[,l][firstEvent:lastEventEnd] )
       thisChartDF[,l] <- round(thisChartDF[,l] + offsetVal, 0)
     }
     
@@ -1843,19 +1843,27 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
     # initialize the name of the NCCA ASCII Outtput file
     NCCAASCIIName <- paste0("D&-", thisOutputName)
     
+    instrumentName <- "Lafayette Windows"
+    # instrumentName <- "Instrument Not Available"
+    
+    softwareVersion <- "10.8.6"
+    # softwareVersion <- "11.0.6"
+    
+    chartDate <- "31Dec69"
+    # chartDate <- "01Jan70"
+    
     print(paste0("format and write NCCA ASCII name: ", NCCAASCIIName) )
   }
   
   #### initialize the header info ####
   
-  headerInfo <- c( # paste0("Name of this file: ", "NA"),
-    paste0("Name of this file: ", NCCAASCIIName),
+  headerInfo <- c(paste0("Name of this file: ", NCCAASCIIName),
     # paste0("Source file: ", "NA"),
     paste0("Source file: ", str_sub(thisOutputName, 1, -7)),
-    # paste0("Instrument: ", "Lafayette Windows"),
-    paste0("Instrument: ", "Instrument Not Available"),
-    paste0("Software Version: ", "NA"),
-    paste0("Chart Date: ", "01JAN70"),
+    paste0("Instrument: ", instrumentName),
+    # paste0("Instrument: ", "Instrument Not Available"),
+    paste0("Software Version: ", softwareVersion),
+    paste0("Chart Date: ", chartDate),
     paste0("Time: ", thisChartTime),
     paste0("Examination Number: ", outputSeriesName2),
     # paste0("Examination Number: 2"),
@@ -1864,14 +1872,14 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
     paste0("Fastest Sample Rate (Hz): ", "30"),
     paste0("Number of samples: ", nrow(thisChartDF)),
     paste0("Number of channels: ", length(outputSensors2)),
-    paste0("Sample Rate (Hz) - UPneumo: ", "30"),
-    paste0("Sample Rate (Hz) - LPneumo: ", "30"),
-    paste0("Sample Rate (Hz) - EDA1: ", "30"),
-    paste0("Sample Rate (Hz) - Cardio1: ", "30"),
-    if(isTRUE(inclMove1)) paste0("Sample Rate (Hz) - Move1: ", "30"),
-    if(isTRUE(inclPPG2)) paste0("Sample Rate (Hz) - PPG1: ", "30"),
-    if(isTRUE(inclAutoEDA)) paste0("Sample Rate (Hz) - EDA2: ", "30"),
-    if(isTRUE(inclFC)) paste0("Sample Rate (Hz) - FC: ", "30")
+    paste0("Sample Rate (Hz)- UPneumo: ", "30"),
+    paste0("Sample Rate (Hz)- LPneumo: ", "30"),
+    paste0("Sample Rate (Hz)- EDA1: ", "30"),
+    paste0("Sample Rate (Hz)- Cardio1: ", "30"),
+    if(isTRUE(inclMove1)) paste0("Sample Rate (Hz)- Move1: ", "30"),
+    if(isTRUE(inclPPG2)) paste0("Sample Rate (Hz)- PPG1: ", "30"),
+    if(isTRUE(inclAutoEDA)) paste0("Sample Rate (Hz)- EDA2: ", "30"),
+    if(isTRUE(inclFC)) paste0("Sample Rate (Hz)- FC: ", "30")
     
   )
   
@@ -1919,14 +1927,18 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
                                  
                                  str_pad(thisChartEventsDF$Begin[n], 10, side="left"),
                                  str_pad(thisChartEventsDF$End[n], 10, side="left"),
-                                 str_pad(thisChartEventsDF$Answer[n], 10, side="left"),
-                                 " "  # add a space at the end of the line
+                                 str_pad(thisChartEventsDF$Answer[n], 10, side="left")
+                                 # commented out the training space 2025Aug18
+                                 # " "  # add a space at the end of the line
                                  
       )
     }
     
     # View(thisChartEventsDF)
     # print(eventInfo)
+    
+    # 2025Aug18
+    eventInfo <- str_sub(eventInfo, 1, 47)
   }
   
   #### initialize a data frame for the time series data ####
@@ -2044,6 +2056,7 @@ writeNCCAASCIIFn <- function(thisChartDF=thisChartDF,
       #  
       # if(isTRUE(inclPPG2) && length(PPG1) == 0) PPG1 <- rep(-9.9, times=length(EDA1))
       
+      examDAT <- str_sub(examDAT, 1, 90)
       
     }
     

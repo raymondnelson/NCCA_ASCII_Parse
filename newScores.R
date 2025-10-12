@@ -126,6 +126,8 @@ newScoresFn <- function(uniqueExams=uniqueExams,
   
   options(warn = 2)
   
+  # stop()
+  
   i=1
   for(i in 1:length(uniqueExams)) {
     
@@ -575,6 +577,9 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       ######### check for DLST DLDT and PCAT type charts #########
       
       {
+        
+        # Oct 7, 2025
+        # DLST exams must have 1 chart per series
         
       }
        

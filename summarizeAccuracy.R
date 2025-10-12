@@ -1,5 +1,6 @@
 
 
+
 #### start by clearing the global envir ####
 
 
@@ -68,6 +69,8 @@
   # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   # this is sourced by the workFlow_init.R script
   
+  source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  
 }
 
 
@@ -78,27 +81,6 @@
 
 {
   
-  
-  
-}
-
-
-
-######## get the ANALYSIS lists in the CWD #############
-
-
-
-{
-  
-  uniqueExams <- getUniqueExams(x="*_Data$")
-  
-  
-  analysisLists <- ls(pattern =".ANALYSIS$")
-  
-  # exclude cases that consist only of the ACQT
-  analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
-  
-  examNames <- str_sub(analysisLists, 2, -11)
   
   
 }
@@ -140,7 +122,31 @@ if(length(ls(pattern="ANALYSIS"))==0) {
 }
 
 
-#################################################
+########################################################
+
+######## get the ANALYSIS lists in the CWD #############
+
+
+
+{
+  
+  uniqueExams <- getUniqueExams(x="*_Data$")
+  
+  
+  analysisLists <- ls(pattern =".ANALYSIS$")
+  
+  # exclude cases that consist only of the ACQT
+  analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
+  
+  examNames <- str_sub(analysisLists, 2, -10)
+  
+  
+}
+
+
+
+
+########################################################
 
 ############# set up the summary ################
 
@@ -162,15 +168,17 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   # initialize a data frame to aggregate the series totals
   # RQNames <- c("R1", "R2", "R3", "R4")
   RQNames <- c("R5", "R7", "R10", "none")
+  # RQNames <- c("R5", "R7", "R10")
   # RQNames <- c("R5", "R8", "R11", "NA")
-  RQNames <- c("R2", "R2", "none", "none")
+  # RQNames <- c("R1", "R2", "none", "none")
+  # RQNames <- c("R1", "R2", "R3", "none")
   
   # seriesTotalsDF <- as.data.frame(matrix(ncol=(5+(1*length(RQNames))), 
   #                                        nrow=length(seriesTotalFiles)))
   
   
-  # DRule <- "TSR"
-  DRule <- "SSR"
+  DRule <- "TSR"
+  # DRule <- "SSR"
   
   ESSMDecisionRule <- ifelse(DRule=="TSR", "TSR", "SSR")
   # ESSMDecisionRule <- "SSR"
@@ -556,7 +564,7 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
     criterionState <- ifelse(criterionState %in% c("0", "D"), -1, 1)
     
     criterionStateDF <- cbind.data.frame(examName=examNames, criterionState)
-    write_csv(criterionStateDF, "criterionState.csv")
+    # write_csv(criterionStateDF, "criterionState.csv")
     
     # View(criterionStateDF)
     
@@ -568,6 +576,8 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
   # criterionStateDF <- read_csv("./.criterionState.csv")
   criterionStateDF <- read_csv(criterionStateFileName)
   
+  # View(criterionStateDF)
+  
   # # remove the $$ characters from Axciton file names
   # criterionStateDF$examName <- str_sub(criterionStateDF$examName, 3, -1)
   # 
@@ -578,11 +588,12 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
   # criterionStateDF$examName <- criterionStateDF$shortName
   
   # Marin reset Axciton names 
-  criterionStateDF$examName <- gsub("[[:punct:]]", "", criterionStateDF$oldID) 
-  criterionStateDF$examName <- str_c("X", criterionStateDF$examName)
+  # criterionStateDF$examName <- gsub("[[:punct:]]", "", criterionStateDF$oldID) 
+  # criterionStateDF$examName <- str_c("X", criterionStateDF$examName)
+  
+  criterionStateDF <- criterionStateDF[order(criterionStateDF$examName),]
   
   # View(criterionStateDF)
-  criterionStateDF[order(criterionStateDF$examName),]
   
   # pad single digit numeric exam names to 3 characters 
   # criterionStateDF$examName <- str_pad(criterionStateDF$examName, 3, pad="0")
@@ -601,10 +612,11 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
 }
 
 
-#############################################################
 
+##############################################################################
 
 ############# summarize the ESS-M series totals without PLE ##################
+
 
 
 summarizeResults <- TRUE
@@ -629,6 +641,8 @@ if(isTRUE(summarizeResults)) {
   seriesTotalFiles <- list.files(pattern="ESSMSeriesTotals.csv")
   
   scoreSheetFiles <- list.files(pattern="ESSMScoresheet.csv")
+  
+  examNames <- str_sub(scoreSheetFiles, 2, -22)
   
   # numbCases <- length(seriesTotalFiles)
   
@@ -721,6 +735,8 @@ if(isTRUE(summarizeResults)) {
   
   # View(seriesTotalsDF)
   
+  seriesTotalsDF <- seriesTotalsDF[order(seriesTotalsDF$examName),]
+  
   ## calculate the totals ##
   
   {
@@ -773,7 +789,9 @@ if(isTRUE(summarizeResults)) {
 } 
 
 
+
 ############# summarize the ESS-M series totals with PLE ##################
+
 
 
 summarizeResults <- TRUE
@@ -797,6 +815,8 @@ if(isTRUE(summarizeResults)) {
   seriesTotalFiles <- list.files(pattern="ESSMSeriesTotals.csv")
   
   scoreSheetFiles <- list.files(pattern="ESSMScoresheet.csv")
+  
+  examNames <- str_sub(scoreSheetFiles, 2, -22)
   
   # numbCases <- length(seriesTotalFiles)
   
@@ -879,6 +899,8 @@ if(isTRUE(summarizeResults)) {
   } # end i loop
   
   # View(seriesTotalsPDF)
+  
+  seriesTotalsPDF <- seriesTotalsPDF[order(seriesTotalsPDF$examName),]
   
   ## calculate the totals ##
   
@@ -1035,6 +1057,8 @@ if(isTRUE(summarizeSensorInfo)) {
   } # end i loop over sensor totals files
   
    # View(sensorTotalsDF)
+  
+  sensorTotalsDF <- sensorTotalsDF[order(sensorTotalsDF$examName),]
   
   # calculate the grand total
   sensorTotalsDF$grandTotal <-
@@ -1240,22 +1264,27 @@ if(isTRUE(summarizeOSS3)) {
         
       }
       
+      # View(OSS3SummaryDF)
+      
+      thisCase <- c(examName, 
+                    testFormat,
+                    testResult,
+                    RQNames,
+                    grandMean,
+                    grandMeanPVal,
+                    minRQPVal,
+                    minRQName, 
+                    sensorMeans,
+                    criterionState )
+      
       # submit the case result to the summary data frame
-      OSS3SummaryDF[i,] <- 
-        c(examName, 
-          testFormat,
-          testResult,
-          RQNames,
-          grandMean,
-          grandMeanPVal,
-          minRQPVal,
-          minRQName, 
-          sensorMeans,
-          criterionState )
+      OSS3SummaryDF[i,] <- thisCase
       
     } # end j loop over series
     
   } # end i loop over exams
+  
+  OSS3SummaryDF <- OSS3SummaryDF[order(OSS3SummaryDF$examName),]
   
   ## recode the OSS-3 result ##
   
@@ -1268,6 +1297,7 @@ if(isTRUE(summarizeOSS3)) {
   
   ## summarize the OSS-3 result ##
   
+  # View(OSS3SummaryDF)
   # str(OSS3SummaryDF)
   OSS3SummaryDF$correctCode <- 
     apply(cbind(OSS3SummaryDF[,'criterionState'], OSS3SummaryDF[,'recodeResult']),
@@ -1333,11 +1363,12 @@ if(isTRUE(summarizeOSS3Sensors)) {
   # remove the empty first row
   OSS3SensorMeansDF <- OSS3SensorMeansDF[2:nrow(OSS3SensorMeansDF),]
   
-  
   colnames(OSS3SensorMeansDF) <- c(thisCSV$sensorName, "criterionState")
   
   OSS3SensorMeansDF <- cbind(examName=examNames, OSS3SensorMeansDF)
   # View(OSS3SensorMeansDF)
+  
+  OSS3SensorMeansDF <- OSS3SensorMeansDF[order(OSS3SensorMeansDF$examName),]
 
   # fix the column types
   OSS3SensorMeansDF[,2] <- as.numeric(OSS3SensorMeansDF[,2])
@@ -1505,6 +1536,8 @@ if(isTRUE(summarizePA)) {
     
   } # end i loop over exams
   
+  PASummaryDF <- PASummaryDF[order(PASummaryDF$examName),]
+  
   ## recode the PA result ##
   
   PASummaryDF$recodeResult <- 
@@ -1662,6 +1695,8 @@ if(isTRUE(summarizeOSS2)) {
     } # end j loop over series
     
   } # end i loop over exams
+  
+  OSS2SummaryDF <- OSS2SummaryDF[order(OSS2SummaryDF$examName),]
   
   ## recode the oss-2 result ##
   
@@ -1831,6 +1866,8 @@ if(isTRUE(summarizeROSS)) {
     
   } # end i loop over exams
   
+  ROSSSummaryDF <- ROSSSummaryDF[order(ROSSSummaryDF$examName),]
+  
   ## recode the ROSS result ##
   
   ROSSSummaryDF$recodeResult <- 
@@ -1988,6 +2025,8 @@ if(isTRUE(summarizePermutation)) {
     } # end j loop over series
     
   } # end i loop over exams
+  
+  PSSSummaryDF <- PSSSummaryDF[order(PSSSummaryDF$examName),]
   
   ## recode the PSS result ##
   
@@ -2147,6 +2186,8 @@ if(isTRUE(summarizeBootstrap)) {
     
   } # end i loop over exams
   
+  bootstrapSummaryDF <- bootstrapSummaryDF[order(bootstrapSummaryDF$examName),]
+  
   ## recode the bootstrap result ##
   
   bootstrapSummaryDF$recodeResult <- 
@@ -2237,6 +2278,9 @@ if(isTRUE(summarizeLXCAT)) {
   
   PCATSummaryDF <- as.data.frame(matrix(ncol=numberCols, 
                                         nrow=length(analysisLists)))
+  
+  # View(PCATSummaryDF)
+  
   names(PCATSummaryDF) <- c("examName", 
                             "testFormat",
                             "testResult",
@@ -2306,6 +2350,8 @@ if(isTRUE(summarizeLXCAT)) {
         PCATAnalysis <- 
           thisAnalysis[[seriesName]][["PCATOutput"]]
         
+        # View(PCATAnalysis)
+        
         if(is.null(PCATAnalysis)) next()
         
         if(PCATAnalysis[['PCATResult']] == "missing PCAT sensors") next()
@@ -2346,7 +2392,11 @@ if(isTRUE(summarizeLXCAT)) {
       
       {
         
+        # View(PCATAnalysis)
+        
         cutScores <- PCATAnalysis[['PCATCutscores']]
+        
+        resultUsing <- PCATAnalysis[['PCATResultUsing']]
         
         if(resultUsing=="grand total") {
           thisCutScore <- ifelse(testResult=="DI/SR",
@@ -2394,6 +2444,8 @@ if(isTRUE(summarizeLXCAT)) {
     } # end j loop over series
     
   } # end i loop over exams
+  
+  bootstrapSummaryDF <- bootstrapSummaryDF[order(bootstrapSummaryDF$examName),]
   
   PCATSummaryDF$criterionState <- as.numeric(PCATSummaryDF$criterionState)
   
@@ -2554,6 +2606,8 @@ if(isTRUE(summarizeIpZ)) {
     # View(ipsativeZSummaryDF)
     
   } # end i loop over exams
+  
+  ipsativeZSummaryDF <- ipsativeZSummaryDF[order(ipsativeZSummaryDF$examName),]
   
   ## recode the ipsative-Z result ##
   
@@ -2761,10 +2815,10 @@ if(isTRUE(summarizeRCRatios)) {
     
   } # end i loop over exams
   
+  RCSummaryDF <- RCSummaryDF[order(RCSummaryDF$examName),]
+  
   # we now have a skinny data frame of R/C ratios for all exams 
   # View(RCSummaryDF)
-    
-    
   
   {
     
@@ -2836,8 +2890,11 @@ if(isTRUE(summarizeScoresProp)) {
   # View(sensorTotalsDF)
   
   print("normalized proportions for absolute sensor sums")
-  print(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)])) / 
-          sum(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)]))) )
+  # print(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)])) / 
+  #         sum(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)])), na.rm=TRUE) )
+  print(colSums(abs(sensorTotalsDF[,4:7])) / 
+          sum(colSums(abs(sensorTotalsDF[,4:7])), na.rm=TRUE) )
+  
   
   ### use the score sheet data frames to summarize the frequency of scores
   
@@ -2880,8 +2937,11 @@ if(isTRUE(summarizeScoresProp)) {
                                "nPneumo", "nAutoEDA", "nCardio", "nPLE", "N",
                                "nScores")
   
+  examNames <- str_sub(scoreSheetFiles, 2, -22)
+  
   # iterate over each case
   
+  # only non-zero scores
   theseScores <- c(-2, -1, 1, 2)
   
   i=1
@@ -2937,6 +2997,10 @@ if(isTRUE(summarizeScoresProp)) {
                                          )
     
   } # end for loop i
+  
+  scoreSheetFreqDF <- scoreSheetFreqDF[order(scoreSheetFreqDF$ID),]
+  
+  # View(scoreSheetFreqDF)
   
   outputVector <- 
     colSums(scoreSheetFreqDF[,2:5]) / colSums(scoreSheetFreqDF)['nScores']
@@ -3019,7 +3083,6 @@ if(all(getCorrelations, truthfulCases != totalCases, deceptiveCases != totalCase
   # setwd("./test")
   
 }
-
 
 
 
@@ -3571,6 +3634,8 @@ if(all(summarizeAccuracy, exists("PCATSummaryDF"), summarizeLXCAT)) {
 
 ############ aggregate the output summaries #############
 
+
+
 aggregateOutputSummaries <- FALSE
 aggregateOutputSummaries <- TRUE
 
@@ -3580,8 +3645,13 @@ if(aggregateOutputSummaries) {
   
   theseCaseRows <- which(criterionStateDF$examName %in% examNames)
   
+  # criterionStateDF needs to be sorted in alphabetic order
+  
+  criterionStateDF2 <- criterionStateDF[order(criterionStateDF$examName),]
+  # View(criterionStateDF2)
+  
   aggSummaryDF <- cbind(criterionStateDF$examName[theseCaseRows], 
-                        criterionStateDF$criterionState[theseCaseRows] )
+                        criterionStateDF2$criterionState[theseCaseRows] )
                         
   aggSummaryDF <- cbind(aggSummaryDF, ESSMSummaryDF[,c(13,14,8,11)])
   
@@ -3646,7 +3716,7 @@ if(aggregateOutputSummaries) {
                            "algSum",
                            "uniformResult" )
   
-  
+  # View(aggSummaryDF)
   
   write_csv(aggSummaryDF, "aggSummary.csv")
   
@@ -3656,7 +3726,7 @@ if(aggregateOutputSummaries) {
 
 
 
- ##################################################################
+##################################################################
 
 
 

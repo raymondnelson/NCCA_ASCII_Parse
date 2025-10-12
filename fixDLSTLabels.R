@@ -13,6 +13,10 @@ fixDLSTLabelsFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
   # R function to fix the DLST/TES question labels in the time series data and events table
   # June, 20, 2025
   # Raymond Nelson
+  ####
+  #
+  # this will oorrec the question labels for data imported and parsed in R 
+  # but does not edit the NCCA ASCII files
   #
   # 1C1, 1R1, 1R2, 1C2, 2R1, 2R2, 2C1, 3R1, 3R2, 2C2, 4R1, 4R2, 3C1
   # necesary when examiners use simple question labels 
@@ -154,7 +158,7 @@ fixDLSTLabelsFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
           allEventDFLabels <- chartEventsDF$Label
           
           allDataLabels <- unique(chartDF$Label)
-          allDataLabels <- allDataLabels[!(allDataLabels %in% c("", "NO","YES", "ANS"))]
+          allDataLabels <- allDataLabels[!(allDataLabels %in% c("", "NO","YES", "ANS", "Yes", "No", "Ans", "yes", "no", "ans"))]
           
           # stop if unequal
           if(any(!(allDataLabels %in% allEventDFLabels), !(allEventDFLabels %in% allDataLabels))) {
@@ -170,6 +174,7 @@ fixDLSTLabelsFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
           uniqueCQs <- unique(CQLabels)
           uniqueRQs <- unique(RQLabels)
           
+		  # next series if ACQT (no CQs or RQs)
           if(length(uniqueCQs) == 0 || length(uniqueRQs) == 0) next()
           
           if(str_sub(uniqueCQs[1], 1, 1) == "1" && str_sub(uniqueRQs[1], 1, 1) == "1") {
@@ -197,6 +202,7 @@ fixDLSTLabelsFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
           #   CQCount[l] <- length(which(CQLabels == uniqueCQs[l]))
           # }
           
+		  # initialize 2 counters for the 2 CQs
           CQCounter1 <- 0
           CQCounter2 <- 0
           
@@ -217,6 +223,7 @@ fixDLSTLabelsFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
             }
           }
           
+		  # initialize 2 counters for the 2 RQs
           RQCounter1 <- 0
           RQCounter2 <- 0
           
@@ -262,13 +269,14 @@ fixDLSTLabelsFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
             thisEvent <- newEventDFLabels[n]
             # next event if not CQ or RQ
             if(!(grepl("[CR]", thisEvent[1]))) next()
-            # the the data rows from the chartEventsDF
+            # get the data rows from the chartEventsDF
             thisEventRow <- which(chartEventsDF$eventLabel == thisEvent)
             thisEventBeginRow <- chartEventsDF$Begin[thisEventRow]
             theseDataRows <- c(chartEventsDF$Begin[thisEventRow]:chartEventsDF$End[thisEventRow])
             # edit the label in the time series data
-            chartDF$eventLabel[thisEventBeginRow] <- thisEvent
             chartDF$Label[theseDataRows] <- thisEvent
+			# only the first eventLabel row has the question name
+			chartDF$eventLabel[thisEventBeginRow] <- thisEvent
           }
           
           # unique(chartDF$eventLabel)

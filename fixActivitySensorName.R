@@ -10,11 +10,15 @@ fixSensorNameFn <- function(x=searchPattern, oldSensorName="Aux01", newSensorNam
   for (i in 1:length(fileNames)) {
     x <- readLines(fileNames[i], encoding="latin1")
     
-    x[5:150] <- gsub(oldName, newName, x[5:150])
-    
-    writeLines(x, fileNames[i])
-    
-    print(fileNames[i])
+    # 2025Oct1 only if the old sensor name is present
+    if(any(grepl(oldName, x[5:150]))) {
+      
+      x[5:150] <- gsub(oldName, newName, x[5:150])
+      
+      writeLines(x, fileNames[i])
+      
+      print(fileNames[i])
+    }
   }
   
 } # end fixSensorNameFn() function

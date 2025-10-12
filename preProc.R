@@ -95,6 +95,8 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("RR", "R", x)
   x <- gsub("R R", "R", x)
   x <- gsub("CC", "C", x)
+  x <- gsub("CD", "C", x)
+  x <- gsub("DC", "C", x)
   # x <- gsub("C C", "C", x)
   x <- gsub("NN", "N", x)
   x <- gsub("N N", "N", x)
@@ -129,6 +131,11 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("2SA", "SA", x)
   x <- gsub("2S", "SA", x)
   x <- gsub("S2", "SA", x)
+  x <- gsub("2S/R", "SA", x)
+  x <- gsub("2SR", "SA", x)
+  x <- gsub("S/R2", "SA", x)
+  x <- gsub("SR2", "SA", x)
+  x <- gsub("RSR", "SA", x)
   
   # SPACES AND COMMAS 
   x <- gsub(" ", "", x)
@@ -196,6 +203,28 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("C3DLC3", "3C3", x)
   x <- gsub("C3DLC4", "3C4", x)
   
+  # x <- gsub("I1A", "1A", x)
+  # x <- gsub("I1B", "1B", x)
+  # x <- gsub("I1C", "1C", x)
+  
+  x <- gsub("1C", "1D", x)
+  # x <- gsub("1A", "1", x)
+  # x <- gsub("1B", "1", x)
+  # x <- gsub("1D", "1", x)
+  # x <- gsub("1E", "1", x)
+  
+  # x <- gsub("I1", "1", x)
+  
+  # re-fix DLST CQ names after 
+  x <- gsub("1D1", "1C1", x)
+  x <- gsub("1D2", "1C2", x)
+  
+  # x <- gsub("I4", "4", x)
+  # x <- gsub("I7", "7", x)
+  
+  # x <- gsub("N1", "1", x)
+  # x <- gsub("N2", "2", x)
+
   x <- gsub("R_R1", "R1", x)
   x <- gsub("R_R2", "R2", x)
   x <- gsub("R_R3", "R3", x)
@@ -365,6 +394,9 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
   
   uniqueExams <- x
   
+  if(!exists("makeDF")) makeDF <- TRUE
+  if(!exists("output")) output <- FALSE
+  
   # get the range from the function input y value
   # colRange <- as.numeric(y)
   
@@ -381,12 +413,12 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
       assign("examName", examName, pos=1)
       print(examName)
       
-      #### 20191231 maybe could  parse the headers and data here ####
+      ###### 20191231 maybe could  parse the headers and data here ######
       
       # get the names of time series lists for all unique series in each exam
       # searchString <- paste0("*", examName, "_Data", "*")
       
-      #### get the exam data frame with the time series data #### 
+      #### get the exam data frame with the time series data ####
       
       # get the time series data frame for the exam
       # examDF <- get(glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
@@ -479,7 +511,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
         seriesOnsetRow <- min(seriesRows)
         seriesEndRow <- max(seriesRows)
         
-        #### slice the series data frame ####
+        ###### slice the series data frame ######
         
         seriesDF <- examDF[seriesRows,]
         # View(seriesDF)
@@ -495,7 +527,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
         
       }
       
-      #### iterate over each unique chart ####
+      ###### iterate over each unique chart ######
       
       k=1
       for(k in 1:length(uniqueCharts)) {
@@ -513,7 +545,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
           chartOnsetRow <- min(chartRows)
           chartEndRow <- max(chartRows)
           
-          #### slice the chart data frame ####
+          ######## slice the chart data frame ########
           
           chartDF <- seriesDF[chartRows,]
           
@@ -651,6 +683,19 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
           allEventsChart <- chartEventsDF$Label
           
           # unique(chartDF$Label)
+          
+        }
+        
+        #### check for NA rows ####
+        
+        {
+          # 2025Aug10 # difficulties with NA rows with LXEdge charts
+          
+          chartDF$Label[which(is.na(chartDF$Label))] <- ""
+          
+          
+          
+          
           
         }
         
@@ -970,7 +1015,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
             # use a loop to keep a single index for each unique event end
             l=1
             for(l in 1:(length(uniqueEvents)-1)) {
-              if(chartDF$Label[l] == chartDF$Label[(l+1)]) uniqueEvents[l] <- ""
+              if( chartDF$Label[l] == chartDF$Label[(l+1)] ) uniqueEvents[l] <- ""
               # if(chartDF$eventLabel[l] == chartDF$eventLabel[l+1]) uniqueEvents[l] <- ""
             } # end for loop over uniqueEvents
             
@@ -979,7 +1024,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
             # uniqueEvents[stimQuestionEnd]
             
             # Oct 2, 2023 removed "Y" and "N" because "Y" is an annotation
-            answerWords <- c("YES", "NO", "ANS")
+            answerWords <- c("YES", "NO", "ANS", "Yes", "No", "Ans", "yes", "no", "ans")
             
             # exclude verbal answers YES, NO and ANS
             stimQuestionEnd <- 
@@ -1021,7 +1066,7 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
             if(length(stimQuestions) >= 3) {
               # removeEvents <- NULL
               for(p in 3:length(stimQuestions)) {
-                # compare each quesiton to the one 2 positions before
+                # compare each question to the one 2 positions before
                 if(stimQuestions[p] == stimQuestions[(p-2)]) {
                   
                   if(stimQuestionEnd[(p-1)] >= (stimQuestionEnd[p]-1))
@@ -1305,8 +1350,8 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
           # in case of short charts
           if(lastEventEnd < 1) lastEventEnd <- nrow(chartDF)
           # assign("firstLastEvents", firstLastEvents, pos=1)
-          print(firstEvent)
-          print(lastEventEnd)
+          # print(firstEvent)
+          # print(lastEventEnd)
           
         }
         
@@ -1318,13 +1363,16 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
           
           # first source the sigProcHelper.R script
           
+          if(!exists("colRange", envir=.GlobalEnv)) colRange=30000
+          
           # start at the first data column 11
           useCols <- ((11 + (lastDataCol - 10)):((lastDataCol + 1) + (lastDataCol - 11)))
           m=17
           for (m in min(useCols):max(useCols)) {
+            # # column values will be NA for charts that did not include a sensor
+            if(is.na(chartDF[1,m])) next()
             # use a function for each data column
             # colRange is set in the init
-            if(!exists("colRange", envir=.GlobalEnv)) colRange=30000
             chartDF[,m] <- setColRangeFn(DAT=chartDF[,m], y=colRange, firstRow=firstEvent, lastRow=lastEventEnd)
             # plot.ts(chartDF[,m])
           } 

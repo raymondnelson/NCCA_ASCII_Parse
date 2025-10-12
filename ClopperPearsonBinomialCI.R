@@ -17,7 +17,7 @@ clopperPearsonFn <- function(p=.8697865,
   # May 16, 2017
   # Raymond Nelson
   #
-  # called by
+  # called by the ESSScoresFn() to compute the lower limit of posterior odds
   # 
   # p input is a decimal probablity value 
   # n input is the sample size

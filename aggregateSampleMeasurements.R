@@ -1,7 +1,9 @@
-# R Script to aggregate the skiny _Measurements.csv" data to a single .csv for all cases in a sample
+# R Script to aggregate the semi-skiny _Measurements.csv" data to a single .csv for all cases in a sample
 # January 19, 2025
 # Raymond Nelson
 ####
+#
+# produce a .csv table similar to input requirements for the 2008 OSS-3 Excel prototype
 
 
 
@@ -12,12 +14,13 @@ rm(list=ls())
 # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N60/NCCA_ASCII_OSS3_holdoutN60")
 
 setwd("~/Dropbox/R/NCCAASCII_data/Ohio_PPG_data/Ohio2015_n40_nccascii_2024Mar")
-
+setwd("~/Dropbox/DATASETS/Axciton_confirmed_casesN44/AxcitonN44_NCCAASCIIOutputLAF_2025Jan")
 
 
 library("readr")
 
 library("stringi")
+library("stringr")
 
 # library("stringr")
 
@@ -46,10 +49,27 @@ N <- length(measurementFileNames)
 
 {
   # federal ZCT
-  theseQuestions <- c("N1", "SA", "E3", "C4", "R5", "C6", "R7", "E8", "C9", "R10")
+  fzctQuestions <- c("N1", "SA", "E3", "C4", "R5", "C6", "R7", "E8", "C9", "R10")
   
   # utah 3 question format
-  theseQuestions <- c("I1", "SA", "N1", "C1", "R1", "N2", "C2", "R2", "N3", "C3", "R3")
+  ut3Questions <- c("I1", "SA", "N1", "C1", "R1", "N2", "C2", "R2", "N3", "C3", "R3")
+  
+  # utah 4 question format
+  ut4Questions <- c("I1", "SA", "N1", "C1", "R1", "R2", "C2", "R3", "R4", "C3", "N2")
+  
+  # USAMFGQT
+  af1mgqtQuestions <- c("N1", "SA", "C3", "R4", "C5", "R6", "C7", "R8", "C9", "R10")
+  
+  af2mgqtQuestions <- c("N1", "SA", "C3", "R4", "R5", "C6", "R7", "R8", "C9")
+                      
+  # Army
+  armyQuestions <- c("I1", "I2", "R3", "I4", "R5", "C6", "I7", "R8", "R9", "C10")
+  
+  # YouPhase
+  theseQuestions <- 
+    unique(c(fzctQuestions, ut3Questions, ut4Questions, af1mgqtQuestions, af2mgqtQuestions, armyQuestions))
+  
+  
 }
 
 
@@ -69,12 +89,13 @@ N <- length(measurementFileNames)
   questionCols <- paste0(rep(paste0("m", rep(c(1:numberSensors), each=numberEvents), "_", rep(1:numberEvents), "_"), each=numberSensors), sensorNames)
   columnNames <- c("examName", "technique", "criterionState", paste0("Q", c(1:numberEvents)), questionCols)
   
+  # initialize a data frame
   aggMeasurementsDF <- as.data.frame(matrix(nrow=length(measurementFileNames), ncol=length(columnNames)))
   names(aggMeasurementsDF) <- columnNames
   
   outputDF <- aggMeasurementsDF
   
-  # 11 output data frame for the event indices
+  # 11 output data frames for the event indices
   preStimOutputDF <- outputDF
   eventBeginOutputDF <- outputDF
   latencyOutputDF <- outputDF
@@ -141,7 +162,8 @@ for(i in 1:length(measurementFileNames)) {
   
   ## limit the data frame to one series ##
   
-  thisExamMeasurementsDF2 <- thisExamMeasurementsDF[thisExamMeasurementsDF$seriesName=="1",]
+  # thisExamMeasurementsDF2 <- thisExamMeasurementsDF[thisExamMeasurementsDF$seriesName=="1",]
+  thisExamMeasurementsDF2 <- thisExamMeasurementsDF[thisExamMeasurementsDF$seriesName=="X",]
   
   ## exclude the X and XX and limit the data frame to the selected questions ##
   
@@ -160,7 +182,7 @@ for(i in 1:length(measurementFileNames)) {
   
   {
     outputRow0["criterionState"] <- 
-      criterionStateDF$criterionState[which(str_sub(thisExamName, 1, -2) == criterionStateDF$examName)]
+      criterionStateDF$criterionState[which(str_sub(thisExamName, 1, -1) == criterionStateDF$examName)]
   }
   
   ## iterate over the charts ##
@@ -235,8 +257,9 @@ for(i in 1:length(measurementFileNames)) {
   
   ## insert the outputRow into the aggMeasurementsDF
   
-  aggMeasurementsDF[i,] <- outputRow0
+  # str(unlist(outputRow0))
   
+  aggMeasurementsDF[i,] <- outputRow0
   
 } # end i loop over _Measurements.csv file names
 

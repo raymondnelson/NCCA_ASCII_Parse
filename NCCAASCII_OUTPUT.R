@@ -142,9 +142,9 @@ if(getOption("warn") !=2) {
   
   # standardize the RQ and CQ rotations for different test formats
   fixRQRotation <- TRUE
-  # fixRQRotation <- FALSE
+  fixRQRotation <- FALSE
   fixCQRotation <- TRUE
-  # fixCQRotation <- FALSE
+  fixCQRotation <- FALSE
   
   # fix the labels and rotation for all procedural questions (not RQ or CQ)
   fixQuestionLength <- TRUE
@@ -153,7 +153,7 @@ if(getOption("warn") !=2) {
   
   # adjust the question length and answer distance 
   fixAnswerDistance <- TRUE
-  # fixAnswerDistance <- FALSE
+  fixAnswerDistance <- FALSE
   
   fixMissingAnswers <- FALSE
   fixMissingAnswers <- TRUE

@@ -7,6 +7,14 @@ PLESigProcFn <- function(x=chartDF, first=firstEvent, last=lastEventEnd, baseLin
   
   chartDF <- x
   
+  # July 8, 2025
+  # exit if the PLE data are missing or flatlined
+  # to avoid errors when including a dummy channel when the PlE is missing
+  if(sd(chartDF$c_PPG1, na.rm=TRUE) <= 10) {
+    chartDF$c_PPG1 <- 0
+    return(chartDF)
+  }
+  
   # reset the zero-centered PLE data
   chartDF$c_PPG1 <- chartDF$PPG1 - chartDF$PPG1[1]
   

@@ -21,7 +21,7 @@ dataReduceFn <- function(chartDF=chartDF, newRate=30) {
   } 
   
   {
-    # check for events on only 1 row, in case they get lost
+    # check for events on only 1 row, in case they get lost during decimation
     LabelVector <- chartDF$Label[2:(nrow(chartDF)-1)]
     # preceding row
     LabelVectorA <- chartDF$Label[1:(nrow(chartDF)-2)]
@@ -39,15 +39,17 @@ dataReduceFn <- function(chartDF=chartDF, newRate=30) {
     # missingRows <- which(chartDF$UPneumo == -9.9)
     # Feb 3, 2023 using EDA1 instead because LXCAT has no pneumo data
     missingRows <- which(chartDF$EDA1 == -9.9)
-    # May 12, 2024 to work with PPT rows that have missing values
-    if(!PCATFormat) {
-      missingRows <- c(missingRows, which(chartDF$UPneumo == -9.9))
-      missingRows <- c(missingRows, which(chartDF$LPneumo == -9.9))
-      missingRows <- c(missingRows, which(chartDF$PPG1 == -9.9))
-      missingRows <- c(missingRows, which(chartDF$Move1 == -9.9))
-      missingRows <- c(missingRows, which(chartDF$PTTPTT == -9.9))
-      missingRows <- sort(unique(missingRows))
-    }
+    
+    # # May 12, 2024 to work with PPT rows that have missing values
+    # # commented out July 6, 2025 to work with axciton subsampled data
+    # if(!PCATFormat) {
+    #   missingRows <- c(missingRows, which(chartDF$UPneumo == -9.9))
+    #   missingRows <- c(missingRows, which(chartDF$LPneumo == -9.9))
+    #   missingRows <- c(missingRows, which(chartDF$PPG1 == -9.9))
+    #   missingRows <- c(missingRows, which(chartDF$Move1 == -9.9))
+    #   missingRows <- c(missingRows, which(chartDF$PTTPTT == -9.9))
+    #   missingRows <- sort(unique(missingRows))
+    # }
     
     # check for single row events on subsampled rows
     adjustThese <- which(theseEvents %in% missingRows)

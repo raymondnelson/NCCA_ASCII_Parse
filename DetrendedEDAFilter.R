@@ -1,5 +1,6 @@
 # R function for Detrended-2 EDA filter
 # 8-17-2012
+# 2022
 # Raymond Nelson
 #
 ####
@@ -11,6 +12,7 @@
 detrended2EDAFilter <- function(x=edaData, cps=30, accel=1.05, wait=5) {
   # R function for Detrended-2 EDA filter
   # 8-17-2012
+  # 2022
   # Raymond Nelson
   #
   ####
@@ -30,6 +32,7 @@ detrended2EDAFilter <- function(x=edaData, cps=30, accel=1.05, wait=5) {
   # 5i) else if the duration is < 5 sec then add the diff to the sum
   # 5g) check the cumulative sum 
   # 5h) if cumulative sum is < 0 subtract the sum from 0 so that the sum is 0
+  # 5i) this will ensure that the data do not descend below the 0 (arrow) location
   #
   # input x is the vector of Manual EDA samples
   # input cps is the number of samples per second
@@ -44,6 +47,9 @@ detrended2EDAFilter <- function(x=edaData, cps=30, accel=1.05, wait=5) {
   # identical to the Manual EDA
   # numerical scores will be identical for Manual EDA and Detrended EDA
   #
+  # the Detrended-2 filter was initially developed on 8/17/2012
+  # this R version was created in 2022
+  # 
   ####
   
   # private function to determine the slope

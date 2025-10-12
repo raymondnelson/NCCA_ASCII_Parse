@@ -133,9 +133,11 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   #### constraints for ESS-M R/C ratios ####
 
-  # now included in 
-  # source(paste0(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
-
+  {
+    # now included in 
+    # source(paste0(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
+  }
+  
   #### initialize a data frame with the question sequence for each chart ####
   
   {
@@ -1233,10 +1235,6 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                          ESSMSensorTotalsDF=sensorTotalsDF, 
                          ESSMMeasurementDF=measurementsDF )
   
-  #### June 22, 2023, save the ESS-M report to the cwd as a .csv ####
-  
-  # capture.output(ESSMOutputList, file=paste0(outputListName, ".txt"))
-  
   #### save the list to the globad env as a side effect ####
   
   # use this to save the output list directly to the global env
@@ -1246,6 +1244,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   {
     
     analysisResultList <- get(analysisListName, envir=.GlobalEnv)
+    # View(analysisResultList)
     seriesListName <- paste("series", seriesName, sep="_")
     outputListName <- "ESSMOutput"
     analysisResultList[[seriesListName]][[outputListName]] <- 
@@ -1253,6 +1252,17 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     assign(analysisListName, analysisResultList, envir=.GlobalEnv)
     
   }
+  
+  #### June 22, 2023, save the ESS-M report to the cwd as a .csv ####
+  
+  outputFileName <- paste0(examName,
+                           "_",
+                           seriesName,
+                           "_",
+                           "ESSMOutputList",
+                           ".txt" )
+  
+  capture.output(ESSMOutputList, file=outputFileName)
   
   #### visible output ####
   

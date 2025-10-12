@@ -665,7 +665,7 @@ if(fixSensorNames==TRUE) {
     
     # PLE sensor name should be PPG1
     fixSensorNameFn(x="D&+", oldSensorName = "PLE1", newSensorName = "PPG1")
-    # fixSensorNameFn(x="D&+", oldSensorName = "  PL", newSensorName = "PPG1")
+    fixSensorNameFn(x="D&+", oldSensorName = "  PL", newSensorName = "PPG1")
     
     # the NCCA ASCI spec uses "UPneumo" and LPnuemo"
     # while the NCCA pReview application seems to use "Upneumo" and "Lpneumo"
@@ -812,8 +812,9 @@ if(NCCAASCIIParse == TRUE) {
   print("source the NCCAASCIIParse.R script to parse the data")
   source(paste0(RPath, 'NCCAASCII_Parse.R'), echo=FALSE)
   
-  # sourced by the NCCAASCIIParse.R script
   source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
+  
+  source("~/Dropbox/R/NCCA_ASCII_Parse/NCCAASCII_dataParse.R", echo = FALSE)
   
   # stop()
   
@@ -827,7 +828,6 @@ if(NCCAASCIIParse == TRUE) {
   print(uniqueExamNames)
 
 } 
-
 
 
 ######## parse the stimulus events ######## 
@@ -1015,7 +1015,7 @@ if(preProcessData == TRUE) {
 
 
 
-######## fix names of repeated stimulus events ######## 
+######## fix names of duplicated or REPEATED stimulus events ######## 
 
 
 
@@ -1048,6 +1048,8 @@ if(fixDuplicateTags == TRUE) {
   print(dataNames)
   
   print (paste0("checked for duplicate event labels in ",length(uniqueExams), " exams"))
+  
+  fixDuplicateTags <- FALSE
   
 }
 
@@ -1156,6 +1158,9 @@ if(!exists("fixDLSTLabels")) fixDLSTLabels <- FALSE
 
 
 if(isTRUE(fixDLSTLabels)) {
+  
+  # June 20, 2025
+  # Stoelting software does not accept the correct DLST/TES question labels
   
   # call a function to fix the DLST/TES question labele
   # 1C1, 1R1, 1R2, 1C2, 2R1, 2R2, 2C1, 3R1, 3R2, 2C2, 4R1, 4R2, 3C1
@@ -1370,6 +1375,10 @@ if(loadRDA1==TRUE) {
   # make a function to make a list of unique exams in the global environment
   if(!exists("getUniqueExams")) {
     getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
+    # July 6, 2025 a function to make it easier to recreate the uniqueExams vector
+    uniqueExamsFn <- function(x="*_Data$") { 
+      assign("uniqueExams", unique(str_sub(ls(pattern=x, pos=1),1, -6)), envir=.GlobalEnv)
+    }
   }
   
   print("make a list of unique exams in the global environment")
@@ -2035,7 +2044,7 @@ if(saveRDA2==TRUE) {
   
 }
 
- 
+
 
 ######## LOAD RDA2 the data from the current working directory  ######### 
 

@@ -161,11 +161,15 @@ pneumoSigProcFn <- function(x=chartDF, PneumoL=PneumoLowPass, first=firstEvent, 
     
     answerBufferIndices <- getAnswerIndicesFn(x=chartDF$Label, ansBuffLen=pneumoAnsBuff, buffer=TRUE)
     
-    chartDF$c_UPneumoRate0 <- chartDF$c_UPneumoRate
-    chartDF$c_UPneumoRate0[answerBufferIndices] <- NA
+    # July 16, 2025 protected against problems when there are no answers
+    if(answerBufferIndices[1] != "") {
+      chartDF$c_UPneumoRate0 <- chartDF$c_UPneumoRate
+      chartDF$c_UPneumoRate0[answerBufferIndices] <- NA
+      
+      chartDF$c_LPneumoRate0 <- chartDF$c_LPneumoRate
+      chartDF$c_LPneumoRate0[answerBufferIndices] <- NA
+    }
     
-    chartDF$c_LPneumoRate0 <- chartDF$c_LPneumoRate
-    chartDF$c_LPneumoRate0[answerBufferIndices] <- NA
   }
   
   ## scaling and offsetting is now done in another function ##

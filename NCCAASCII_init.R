@@ -46,7 +46,8 @@ print("init parameters for parsing and processing NCCA ASCII data")
   
   # reduceSampling will decimate the data rate to 30cps if necessary
   # will also upsample to 30cps if necessary 
-  reduceSampleRate=FALSE
+  reduceSampleRate <- FALSE
+  reduceSampleRate <- TRUE
   
 }
 
@@ -95,7 +96,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # EDAFilt="laf" # Lafaytte(.2/.03)
   # EDAFilt="laf0" # Lafaytte(.5/.01)
   # EDAFilt="test" # Lafayette (.0159/.443)
-  EDAFilt="laf18" # Lafayette (.0159/.443)
+  # EDAFilt="laf18" # Lafayette (.0159/.443)
   # EDAFilt="test" # Lafayette (.1/.5)
   # EDAFilt="Det2" # Lafayette Detrended-2 filter (2012)
   # EDAFilt="lafX" # Lafayette (.05/.05)
@@ -681,7 +682,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # 
   # OSS3DecisionRule <- ifelse(DRule=="TSR", "TSR", "SCR")
   # # OSS-3 can use the SCR rule which uses the KW-ANOVA
-  # # OSS3DecisionRule <- "SCR"
+  # OSS3DecisionRule <- "SCR"
   # 
   # PADecisionRule <- "TSR"
   # 

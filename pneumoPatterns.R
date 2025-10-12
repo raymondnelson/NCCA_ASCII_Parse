@@ -1,94 +1,191 @@
 # R script to extract pneumo response patterns
 # Jan 31, 2022
+# July 2025
 # Raymond Nelson
 # 
 
-# maxPeak <- function(x, y=round(.25*cps,0), firstLast=TRUE) {
-#   # function to get the cyclic peaks from the time series data
-#   # will keep the index number of max peak samples
-#   # x input is a time series vector
-#   # y input is the number of offset samples 
-#   # firstLast will keep or exclude the first and last samples
-#   ###
-#   # xOut is a vector of peak indices to compute the cyclic rate or interpolate the line
-#   xOut <- rep(NA, times=(length(x)))
-#   if(firstLast==TRUE){
-#     xOut[1] <- 1 # keep the first
-#     xOut[length(xOut)] <- length(xOut) # keep the last
-#   }
-#   # buffer will be double the offset value
-#   input_buffer <- x[2:(2*y+1)]
-#   for (i in 2:(length(x)-(2*y))) {
-#     input_buffer <- c(input_buffer[2:(2*y)], x[i+(2*y)])
-#     # check to see if the middle value of the buffer is the max
-#     ifelse(input_buffer[(y+1)]==max(input_buffer),
-#            xOut[i+y+1] <- c(i+y+1), # +1 because we started at 2
-#            # work on this 4/23/2016
-#            # another way is to
-#            # create a buffer of NA and keep only the i+y+1 set to the row index
-#            # slice the buffer into the vector 
-#            # the result should be the same
-#            # non max samples in the buffer are NA
-#            next()
-#     )
-#   } # end for loop
-#   return(as.numeric(na.omit(xOut)))
-# }
+
+# requires the maxPeak() function and ratePerMin() function
+# from the sigProcHelper.R script
 
 
 
 
-# ratePerMin <- function(x=chartDF$c_UPneumo, buffer=42, peaks="upper", lowPass=FALSE) {
-#   # function to calculate the cyclic rate per minute
-#   # for cardio and pneumo time series data
-#   # x input is a a time series vector
-#   # peaks input is a switch to choose "upper" or "lower" peaks
-#   # buffer input is the number of pre and post index samples to include in the search space
-#   # buffer = 40 for pneumo
-#   # buffer = 9 for cardio
-#   # output is the mean rate 
-#   ####
-#   # first smooth the input to remove artifact peaks
-#   if(lowPass == TRUE) { 
-#     x1 <- lowPass2hz.2nd(x) 
-#   } else {
-#     x1 <- x
-#   }
-#   # then get the max or min peak
-#   ifelse(peaks=="lower",
-#          Peaks <- minPeak(x=x1, y=buffer, firstLast=FALSE),
-#          Peaks <- maxPeak(x=x1, y=buffer, firstLast=FALSE) 
-#   )  
-#   # calculate the rate
-#   
-#   peakDiffs <- diff(Peaks)
-#   # remove peak diffs of 1 because these occur when the cardio cuff is deflated
-#   # peak diffs of 1 will distort the cardio rate measurement
-#   peakDiffs <- peakDiffs[which(peakDiffs != 1)]
-#   
-#   rateMin <- ifelse(length(peakDiffs)>1,
-#                     60 / (mean(peakDiffs) / cps ),
-#                     # 60/1/cps
-#                     60 / peakDiffs / cps
-#   )
-#   return( round(rateMin , 2) )
-# }
+slowingPatternFn <- function(dataVector, constrained=FALSE, constraintVal=.1) {
+  # R function to compute a value for the respiration slowing response pattern
+  # July 5, 2025
+  # intended to mimick manual feature extraction
+  # input data vector is the time series respiration data (upper or lower)
+  # for 10 prestimulus seconds, 15 stimulus seconds, and 10 poststimulus seconds
+  # output is a log ratio (will be 0 if no response or insufficient response)
+  ##
+
+  # get the peak indices 
+  maxPeakIdx <- maxPeak(x=dataVector, y=60, firstLast=FALSE)
+    
+  # rate values indicate the mean number of seconds per resp cycle
+  # 10 prestimulus seconds
+  preRate <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 1:300)]), na.rm=TRUE) / cps
+  # 10 poststimulus seconds
+  postRate  <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 751:1050)]), na.rm=TRUE) / cps
+  
+  # combine prestim and poststim segement, weighted for the prestim seg
+  prePostRate <- mean(c(preRate, preRate, postRate), na.rm=TRUE)
+  
+  # stim segment with 2.5 sec latency
+  stimRate  <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 376:750)]), na.rm=TRUE) / cps
+    
+  # compute the rate change ratio, weighted for the prestimulus segment
+  rateChangeRatio <- prePostRate / stimRate
+  # values < 1 indicate a response
+  # values > 1 indicate no response
+
+  # calculate the slowing log rate change value 
+  logRateChangeVal <-  -log(rateChangeRatio)
+  # values > 0 indicate a slowing response
+  # larger values indicate a greater response
+	
+  if(is.na(logRateChangeVal)) logRateChangeVal <- 0
+    
+  if(isTRUE(constrained)) {
+    # remove log ratios for non-responses (values < 0)
+    if(logRateChangeVal < 0) logRateChangeVal <- 0
+    if(logRateChangeVal < constraintVal) {
+	  # rateChange <- NULL
+	  logRateChangeVal <- 0
+    }
+  }
+    
+  return(logRateChangeVal)
+
+} # end slowingPatternFn()
 
 
 
+amplitudePatternFn <- function(ampVector, constrained=FALSE, constraintVal=.1) {
+  # R function to compute a value for the respiration amplitude response pattern
+  # July 5, 2025
+  # intended to mimick manual feature extraction
+  # input ampVector is a vector of differences between the interpolated lines at inhalation and exhalation peaks
+  # for 10 prestimulus seconds, 15 stimulus seconds, and 10 poststimulus seconds
+  # output is a log ratio (will be 0 if no response or insufficient response)
+  ##
+   
+  preAmp <- ampVector[1:300]
+  postAmp <- ampVector[751:1050]
+  stimAmp <- ampVector[376:750]
+    
+  # weighted for the prestimulus
+  prePostAmp <- median(c(mean(preAmp), mean(preAmp), median(postAmp)), na.rm=TRUE)
+    
+  # calculate the amplitude decrease difference
+  ampChange <- prePostAmp / median(stimAmp)
+  # values > 1 indicate a decrease in amplitude
+    
+  # remove ratios for non-response segments (values < 1)
+  # if(ampChange < 1) ampChange <- 0
+  
+  # transform to a log ratio 
+  logAmpChange <- log(ampChange)
+  # values > 0 indicate a slowing response
+  # larger values indicate a greater response
+  
+  if(is.na(logAmpChange)) logAmpChange <- 0
+  
+  # if(ampChange >= 1) {
+  #    
+  # } else {
+  #   logAmpChange <- 0
+  # }
+    
+  if(isTRUE(constrained)) {
+    if(logAmpChange <= 0) logAmpChangeUP <- 0
+    if(logAmpChange < constraintVal) {
+      # ampChange <- NULL
+        logAmpChangeUP <- 0
+    }
+  }
+    
+  return(logAmpChange)
+  
+} # end amplitudePatternFn()
 
+
+
+baselinePatternFn <- function(exhVector, ampVector, Q50, IQRange, constrained=FALSE, constraintVal=.1) {
+# R function to compute a value for the respiration baseline response pattern
+  # July 5, 2025
+  # intended to mimick manual feature extraction
+  
+  # input exhVector is a vector of values interpolated across the exhalation peaks (thoracic and abdominal sensors)
+  # for 10 prestimulus seconds, 15 stimulus seconds, and 10 poststimulus seconds
+  # input ampVector is a vector of differences for the interpolated inhalation and exhalation lines
+  # for 10 prestimulus seconds, 15 stimulus seconds, and 10 poststimulus seconds
+  # Q50 is the 50th percentile  (nedian) of the time series data from X to XX
+  # used to compute changes in baseline that are robust against y-axis location
+  # IQRange is the interquartile range of the time series data from X to XX
+  # used to compute changes in baseline that are robust against y-axix location
+  # output is a log ratio (will be 0 if no response or insufficient response)
+  ##
+  
+  preBase <- exhVector[1:300]
+  postBase <- exhVector[751:1050]
+  stimBase <- exhVector[376:750]
+  
+  # medAmp <- median(ampVector)
+    
+  # weighted for the prestimulus segment
+  prePost <- mean(c(median(preBase), median(preBase), median(postBase)))
+    
+  # calculate the temporary increase in baseline
+  prePostDiff <- Q50 - prePost
+  stimBaseDiff <- Q50 - median(stimBase)
+  
+  baseChange <- prePostDiff - stimBaseDiff
+  # values > 0 indicate a temp baseline increase
+  
+  # 2025Aug11 to protect against errors from a large drop in baseline 
+  if((baseChange / IQRange) < -1)  return(0)
+  
+  # compute the log ratio
+  logBaseChangeVal <- log( (baseChange / IQRange) + 1 )
+  
+  if(is.na(logBaseChangeVal)) logBaseChangeVal <- 0
+  
+  # if(baseChange < 0) baseChange <- 0
+  # 
+  # if(baseChange > 0) {
+  #   
+  # } else {
+  #   logBaseChangeVal <- 0
+  # }
+  # # values > 0 indicate an increase in baseline
+    
+  if(isTRUE(constrained)) {
+    if(logBaseChangeVal <= 0) logBaseChangeVal <- 0
+    if(logBaseChangeVal < constraintVal) {
+      # baseChange <- NULL
+      logBaseChangeVal <- 0
+    }
+  }
+   
+  return(logBaseChangeVal)
+	
+} # end baselinePatternFn()
+
+
+
+################################################################
+
+################# main function #########################
 
 
 
 pneumoPatternsFn <- function(segmentDF=segmentDF, 
                              extract.params=extract.params,
-                             # dataVector, 
-                             # inhVector,
-                             # exhVector,
-                             # verbalAnswer, 
-                             rateDiff=.05,
-                             ampDiff=.05,
-                             baseDiff=.05,
+                             rateDiff=.1,
+                             ampDiff=.1,
+                             baseDiff=.1,
                              constrained=TRUE ) {
   # R function to extract respiration patterns
   # called by the pneumoExtractFn()
@@ -115,7 +212,7 @@ pneumoPatternsFn <- function(segmentDF=segmentDF,
   # Respiratory excursion is the sum of 
   # the absolute difference of all successive respiration samples.
   
-  # output is list of 4 items: rRate rBase rAmp and RLE
+  # output is list of 4 items: rateChange ampChange, baseChange and RLE
   # 3 respiration patterns, along with the RLE measurement
   # reduction of respiration amplitude
   # slowing of respiration rate
@@ -123,17 +220,37 @@ pneumoPatternsFn <- function(segmentDF=segmentDF,
   
   ####
   
+  { 
+    ## segment info ##
+    examName <- segmentDF$examName[301]
+    seriesName <- segmentDF$seriesName[301]
+    chartName <- segmentDF$chartName[301]
+    eventLabel <- segmentDF$eventLabel[301]
+    
+    segInfo <- c(examName, seriesName, chartName, eventLabel)
+  }
+  
+  if(any(any(segmentDF$c_UPneumoMid > segmentDF$c_UPneumo_Q75),
+         any(segmentDF$c_LPneumoMid > segmentDF$c_LPneumo_Q75),
+         any(segmentDF$c_UPneumoMid < segmentDF$c_UPneumo_Q25),
+         any(segmentDF$c_LPneumoMid < segmentDF$c_LPneumo_Q25))) {
+    ## no pattern extraction if the data are unstable ##
+    # respiration mid line exceeds the interquartile range
+    # for either the thoracic or abdominal sensor
+    outputVector <- c(segInfo, rep(0, times=8))
+    headerNames <- c("examName", "seriesName", "chartName", "eventLabel")
+    patternNames <- c("rateChangeUP", "rateChangeLP", "ampChangeUP", "ampChangeLP", "baseChangeUP", "baseChangeLP", "RLEUp", "RLELp")
+    names(outputVector) <- c(headerNames, patternNames)
+                             
+    return(outputVector)
+  }
+  
   {
-    integerScores <- FALSE
-    
-    if(!exists("rateDiff")) rateDiff=.05
-    if(!exists("ampDiff")) ampDiff=.05
-    if(!exists("baseDiff")) baseDiff=.05
-    if(!exists("constrained")) constrained=FALSE
-    
-    # rateDiff=.025
-    # ampDiff=.025
-    # baseDiff=.025
+	  # ratio constraints
+    if(!exists("rateDiff")) rateDiff=.1
+    if(!exists("ampDiff")) ampDiff=.1
+    if(!exists("baseDiff")) baseDiff=.1
+    if(!exists("constrained")) constrained=TRUE
   }
   
   {
@@ -141,34 +258,49 @@ pneumoPatternsFn <- function(segmentDF=segmentDF,
     inhVectorUP <- segmentDF$c_UPneumoInh
     exhVectorUP <- segmentDF$c_UPneumoExh
     
+    # amplitude vector for upper respiration sensor
+	  ampVectorUP <- inhVectorUP - exhVectorUP
+    
     dataVectorLP <- segmentDF$c_LPneumoSm
     inhVectorLP <- segmentDF$c_LPneumoInh
     exhVectorLP <- segmentDF$c_LPneumoExh
+	
+    # amplitude vector for lower respiration sensor
+	  ampVectorLP <- inhVectorLP - exhVectorLP
+	  
+	  # median for the time series from X to XX
+	  Q50Up <- segmentDF$c_UPneumo_Q50[1]
+	  Q50Lp <- segmentDF$c_UPneumo_Q50[1]
+	  
+	  # interquartile range
+	  IQRangeUp <- segmentDF$c_UPneumo_Q75[1] - segmentDF$c_UPneumo_Q25[1]
+	  IQRangeLp<- segmentDF$c_LPneumo_Q75[1] - segmentDF$c_LPneumo_Q25[1]
     
     answerRow <- extract.params$answer
     verbalAnswer <- verbalAnswer <- answerRow-(prestimSeg*cps)
-    
-    examName <- segmentDF$examName[301]
-    seriesName <- segmentDF$seriesName[301]
-    chartName <- segmentDF$chartName[301]
-    eventLabel <- segmentDF$eventLabel[301]
   }
   
   {
-    # scaleVals are set in the init script 
-    # Jan 31, 2022 default to 200
-    rateChangeConstraint <- log(rateDiff + 1)
-    # ampChangeConstraint <- scaleVals['uPneumo'] * ampDiff
-    # baseChangeConstraint <- scaleVals['uPneumo'] * baseDiff
-    ampChangeConstraint <- log(ampDiff + 1)
-    baseChangeConstraint <- log(baseDiff + 1)
+    if(rateDiff < 1) {
+      rateChangeConstraint <- log(rateDiff + 1)
+    } else {
+      rateChangeConstraint <- log(rateDiff)
+    }
+    if(ampDiff < 1) {
+      ampChangeConstraint <- log(ampDiff + 1)
+    } else {
+      ampChangeConstraint <- log(ampDiff)
+    }
+    if(baseDiff < 1) {
+      baseChangeConstraint <- log(baseDiff + 1)
+    } else {
+      baseChangeConstraint <- log(baseDiff)
+    }
   }
   
   #### initialize the output ####
 
   {
-    # outputList <- NULL
-    # outputVector <- c(rRate="", rAmp="", rBase="", RLE="")
     outputVectorUP <- NULL
     outputVectorLP <- NULL
   }
@@ -176,254 +308,56 @@ pneumoPatternsFn <- function(segmentDF=segmentDF,
   #### compute the change in respiration rate - upper ####
   
   {
-    # get the peak indices 
-    maxPeakIdx <- maxPeak(x=dataVectorUP, y=40, firstLast=FALSE)
-    
-    # rate values indicate the mean number of seconds per resp cycle
-    preRate <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 1:300)]), na.rm=TRUE) / cps
-    postRate  <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 751:1050)]), na.rm=TRUE) / cps
-    
-    # stim segment with 2.5 sec latency
-    stimRate  <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 376:750)]), na.rm=TRUE) / cps
-    
-    # calculate the slowing log rate changen value 
-    rateChangeUp <-  -log(mean(c(preRate, postRate), na.rm=TRUE) / stimRate)
-    # values > 0 indicate a slowing response
-    
-    if(is.na(rateChangeUp)) rateChangeUp <- 0
-    
-    if(isTRUE(constrained)) {
-      if(rateChangeUp < rateChangeConstraint) {
-        # rateChange <- NULL
-        rateChangeUp <- 0
-      }
-    }
-    
-    # # recode slowing response as integer
-    if(integerScores && rateChangeUp >= rateChangeConstraint) {
-      rateChangeUp <- 1
-    }
-    
-    # submit the log rate change to the output vector
-    if(!is.null(rateChangeUp)) {
-      # outputList$rRate <- rateChange
-      outputVectorUP <- c(outputVectorUP, rRate=round(rateChangeUp,3))
-    }
+    rateChangeUP <- slowingPatternFn(dataVector=dataVectorUP, 
+                                     constrained=constrained, 
+                                     constraintVal=rateChangeConstraint)
   }
   
   #### compute the change in respiration rate - lower ####
   
   {
-    # get the peak indices 
-    maxPeakIdx <- maxPeak(x=dataVectorLP, y=40, firstLast=FALSE)
-    
-    # rate values indicate the mean number of seconds per resp cycle
-    preRate <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 1:300)]), na.rm=TRUE) / cps
-    postRate  <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 751:1050)]), na.rm=TRUE) / cps
-    
-    # stim segment with 2.5 second latency
-    stimRate  <- mean(diff(maxPeakIdx[which(maxPeakIdx %in% 376:750)]), na.rm=TRUE) / cps
-    
-    # calculate the slowing log rate change value
-    rateChangeLp <-  -log( mean(c(preRate, postRate), na.rm=TRUE) / stimRate )
-    # values > 0 indicate a slowing response
-    
-    if(is.na(rateChangeLp)) rateChangeLp <- 0
-    
-    if(isTRUE(constrained)) {
-      if(rateChange < rateChangeConstraint) {
-        # rateChange <- NULL
-        rateChangeLp <- 0
-      }
-    }
-    
-    # # recode slowing resopnse as integer
-    if(integerScores && rateChangeLp >= rateChangeConstraint) {
-      rateChangeLP <- 1
-    } 
-    
-    # submit the log rate change to the output vector
-    if(!is.null(rateChangeLp)) {
-      # outputList$rRate <- rateChange
-      outputVectorLP <- c(outputVectorLP, rRate=round(rateChangeLp,3))
-    }
+    rateChangeLP <- slowingPatternFn(dataVector=dataVectorLP, 
+                                     constrained=constrained, 
+                                     constraintVal=rateChangeConstraint)
   }
   
   #### compute the change in respiration amplitude - upper ####
   
   {
-    # use the difference between inh and exh
-    ampVectorUP <- inhVectorUP - exhVectorUP
-    
-    preAmp <- ampVectorUP[1:300]
-    postAmp <- ampVectorUP[751:1050]
-    stimAmp <- ampVectorUP[376:750]
-    
-    prePostAmpUP <- mean(c(mean(preAmp), mean(postAmp)), na.rm=TRUE)
-    
-    # calculate the amplitude decrease difference
-    ampChangeUP <- prePostAmpUP - mean(stimAmp)
-    # values > 0 indicate a decrease in amplitude
-    
-    # transform to a log ratio 
-    # log ratio is a proportion of the expected y axis amplitude
-    if(ampChangeUP > 0) {
-      logAmpChangeUP <-  abs( log( ampChangeUP / prePostAmpUP ) )
-    } else {
-      logAmpChangeUP <- -abs( log( abs(ampChangeUP) / prePostAmpUP ) )
-    }
-    # log values > 0 indicate a reaction (suppression of amplitude)
-    
-    if(is.na(logAmpChangeUP)) logAmpChangeUP <- 0
-    
-    if(isTRUE(constrained)) {
-      if(logAmpChangeUP < ampChangeConstraint) {
-        # ampChange <- NULL
-        logAmpChangeUP <- 0
-      }
-    }
-    
-    # # recode amplitude response as integer
-    if(integerScores && logAmpChangeUP >= ampChangeConstraint) {
-      logAmpChangeUP <- 1
-    } 
-    
-    if(!is.null(logAmpChangeUP)) {
-      # outputList[['rAmp']] <- ampChange 
-      outputVectorUP <- c(outputVectorUP, rAmp=round(logAmpChangeUP,2))
-    }
+    logAmpChangeUP <- amplitudePatternFn(ampVector=ampVectorUP, 
+                                         constrained=constrained, 
+                                         constraintVal=ampChangeConstraint)
+
   }
   
   #### compute the change in respiration amplitude - lower ####
   
   {
-    # use the difference between inh and exh
-    ampVectorLP <- inhVectorLP - exhVectorLP
-    
-    preAmp <- ampVectorLP[1:300]
-    postAmp <- ampVectorLP[751:1050]
-    stimAmp <- ampVectorLP[376:750]
-    
-    prePostAmpLP <- mean(c(mean(preAmp), mean(postAmp)), na.rm=TRUE)
-    
-    # calculate the amplitude decrease
-    ampChangeLP <- prePostAmpLP - mean(stimAmp)
-    # values > 0 indicate a decrease in amplitude
-    
-    # transform to a log ratio 
-    if(ampChangeLP > 0) {
-      logAmpChangeLP <-  abs( log( ampChangeLP / prePostAmpLP ) )
-    } else {
-      logAmpChangeLP <- -abs( log( abs(ampChangeLP) / prePostAmpLP ) )
-    }
-    # log values > 0 indicate a reaction (suppression of amplitude)
-    
-    if(is.na(logAmpChangeLP)) logAmpChangeLP <- 0
-    
-    # # recode amplitude response as integer
-    if(integerScores && logAmpChangeLP >= ampChangeConstraint) {
-      logAmpChangeLP <- 1
-    } else {
-      # logAmpChangeLP <- 0
-    }
-    
-    if(isTRUE(constrained)) {
-      if(abs(logAmpChangeLP) < ampChangeConstraint) {
-        # ampChange <- NULL
-        logAmpChangeLP <- 0
-      }
-    }
-    
-    if(!is.null(logAmpChangeLP)) {
-      # outputList[['rAmp']] <- ampChange 
-      outputVectorLP <- c(outputVectorLP, rAmp=round(logAmpChangeLP,2))
-    }
+    logAmpChangeLP <- amplitudePatternFn(ampVector=ampVectorLP, 
+                                         constrained=constrained, 
+                                         constraintVal=ampChangeConstraint)
   }
   
   #### compute the change in respiration baseline - upper #### 
   
   {
-    # use the exhVector
-    
-    preBase <- exhVectorUP[1:300]
-    postBase <- exhVectorUP[751:1050]
-    stimBase <- exhVectorUP[376:750]
-    
-    prePost <- mean(c(mean(preBase), mean(postBase)))
-    
-    # calculate the temporary increase in baseline
-    baseChangeUP <- mean(stimBase) - prePost
-    # values > 0 indicate a temp baseline increase
-    
-    # transform to a log ratio 
-    if(baseChangeUP > 0) {
-      logBaseChangeUP <- abs( log( baseChangeUP / prePostAmpUP ) )
-    } else {
-      logBaseChangeUP <- -abs( log( abs(baseChangeUP) / prePostAmpUP ) )
-    }
-    # values > 0 indicate an increase in baseline
-    
-    if(is.na(logBaseChangeUP)) logBaseChangeUP <- 0
-    
-    if(isTRUE(constrained)) {
-      if(logBaseChangeUP < baseChangeConstraint) {
-        # baseChange <- NULL
-        logBaseChangeUP <- 0
-      }
-    }
-    
-    # # recode baseline change as integer
-    if(integerScores && logBaseChangeUP >= baseChangeConstraint) {
-      logBaseChangeUP <- 1
-    }
-    
-    if(!is.null(logBaseChangeUP)) {
-      # outputList[['rBase']] <- baseChange
-      outputVectorUP <- c(outputVectorUP, rBase=round(logBaseChangeUP,2))
-    }
+    logBaseChangeUP <- baselinePatternFn(exhVector=exhVectorUP, 
+                                         ampVector=ampVectorUP, 
+                                         Q50=Q50Up,
+                                         IQRange=IQRangeUp,
+                                         constrained=constrained, 
+                                         constraintVal=baseChangeConstraint)
   }
 
   #### compute the change in respiration baseline - lower #### 
   
   {
-    # use the exhVector
-    
-    preBase <- exhVectorLP[1:300]
-    postBase <- exhVectorLP[751:1050]
-    stimBase <- exhVectorLP[301:750]
-    
-    prePost <- mean(c(mean(preBase), mean(postBase)))
-    
-    # calculate the temporary increase in baseline
-    baseChangeLP <- mean(stimBase) - prePost
-    # values > 0 indicate a temp baseline increase
-    
-    # transform to a log ratio 
-    if(baseChangeLP > 0) {
-      logBaseChangeLP <- abs( log( baseChangeLP / prePostAmpLP ) )
-    } else {
-      logBaseChangeLP <- -abs( log( abs(baseChangeLP) / prePostAmpLP ) )
-    }
-    # values > 0 indicate an increase in baseline
-    
-    if(is.na(logBaseChangeLP)) logBaseChangeLP <- 0
-    
-    if(isTRUE(constrained)) {
-      if(logBaseChangeLP < baseChangeConstraint) {
-        # baseChange <- NULL
-        logBaseChangeLP <- 0
-      }
-    }
-    
-    # # recode baseline change as integer
-    if(integerScores && logBaseChangeLP >= baseChangeConstraint) {
-      logBaseChangeLP <- 1
-    }
-    
-    if(!is.null(logBaseChangeLP)) {
-      # outputList[['rBase']] <- baseChange
-      outputVectorLP <- c(outputVectorLP, rBase=round(logBaseChangeLP,2))
-    }
+    logBaseChangeLP <- baselinePatternFn(exhVector=exhVectorLP, 
+                                         ampVector=ampVectorLP, 
+                                         Q50=Q50Lp,
+                                         IQRange=IQRangeLp,
+                                         constrained=constrained, 
+                                         constraintVal=baseChangeConstraint)
   }
   
   #### calculate the RLE measurement - upper ####
@@ -431,12 +365,8 @@ pneumoPatternsFn <- function(segmentDF=segmentDF,
   {
     RLEUp <- pneumoMeasurementFn(dataVector=dataVectorUP[301:750], 
                                verbalAnswer=verbalAnswer)
-    
-    if(!is.null(RLEUp)) {
-      # outputVector['RLE'] <- RLE * pneumoFEFactor
-      RLEUp <- RLEUp * pneumoFEFactor
-      outputVectorUP <- c(outputVectorUP, RLE=round((RLEUp*pneumoFEFactor),2))
-    }
+    # pneumoFEFactor is initialized in the NCCAASCII_init.R script
+    RLEUp <- round((RLEUp*pneumoFEFactor),2)
   }
   
   #### calculate the RLE measurement - lower ####
@@ -444,50 +374,38 @@ pneumoPatternsFn <- function(segmentDF=segmentDF,
   {
     RLELp <- pneumoMeasurementFn(dataVector=dataVectorLP[301:750], 
                                  verbalAnswer=verbalAnswer)
-    
-    if(!is.null(RLELp)) {
-      # outputVector['RLE'] <- RLE * pneumoFEFactor
-      RLELp <- RLELp * pneumoFEFactor
-      outputVectorLP <- c(outputVectorLP, RLE=round((RLELp*pneumoFEFactor),2))
-    }
+    # pneumoFEFactor is initialized in the NCCAASCII_init.R script
+    RLELp <- round((RLELp*pneumoFEFactor),2)
   }
   
   #### output ####
   
   {
-    segInfo <- c(examName, seriesName, chartName, eventLabel)
-    headerInfo <- c("examName", "seriesName", "chartName", "eventLabel", "sensorName")
+    headerInfo <- c("examName", "seriesName", "chartName", "eventLabel")
     
-    patternNames <- c("rRate", "rAmp", "rBase", "RLE")
-    
-    outputVectorUPi <- c(segInfo, "UPneumo", outputVectorUP)
-    outputVectorLPi <- c(segInfo, "LPneumo", outputVectorLP)
+    # outputVectorUPi <- c(segInfo, "UPneumo", outputVectorUP)
+    # outputVectorLPi <- c(segInfo, "LPneumo", outputVectorLP)
     
     outputVector <- c(segInfo,
-                      round(as.numeric(rateChangeUp, 3), 3), 
-                      round(as.numeric(rateChangeLp, 3), 3), 
-                      round(as.numeric(ampChangeUP, 3), 3), 
-                      round(as.numeric(ampChangeLP, 3), 3), 
-                      round(as.numeric(baseChangeUP, 3), 3), 
-                      round(as.numeric(baseChangeLP, 3), 3), 
-                      round(as.numeric(RLEUp, 3), 3),
-                      round(as.numeric(RLELp, 3), 3) )
+                      round(as.numeric(rateChangeUP), 3), 
+                      round(as.numeric(rateChangeLP), 3), 
+                      round(as.numeric(logAmpChangeUP), 3), 
+                      round(as.numeric(logAmpChangeLP), 3), 
+                      round(as.numeric(logBaseChangeUP), 3), 
+                      round(as.numeric(logBaseChangeLP), 3), 
+                      round(as.numeric(RLEUp), 3),
+                      round(as.numeric(RLELp), 3) )
     
-    patternNames <- c("rRateUP", "rRateLP", "ampChangeUP", "ampChangeLP", "baseChangeUP", "baseChangeLP", "RLEUp", "RLELp")
+    patternNames <- c("rateChangeUP", "rateChangeLP", "ampChangeUP", "ampChangeLP", "baseChangeUP", "baseChangeLP", "RLEUp", "RLELp")
     
-    names(outputVector) <- c(headerInfo[1:4], patternNames)
+    names(outputVector) <- c(headerInfo, patternNames)
     
     outputVector <- rbind.data.frame(outputVector)
     
-    names(outputVector) <- c(headerInfo[1:4], patternNames)
+    names(outputVector) <- c(headerInfo, patternNames)
     
-    # outputDF <- rbind.data.frame(outputVectorUPi, outputVectorLPi)
-    # row.names(outputDF) <- NULL
-    # names(outputDF) <- c(headerInfo, patternNames)
   }
   
-  # return
-  # return(outputDF)
   return(outputVector)
   
 } # end pneumoPatternsFn() function
