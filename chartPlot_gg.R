@@ -162,16 +162,13 @@
     # for ESS and other scores
     
     showScores <- TRUE
-    # showScores <- FALSE
+    showScores <- FALSE
     
     if(showScores) {
       outputChartFileName <- paste0("_SCORES", outputChartFileName)
     } else {
       outputChartFileName <- paste0("_NO_SCORES", outputChartFileName)
     }
-    
-    showShadedAreas <- TRUE
-    # showShadedAreas <- FALSE
     
     # also changes the showMeasurements (lines)
     
@@ -806,10 +803,25 @@ for(i in 1:length(uniqueExams)) {
           
           ############### stimulus events  ##############
           
-          eventIndices <- which(chartDF$Events != "")
+          eventIndices <- which(chartDF$Events != "") 
           chartDF$eventLabel[which(chartDF$Events != "")]
           # no need for a loop because geom_vline is vectorized
           g <- g + geom_vline(aes(xintercept=as.numeric(eventIndices)), color="black", alpha=.7)
+          
+          # 2025Oct23
+          # EDA latency
+          onsetRow <- which(chartDF$Events=="onsetRow")
+          EDALatRow <- onsetRow+(EDALat*cps)
+          g <- g + geom_vline(aes(xintercept=as.numeric(EDALatRow)), color="red4", linewidth=.15) # grey80
+          
+          
+          # 2025Oct23
+          # end of response onset window
+          ROWEndRow <- which(chartDF$Events=="answerRow") + (ROWEnd*cps) -1
+          # ROWEndRow <- answerRow + (ROWEnd*cps) - (segOnsetRow - 1)
+          # ROWEndRow <- answerRow + (ROWEnd*cps)
+          g <- g + geom_vline(aes(xintercept=as.numeric(ROWEndRow)), color="red4", linewidth=.15) # grey80
+          
           
           # # another way to make the stimulus event lines one by one
           # # onsetRow <- segOnsetRow
@@ -943,23 +955,25 @@ for(i in 1:length(uniqueExams)) {
                             alpha=.10, 
                             fill="blue")
           
-          # latency shaded area
-          g <- g + annotate("rect",
-                            xmin=as.numeric(stimOnset),
-                            xmax=as.numeric(stimOnset+(EDALat*cps)),
-                            ymin=yMin,
-                            ymax=yMax,
-                            alpha=.75,
-                            fill="yellow")
+          # commented out 2025Oct23
+          # # latency shaded area
+          # g <- g + annotate("rect",
+          #                   xmin=as.numeric(stimOnset),
+          #                   xmax=as.numeric(stimOnset+(EDALat*cps)),
+          #                   ymin=yMin,
+          #                   ymax=yMax,
+          #                   alpha=.75,
+          #                   fill="yellow")
           
-          # response onset window shaded area
-          g <- g + annotate("rect",
-                            xmin=as.numeric(stimOnset),
-                            xmax=as.numeric(answerRow+(ROWEnd*cps)),
-                            ymin=yMin,
-                            ymax=yMax,
-                            alpha=.10,
-                            fill="blue")
+          # commented out 2025Oct23
+          # # response onset window shaded area
+          # g <- g + annotate("rect",
+          #                   xmin=as.numeric(stimOnset),
+          #                   xmax=as.numeric(answerRow+(ROWEnd*cps)),
+          #                   ymin=yMin,
+          #                   ymax=yMax,
+          #                   alpha=.10,
+          #                   fill="blue")
           
         } # end if showShadedAreas==TRUE
         
