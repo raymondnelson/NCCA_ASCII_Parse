@@ -16,7 +16,8 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
   #
   # called by the parseUniqueExams() function in NCCAASCII_Parse.R script
   #
-  # input is a vector of exam names from the output of the dataFile function
+  # x input is a vector of exam names from the output of the dataFile function
+  #
   # this function will resample exams that are not Lafayette
   # output is a vector of exam names 
   #
@@ -60,7 +61,6 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
       if(str_sub(headerRow, 25, 35) != "    UPneumo") {
         useAlternate <- TRUE
       }
-      
     }
     
     #### initialize the chart DF from the NCCA ASCII data ####
@@ -353,7 +353,12 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
         
         thisColNumber <- dataColNumbers[j]
         
-        thisColDAT <- chartDF[,thisColNumber] 
+        # View(chartDF)
+        
+        thisColDAT <- as.numeric(chartDF[,thisColNumber])
+        
+        # next column if there is no data (all values are -9.9)
+        if(sd(thisColDAT) == 0) next()
         
         p25 <- quantile(thisColDAT, .25)
         p50 <- quantile(thisColDAT, .5)
@@ -361,24 +366,29 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
         IQRange <- p75 - p25
         
         # tukey fences
+        # 2025Oct25 inner fences cause a lot o of problems
         inUp <- p75 + (1.5 * IQRange)
         inLw <- p25 - (1.5 * IQRange)
+        
+        # 2025Oct25 changed to outer fence to avoid inducing EDA artifacts
+        outUp <- p75 + (9 * IQRange)
+        outLw <- p25 - (9 * IQRange)
         
         errCount <- 0
         
         k=1
         for(k in 1:length(thisColDAT)) {
           
-          if(thisColDAT[k] >= inUp) {
+          if(thisColDAT[k] >= outUp) {
             # upper fence
             errCount <- errCount + 1
-            thisColDAT[k] <- p50
+            thisColDAT[k] <- p75
           }
           
-          if(thisColDAT[k] <= inLw) {
+          if(thisColDAT[k] <= outLw) {
             # lower fence
             errCount <- errCount + 1
-            thisColDAT[k] <- p50
+            thisColDAT[k] <- p25
           }
           
         }
