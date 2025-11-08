@@ -12,14 +12,21 @@
 # positiveSlope() to locate the positive slope segments
 # negativeSlope() to locate the negative slope segments
 # positiveOnset() to make a vector of 0 slope onset row indices
-# maxSlopeChangeFn() to determine the max sig value in + slope segment
 # slopePeak() to locate the peak of all positive slope segments
 # descentProp() to exclude peak indices after the data descend a proportion
 # sdp() to compute a population standard deviation
 # tonicSlope() to calculate the slope value of a segment
 
 
+
 # amplitudeIncreaseFn() # not present in this document
+
+
+
+# source a script for the maxSlopeChangeFn()
+# to determine the max sig value in + slope segment
+# source(paste0(RPath, 'slopeChange.R'), echo=FALSE)
+
 
 
 ###############
@@ -169,197 +176,206 @@ positiveOnset <- function(x=posSlope) {
 
 
 
-maxSlopeChangeFn <- function(x=tsData) {
-  # new function to determine the max significant value 
-  # in a series of significant changes in positive slope
-  # supercedes the slopeChangeFn 
-  # which always selected the first sig value in a run 
-  # 11-24-2016 raymond nelson
-  # improved 10-7-2018
-  # called by the amplitudeExtractFn() function
-  # used to impute a response onset 
-  # within a positive slope segment 
-  # such as when the slope is positive prior to stimulus onset
-  # compare each nPre period (seconds) with the next nPost seconds
-  ###
-  # x input is the vector of time series data for a stim segment
-  # including 10 prestimulus seconds 
-  # and 10 additional seconds after the evaluation window
-  ### these parameters are set in the global environment by the init script
-  # nPre is the number of pre change seconds
-  # nPost is the number of post change seconds
-  # aChange is the level of sig for the z test # currently .999
-  # p=.999 will be +3.09 standard deviations
-  # p=.9999 will be +3.72 standard deviations
-  # p=.998650102 = 3 SD
-  # 4 standard deviations is p=.9999683
-  # cps is data sampling rate # normally 30cps 
-  ###
-  # output is a vector of 0s the same length as input 
-  # and including +1 change in slope energy,
-  # located at the max zScore during a series of sig changes in nPre and nPo,
-  ####
-  
-  # tsData <- x
-  
-  # calculate the difference for all values in the x input
-  # modified 10-7-2018 to use the absolute value
-  xDiff <- c(0, abs(diff(x)))
-  
-  ###
-  
-  # use a function to compute the z score cutpoint from the aChange quantile
-  zCut <- qnorm(aChange)
-  
-  # round the nPre and nPost segments to the nearest sample
-  preLen <- round(cps*nPre,0)
-  postLen <- round(cps*nPost,0)
-  tonicLen <- round(cps*tonicSec,0)
-  
-  # initialize the output vector
-  y <- rep(0, times=length(xDiff))
-  
-  # exit if the input vector is too short
-  if(length(xDiff) <= (preLen+1)) return(y)
-  
-  ###
-  
-  # initialize some vectors
-  preDiffMean <- rep(0, times=length(xDiff))
-  preDiffSD <- rep(0, times=length(xDiff))
-  postDiffMean <- rep(0, times=length(xDiff))
-  zScore <- rep(0, times=length(xDiff))
-  
-  ###
-  
-  # calculate all preDiff means
-  for (i in preLen:length(xDiff)) {
-    preDiffMean[i] <- mean(xDiff[(i-preLen+1):i], na.rm=TRUE)
-  }
-  
-  # calculate all preDiff standard deviations
-  # uses a helper function sdp() to compute the population standard deviation
-  for (i in preLen:length(xDiff)) {
-    preDiffSD[i] <- sdp(xDiff[(i-preLen+1):i])
-    # preDiffSD[i] <- sd(xDiff[(i-preLen+1):i])
-  }
-  
-  # calculate all postDiff means
-  for (i in (preLen+1):(length(xDiff)-postLen+1)) {
-    postDiffMean[i] <- mean(xDiff[i:(i+postLen-1)], na.rm=TRUE)
-  } 
-  
-  # compute the z-score for all posDiff means compared to the preDiff means
-  for (i in (preLen+1):(length(xDiff)-postLen+1)) {
-    # increment the loop if preDiffSD[(i-1)] == 0
-    # to avoid NaN result when divide by zero
-    if(preDiffSD[(i-1)] == 0) next()
-    # calculate the zScore for each postDiff mean,
-    # using the mean and SD from the previous sample
-    zScore[i] <- (postDiffMean[i] - preDiffMean[(i-1)]) / preDiffSD[(i-1)]
-  }
-  
-  # next determine which values are significant in the zScore vector
-  zScore[which(zScore < zCut)] <- 0
-  zScoreIdcs <- which(zScore != 0)
-  
-  # make a vector of slope data for the input
-  slopeDat <- fillSlope(smoothSlope(slopeDir(x), 
-                                    nSmooth=round(cps*ignoreTonicChange,0)))
-  
-  
-  
-  # 10-7-2018 remove zScore for which the tonicLen slope is not +
-  if(length(zScoreIdcs) > 0) {
-    # i=26
-    for (i in 1:length(zScoreIdcs)) {
-      preSlope <- zScoreIdcs[i]-tonicLen+1
-      preSlope <- ifelse(preSlope < 1, 1, preSlope)
-      if( sum(slopeDat[preSlope:zScoreIdcs[i]]) != tonicLen ) {
-        zScore[zScoreIdcs[i]] <- 0
-      }
-    }
-  }
-  
-  
-  
-  # then remove zScores for non-ascending segments
-  zScore[which(slopeDat != 1)] <- 0
-  
-  # first initialize the holding variables
-  z <- 0
-  zKeep <- NULL
-  
-  # then finally iterate over the zScore vector,
-  # to locate the max zScore in each run of non-zero values
-  # and remove zScores for which the data are not,
-  # ascending throughout the preDiff
-  i=342
-  for (i in 1:length(zScore)) {
-    # increment the loop if the current value is zero
-    if(zScore[i] == 0) next()
-    # set the z holding variable to the non-zero i index
-    z <- i
-    # another loop to the max index for each non-zero run,
-    # in the zScore vector
-    # cannot use which.max() because there may be,
-    # multiple non-zero runs in the zScore vector
-    j=z+1
-    for (j in (z+1):length(zScore)) {
-      # stop the loop if the zScore value is zero
-      if(zScore[j] == 0) {
-        z <= j+1
-        break()
-      }
-      # change the z index to advance the loop
-      # if zScore[j] is greater than zScore[z]
-      if(zScore[j] > zScore[z]) z <- j
-    } # end inner loop
-    
-    # # keep the z index if the value is greater than the last zKeep value
-    # if(is.null(zKeep)) {
-    #   zKeep <- c(zKeep, z)
-    # } else {
-    #   # this the problem 4/30/2018
-    #   if(zScore[z] > zScore[zKeep[length(zKeep)]]) zKeep <- c(zKeep, z)
-    # }
-    
-    zKeep <- c(zKeep, z)
-    
-  } # end for loop
-  
-  zKeep <- unique(zKeep)
-  # zScore[zKeep]
-  
-  # initialize the output vector
-  # y <- rep(0, times=length(xDiff))
-  
-  # add the slope change onset indices to the output vector
-  y[zKeep] <- 1
-  # y is now a vector of 0s 
-  # with the onset of signficant changes in slope marked by 1
-  
-  # output the result
-  return(y)
-  
-} # end maxSlopeChangeFn
-
-
-
-# helper function to locate the peak of all positive slope segments 
-slopePeak <- function(x=mySlope2) {
-  # helper function to locate the peak of all positive slope segments
-  # called by the amplitudeExtractFn() function
-  # x input is a vector of smoothed slope values not including zero
-  # output is a vector of 0s including only +1 slope peak points 
-  xPeak <- x
-  xPeak <- ifelse(x == 1,
-                  ifelse((x[1:(length(x)-1)] + x[2:length(x)]) == 2,
-                         xPeak <- 0,
-                         xPeak <- 1),
-                  xPeak <- 0)
-  return(xPeak)
-} # end slopePeak function
+# maxSlopeChangeFn <- function(x=tsData) {
+#   # new function to determine the max significant value 
+#   # in a series of significant changes in positive slope
+#   # located in the aplitudeExtractHelperFunctions.R script
+#   # supercedes the slopeChangeFn 
+#   # which always selected the first sig value in a run 
+#   # 11-24-2016 raymond nelson
+#   # improved 10-7-2018
+#   # called by the amplitudeExtractFn() function
+#   # used to impute a response onset 
+#   # within a positive slope segment 
+#   # such as when the slope is positive prior to stimulus onset
+#   # compare each nPre period (seconds) with the next nPost seconds
+#   ###
+#   # x input is the vector of time series data for a stim segment
+#   # including 10 prestimulus seconds 
+#   # and 10 additional seconds after the evaluation window
+#   ### these parameters are set in the global environment by the init script
+#   # nPre is the number of pre change seconds
+#   # nPost is the number of post change seconds
+#   # aChange is the level of sig for the z test # currently .999
+#   # p=.999 will be +3.09 standard deviations
+#   # p=.9999 will be +3.72 standard deviations
+#   # p=.998650102 = 3 SD
+#   # 4 standard deviations is p=.9999683
+#   # cps is data sampling rate # normally 30cps 
+#   ###
+#   # output is a vector of 0s the same length as input 
+#   # and including +1 change in slope energy,
+#   # located at the max zScore during a series of sig changes in nPre and nPo,
+#   ####
+#   
+#   # tsData <- x
+#   
+#   # calculate the difference for all values in the x input
+#   # modified 10-7-2018 to use the absolute value
+#   xDiff <- c(0, abs(diff(x)))
+#   
+#   ###
+#   
+#   # use a function to compute the z score cutpoint from the aChange quantile
+#   zCut <- qnorm(aChange)
+#   
+#   # round the nPre and nPost segments to the nearest sample
+#   preLen <- round(cps*nPre,0)
+#   postLen <- round(cps*nPost,0)
+#   tonicLen <- round(cps*tonicSec,0)
+#   
+#   # initialize the output vector
+#   y <- rep(0, times=length(xDiff))
+#   
+#   # exit if the input vector is too short
+#   if(length(xDiff) <= (preLen+1)) return(y)
+#   
+#   ###
+#   
+#   # initialize some vectors
+#   preDiffMean <- rep(0, times=length(xDiff))
+#   preDiffSD <- rep(0, times=length(xDiff))
+#   postDiffMean <- rep(0, times=length(xDiff))
+#   zScore <- rep(0, times=length(xDiff))
+#   
+#   ###
+#   
+#   # calculate all preDiff means
+#   for (i in preLen:length(xDiff)) {
+#     preDiffMean[i] <- mean(xDiff[(i-preLen+1):i], na.rm=TRUE)
+#   }
+#   
+#   # calculate all preDiff standard deviations
+#   # uses a helper function sdp() to compute the population standard deviation
+#   for (i in preLen:length(xDiff)) {
+#     preDiffSD[i] <- sdp(xDiff[(i-preLen+1):i])
+#     # preDiffSD[i] <- sd(xDiff[(i-preLen+1):i])
+#   }
+#   
+#   # calculate all postDiff means
+#   for (i in (preLen+1):(length(xDiff)-postLen+1)) {
+#     postDiffMean[i] <- mean(xDiff[i:(i+postLen-1)], na.rm=TRUE)
+#   } 
+#   
+#   # compute the z-score for all posDiff means compared to the preDiff means
+#   for (i in (preLen+1):(length(xDiff)-postLen+1)) {
+#     # increment the loop if preDiffSD[(i-1)] == 0
+#     # to avoid NaN result when divide by zero
+#     if(preDiffSD[(i-1)] == 0) next()
+#     # calculate the zScore for each postDiff mean,
+#     # using the mean and SD from the previous sample
+#     zScore[i] <- (postDiffMean[i] - preDiffMean[(i-1)]) / preDiffSD[(i-1)]
+#   }
+#   
+#   # next determine which values are significant in the zScore vector
+#   zScore[which(zScore < zCut)] <- 0
+#   
+#   # get the sample indices for zScores that are statistically significant
+#   zScoreIdcs <- which(zScore != 0)
+#   
+#   # 2025Oct 25
+#   # offsetthe sample indices slightly to reduce phasing
+#   zScoreIdcs <- maxSlopeChangeFn - (.25*cps)
+#    
+#   
+#   
+#   # make a vector of slope data for the input vector
+#   slopeDat <- fillSlope(smoothSlope(slopeDir(x), 
+#                                     nSmooth=round(cps*ignoreTonicChange,0)))
+#   
+#   
+#   
+#   # 10-7-2018 remove zScore for which the tonicLen slope is not +
+#   if(length(zScoreIdcs) > 0) {
+#     # i=26
+#     for (i in 1:length(zScoreIdcs)) {
+#       preSlope <- zScoreIdcs[i]-tonicLen+1
+#       preSlope <- ifelse(preSlope < 1, 1, preSlope)
+#       if( sum(slopeDat[preSlope:zScoreIdcs[i]]) != tonicLen ) {
+#         zScore[zScoreIdcs[i]] <- 0
+#       }
+#     }
+#   }
+#   
+#   
+#   
+#   # then remove zScores for non-ascending segments
+#   zScore[which(slopeDat != 1)] <- 0
+#   
+#   # first initialize the holding variables
+#   z <- 0
+#   zKeep <- NULL
+#   
+#   # then finally iterate over the zScore vector,
+#   # to locate the max zScore in each run of non-zero values
+#   # and remove zScores for which the data are not,
+#   # ascending throughout the preDiff
+#   i=342
+#   for (i in 1:length(zScore)) {
+#     # increment the loop if the current value is zero
+#     if(zScore[i] == 0) next()
+#     # set the z holding variable to the non-zero i index
+#     z <- i
+#     # another loop to the max index for each non-zero run,
+#     # in the zScore vector
+#     # cannot use which.max() because there may be,
+#     # multiple non-zero runs in the zScore vector
+#     j=z+1
+#     for (j in (z+1):length(zScore)) {
+#       # stop the loop if the zScore value is zero
+#       if(zScore[j] == 0) {
+#         z <= j+1
+#         break()
+#       }
+#       # change the z index to advance the loop
+#       # if zScore[j] is greater than zScore[z]
+#       if(zScore[j] > zScore[z]) z <- j
+#     } # end inner loop
+#     
+#     # # keep the z index if the value is greater than the last zKeep value
+#     # if(is.null(zKeep)) {
+#     #   zKeep <- c(zKeep, z)
+#     # } else {
+#     #   # this the problem 4/30/2018
+#     #   if(zScore[z] > zScore[zKeep[length(zKeep)]]) zKeep <- c(zKeep, z)
+#     # }
+#     
+#     zKeep <- c(zKeep, z)
+#     
+#   } # end for loop
+#   
+#   zKeep <- unique(zKeep)
+#   # zScore[zKeep]
+#   
+#   # initialize the output vector
+#   # y <- rep(0, times=length(xDiff))
+#   
+#   # add the slope change onset indices to the output vector
+#   y[zKeep] <- 1
+#   # y is now a vector of 0s 
+#   # with the onset of signficant changes in slope marked by 1
+#   
+#   # output the result
+#   return(y)
+#   
+# } # end maxSlopeChangeFn
+# 
+# 
+# 
+# # helper function to locate the peak of all positive slope segments 
+# slopePeak <- function(x=mySlope2) {
+#   # helper function to locate the peak of all positive slope segments
+#   # called by the amplitudeExtractFn() function
+#   # x input is a vector of smoothed slope values not including zero
+#   # output is a vector of 0s including only +1 slope peak points 
+#   xPeak <- x
+#   xPeak <- ifelse(x == 1,
+#                   ifelse((x[1:(length(x)-1)] + x[2:length(x)]) == 2,
+#                          xPeak <- 0,
+#                          xPeak <- 1),
+#                   xPeak <- 0)
+#   return(xPeak)
+# } # end slopePeak function
 
 
 
