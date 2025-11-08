@@ -245,7 +245,7 @@ parseUniqueExams <- function(uniqueExamNames=uniqueExamNames,
       assign("thisExamName", thisExamName, envir=.GlobalEnv)
       # stop()
       
-      # call the dataParse function from the NCCAASCII_ParseHelperFunctions.R script
+      # call the dataParse function from the NCCAASCII_dataParse.R script
       outName <- dataParse(x=dataNames, 
                            y=thisExamName, 
                            saveCSV=FALSE, 

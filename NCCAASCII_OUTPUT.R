@@ -18,6 +18,11 @@
 
 
 
+source("~/Dropbox/R/NCCA_ASCII_Parse/workFlow_init.R", echo=FALSE)
+
+source("~/Dropbox/R/NCCA_ASCII_Parse/NCCAASCII_init.R", echo=FALSE)
+
+
 #### required libraries ####
 
 
@@ -505,8 +510,12 @@ if(isTRUE(writeNCAAASCII_LAF)) {
   ######## set the output sensors ########
   
   {
-    if(!exists("outputSensors")) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "c_Move1", "c_PPG1")
-    if(is.null(outputSensors)) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "c_Move1", "c_PPG1")
+    # if(!exists("outputSensors")) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "c_Move1", "c_PPG1")
+    # if(is.null(outputSensors)) outputSensors <- c("c_UPneumoSm", "c_LPneumoSm", "c_AutoEDA", "c_Cardio1", "c_Move1", "c_PPG1")
+    
+    # 2025Oct26 use the un-centered data columns to avoid over-smoothing
+    if(!exists("outputSensors")) outputSensors <- c("c_UPneumo", "c_LPneumo", "c_EDA1", "c_Cardio1", "c_Move1", "c_PPG1")
+    if(is.null(outputSensors)) outputSensors <- c("c_UPneumo", "c_LPneumo", "c_EDA1", "c_Cardio1", "c_Move1", "c_PPG1")
     
     # inclPPG <- FALSE
     if(!exists("inclPPG")) inclPPG <- TRUE

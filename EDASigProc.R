@@ -30,9 +30,16 @@ EDASigProcFn <- function(x=chartDF,
   chartDF$c_EDA1 <-  
     setColRange(DAT=chartDF$c_EDA1, y=colRange, firstRow=first, lastRow=last)
   
+  # not needed
+  # chartDF$c_ManualEDA <- 
+  #   setColRange(DAT=chartDF$c_ManualEDA, y=colRange, firstRow=first, lastRow=last)
+  
+    
   # fix NA values
   chartDF$c_EDA1 <- NAInterp(chartDF$c_EDA1)
-  chartDF$c_ManualEDA <- NAInterp(chartDF$c_EDA1)
+  
+  # not needed
+  # chartDF$c_ManualEDA <- NAInterp(chartDF$c_EDA1)
   
   # if the EA data are available
   if( "c_EA" %in% colnames(chartDF) &
@@ -69,10 +76,20 @@ EDASigProcFn <- function(x=chartDF,
   
   # smoothing filter for the manual EDA 
   # chartDF$c_ManualEDA <- lowPass.886(x=chartDF$c_ManualEDA)
+  # chartDF$c_ManualEDA <- rev(lowPass.886(x=rev(chartDF$c_ManualEDA)))
   
-  # Dec 2, 2022
-  chartDF$c_ManualEDA <- lowPass12hz(x=chartDF$c_ManualEDA)
-  chartDF$c_ManualEDA <- lowPass.443(x=chartDF$c_ManualEDA)
+  # October 25, 2025
+  chartDF$c_ManualEDA <- boxcarSmoothFn(chartDF$c_ManualEDA, mult=.125)
+  # running the second stage backwards reduces phasing
+  chartDF$c_ManualEDA <- rev(boxcarSmoothFn(rev(chartDF$c_ManualEDA), mult=.125))
+  
+  # # Dec 2, 2022
+  # chartDF$c_ManualEDA <- lowPass12hz(x=chartDF$c_ManualEDA)
+  # chartDF$c_ManualEDA <- rev(lowPass12hz(x=rev(chartDF$c_ManualEDA)))
+  
+  # chartDF$c_ManualEDA <- lowPass.443(x=chartDF$c_ManualEDA)
+  # chartDF$c_ManualEDA <- rev(lowPass.443(x=rev(chartDF$c_ManualEDA)))
+  
   
   ############ Auto-centering EDA ############
   
@@ -92,8 +109,8 @@ EDASigProcFn <- function(x=chartDF,
                                 "lafD"=lowPass.3(x=chartDF$c_AutoEDA),
                                 "lim"=lowPass.0467(x=chartDF$c_AutoEDA),
                                 "leg"=lowPass.886(x=chartDF$c_AutoEDA),
-                                # "laf18"=lowPass12hz(x=chartDF$c_AutoEDA),
-                                "laf18"=lowPass.443(x=chartDF$c_AutoEDA),
+                                "laf18"=lowPass12hz(x=chartDF$c_AutoEDA),
+                                # "laf18"=lowPass.443(x=chartDF$c_AutoEDA),
                                 "test"=lowPass.3hz.3rd(x=chartDF$c_AutoEDA),
                                 "Det2"=lowPass.886(x=chartDF$c_AutoEDA),
                                 "resp"=lowPass_resp(x=chartDF$c_AutoEDA),
@@ -104,7 +121,8 @@ EDASigProcFn <- function(x=chartDF,
     # to reduce high frequency noise in the Axciton cases 
     # which do not use the LIC high pass
     chartDF$c_AutoEDA <- lowPass12hz(x=chartDF$c_AutoEDA)
-    chartDF$c_AutoEDA <- lowPass.443(x=chartDF$c_AutoEDA)
+    # chartDF$c_AutoEDA <- rev(lowPass12hz(x=rev(chartDF$c_AutoEDA)))
+    # chartDF$c_AutoEDA <- lowPass.443(x=chartDF$c_AutoEDA)
     # this is identical to the Manual EDA
   }
   
@@ -347,6 +365,43 @@ EDASigProcFn <- function(x=chartDF,
 #   } # end loop over times
 #   return(xOut)
 # } # end MASmooth function()
+# 
+# 
+# 
+# MASmooth <- function(x=myData, y=round(.25*cps,0), times=5) {
+#   # function to calculate a smoothed average of the time series data
+#   # x input is a time series vector
+#   # y input is the number of offset samples
+#   # times is the number of times to smooth the data
+#   ###
+#   # make the output vector 
+#   # beginning and end of the output vector are the mean of 2 * the buffer at begin and end of x
+#   xOut <- x
+#   # loop over the number of times
+#   for (j in 1:times) {
+#     # for loop to compute the moving average
+#     # buffer will be double the offset value + 1
+#     input_buffer <- x[1:(2*y+1)]
+#     # starts at sample y + 1
+#     for (i in (y+1):(length(x)-y)) { 
+#       # replace the middle value of the buffer with the mean
+#       xOut[i] <- mean(input_buffer) 
+#       # increment the input buffer
+#       input_buffer <- c(input_buffer[2:length(input_buffer)], x[i+y+1])
+#     } 
+#     # fix the start and end segments
+#     xOut[1:y] <- xOut[y+1]
+#     xOut[(length(xOut)-y):length(xOut)] <- xOut[length(xOut)-(y+1)]
+#     # replace the input vector
+#     # 2025Oct23 this was incorrectly commented out, making the loop ineffective
+#     x <- xOut
+#   } # end loop over j times
+#   return(xOut)
+# } # end MASmooth function()
+
+
+
+
 
 
 

@@ -4,8 +4,19 @@
 ####
 
 
+
 # this path is prepended to the file path before sourcing a script
-RPath <- "C://Users/raymo/Dropbox/"
+# RPath <- "C://Users/raymo/Dropbox/"
+
+if(!exists("RPath")) {
+  # mac
+  RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+  # windows
+  # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
+  
+  # use this
+  # source(paste0(RPath, <filePath>), echo=FALSE)
+}
 
 
 
@@ -18,7 +29,8 @@ setwd("C:/Users/raymo/Dropbox/DATASETS/AFMGQTN22")
 {
   
   # source the getExamNames.R script to load the getCharts() and uniqueNames() functions
-  source(paste0(RPath, 'R/NCCA_ASCII_Parse/getExamNames.R'), echo=FALSE)
+  # source(paste0(RPath, 'R/NCCA_ASCII_Parse/getExamNames.R'), echo=FALSE)
+  source(paste0(RPath, 'getExamNames.R'), echo=FALSE)
   
   # getCharts() will locate NCCA ASCII charts in the cwd
   # uniqueNames() is used to make a list of uniques exams in a directory
@@ -86,5 +98,6 @@ setwd("C:/Users/raymo/Dropbox/DATASETS/AFMGQTN22")
 
 library(readr)
 
-write.csv(uniqueExamNames, file="fileList.txt")
-write.csv(x=uniqueExamNames, file="fileList.txt", col.names=FALSE, row.names=)
+
+# write.csv(uniqueExamNames, file="fileList.txt")
+write.table(x=uniqueExamNames, file="fileList.txt", col.names=FALSE, row.names=FALSE)

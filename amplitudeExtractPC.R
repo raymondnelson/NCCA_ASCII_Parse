@@ -163,26 +163,37 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   
   # if(all(examName=="DTedTestGlenda0", chartName == "05A", segmentName == "R2", sensorName == "CardioMA")) {
-  # if(all(examName=="DX372629AF2MGQT4RQ", chartName == "01A", segmentName == "C6", sensorName == "AutoEDA")) {
+  # if(all(chartName == "03A", segmentName == "C7", sensorName == "AutoEDA")) {
   #     # stop for inspection
-  #   stop(sensorName)
+  #   assign("AutoExtractList", extractList, envir = .GlobalEnv)
+  #   assign("extractList", extractList, envir = .GlobalEnv)
+  #   assign("segmentDF", segmentDF, envir = .GlobalEnv)
+  #   assign("tsData", tsData, envir = .GlobalEnv)
+  #   print(segmentName)
+  #   print(sensorName)
+  #   assign("sensorName", sensorName, envir= .GlobalEnv)
+  #   assign("segmentName", segmentName, envir= .GlobalEnv)
+  #   assign("chartName", chartName, envir = .GlobalEnv)
+  #   # plot.ts(tsData)
+  #   stop()
   # }
   
   # get the information from the input list
   
   #### Nov 11, 2023 smooth the EDA data more to reduce high frequency information ####
   
+  tsDataB <- tsData
+  # tsDataB is used by the getResponsePeaksfn() and getResponseOnsetsFn()
+  # tsDataB is passed to the maxSlopechangeFn()
+
   if(sensorName %in% c("AutoEDA", "ManualEDA")) {
-    # to reduce location of response onset due to high frequency noise
-    # tsDataB <- MASmooth(tsData, 15, 1)
-    tsDataB <- MASmooth(tsData, y=7, times=1) # April 7, 2024
+    # additional smoothing to reduce location of response onset due to high frequency noise
+    tsDataB <- MASmooth(tsData, y=7, times=1) 
     if(length(tsDataB) < length(tsData)) {
       tsDataB <- c(rep(tsDataB[1], length(tsData) - length(tsDataB)))
     }
     # plot.ts(tsDataB)
-  } else {
-    tsDataB <- tsData
-  }
+  } 
   
   #### reset the artifact column for this sensor Nov 29, 2023 ####
   
@@ -200,7 +211,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   #### exit if the time series data are flatlined ####
   
-  # June 28, 2023 to avoid problems with flatlined EDA data
+  # to avoid problems with flatlined EDA data
   if(sd(tsData)==0)  {
     # standard deviation will be 0 for flatLined data
     
@@ -255,6 +266,8 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # so that the value at  2.5seconds may be used as an onset
     # if there is no positive slope onset
     # using the blunt approximation method (not the statistical method)
+    
+    if(!exists("strictWindow")) strictWindow <- TRUE
     
     # measuredSeg and shortenEW are set in the init script
     if(sensorName == "CardioMA") {
@@ -336,18 +349,9 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     yChangeValue <- NA
   }
   
-  ####  make a vector of slope values ####
-  
-  {
-    # Aug 2023
-    # abstracted to separate functions 
-    # that are called from the functions used to locate peak and onset points
-  }
-  
   ####   locate the response peak indices   ####
-
   
-  # August 2023 abstracted to a separate function
+  # source("~/Dropbox/R/NCCA_ASCII_Parse/getResponsePeaks.R")
   xPeak <- getResponsePeaksFn(tsData=tsDataB, 
                               latRow=latRow, 
                               ROWEndRow=ROWEndRow, 
@@ -359,7 +363,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   ####   locate the response onset indices   ####
   
-  # August 2023 abstracted to a separate function
+  # source("~/Dropbox/R/NCCA_ASCII_Parse/getResponseOnsets.R")
   xOnset <- getResponseOnsetsFn(tsData=tsDataB, 
                                 xPeak=xPeak,
                                 onsetRow=onsetRow,
@@ -368,6 +372,10 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
                                 endRow=endRow,
                                 slopeChangeRule=slopeChangeRule, 
                                 addLat=addLat)
+  # plot.ts(tsData)
+  # plot.ts(tsDataB)
+  # tsData_save <- tsData
+  # tsData <- tsDataB
   
   ####  keep response onset indices prior to the last peak index  ####
   

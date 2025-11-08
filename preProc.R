@@ -97,6 +97,7 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("CC", "C", x)
   x <- gsub("CD", "C", x)
   x <- gsub("DC", "C", x)
+  x <- gsub("DLC", "C", x)
   # x <- gsub("C C", "C", x)
   x <- gsub("NN", "N", x)
   x <- gsub("N N", "N", x)
@@ -164,30 +165,51 @@ fixTagsFn <- function(x=chartDF$Label) {
   # SOME MORE UNUSUAL QUESTION TAGS
   x <- gsub("3C", "C3", x)
   x <- gsub("C3C", "C3", x)
+  x <- gsub("CC3", "C3", x)
   x <- gsub("4C", "C4", x)
   x <- gsub("C4C", "C4", x)
+  x <- gsub("CC4", "C4", x)
   x <- gsub("5C", "C5", x)
   x <- gsub("C5C", "C5", x)
+  x <- gsub("CC5", "C5", x)
   x <- gsub("6C", "C6", x)
   x <- gsub("C6C", "C6", x)
+  x <- gsub("CC6", "C6", x)
   x <- gsub("7C", "C7", x)
   x <- gsub("C7C", "C7", x)
+  x <- gsub("CC7", "C7", x)
+  x <- gsub("8C", "C8", x)
+  x <- gsub("C8C", "C8", x)
+  x <- gsub("CC8", "C8", x)
   x <- gsub("9C", "C9", x)
   x <- gsub("C9C", "C9", x)
+  x <- gsub("CC9", "C89", x)
+  x <- gsub("10C", "C10", x)
+  x <- gsub("C10C", "C10", x)
+  x <- gsub("CC10", "C10", x)
+  
   x <- gsub("4R", "R4", x)
   x <- gsub("R4R", "R4", x)
+  x <- gsub("RR4", "R4", x)
   x <- gsub("5R", "R5", x)
   x <- gsub("R5R", "R5", x)
+  x <- gsub("RR5", "R5", x)
   x <- gsub("6R", "R6", x)
   x <- gsub("R6R", "R6", x)
+  x <- gsub("RR6", "R6", x)
   x <- gsub("7R", "R7", x)
   x <- gsub("R7R", "R7", x)
+  x <- gsub("RR7", "R7", x)
   x <- gsub("8R", "R8", x)
   x <- gsub("R8R", "R8", x)
+  x <- gsub("RR8", "R8", x)
   x <- gsub("9R", "R9", x)
   x <- gsub("R9R", "R9", x)
+  x <- gsub("RR9", "R9", x)
   x <- gsub("10R", "R10", x)
   x <- gsub("R10R", "R10", x)
+  x <- gsub("RR10", "R10", x)
+  
   
   # stoelting DLC questions
   x <- gsub("C1DLC1", "1C1", x)
@@ -244,6 +266,15 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("R45", "4R5", x)
   x <- gsub("R46", "4R6", x)
   
+  x <- gsub("CC3", "C3", x)
+  x <- gsub("CC4", "C4", x)
+  x <- gsub("CC5", "C5", x)
+  x <- gsub("CC6", "C6", x)
+  x <- gsub("CC7", "C7", x)
+  x <- gsub("CC8", "C8", x)
+  x <- gsub("CC9", "C9", x)
+  x <- gsub("CC10", "C10", x)
+  
   x <- gsub("3E", "E3", x)
   x <- gsub("8E", "E8", x)
   
@@ -272,8 +303,8 @@ fixTagsFn <- function(x=chartDF$Label) {
   x <- gsub("BD", "DB", x)
   
   # June 30, 2023
-  #  x <- gsub("CGH", "TS", x)
-  # <- gsub("GH", "TS", x)  
+  x <- gsub("CGH", "TS", x)
+  x <- gsub("GH", "TS", x)  
   
   return(x)
 } 
@@ -394,8 +425,10 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
   
   uniqueExams <- x
   
-  if(!exists("makeDF")) makeDF <- TRUE
-  if(!exists("output")) output <- FALSE
+  {
+    if(!exists("makeDF")) makeDF <- TRUE
+    if(!exists("output")) output <- FALSE
+  }
   
   # get the range from the function input y value
   # colRange <- as.numeric(y)
@@ -407,54 +440,58 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
    
     {
       
-      # get the exam data and stimulus events and the names of each series
-      
-      examName <- uniqueExams[i]
-      assign("examName", examName, pos=1)
-      print(examName)
-      
-      ###### 20191231 maybe could  parse the headers and data here ######
-      
-      # get the names of time series lists for all unique series in each exam
-      # searchString <- paste0("*", examName, "_Data", "*")
-      
-      #### get the exam data frame with the time series data ####
-      
-      # get the time series data frame for the exam
-      # examDF <- get(glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
-      examDF <- get(paste0(examName, "_Data"), pos=1)
-      
-      # View(examDF)
+      ### get the exam data and stimulus events and the names of each series ###
       
       {
-        examDF$UPneumo <- as.numeric(examDF$UPneumo)
-        examDF$LPneumo <- as.numeric(examDF$LPneumo)
-        examDF$EDA1 <- as.numeric(examDF$EDA1)
-        examDF$Cardio1 <- as.numeric(examDF$Cardio1)
-        if("Move1" %in% names(examDF[5:16])) {
-          examDF$Move1 <- as.numeric(examDF$Move1)
+        
+        examName <- uniqueExams[i]
+        assign("examName", examName, pos=1)
+        print(examName)
+        
+        ###### 20191231 maybe could  parse the headers and data here ######
+        
+        # get the names of time series lists for all unique series in each exam
+        # searchString <- paste0("*", examName, "_Data", "*")
+        
+        #### get the exam data frame with the time series data ####
+        
+        # get the time series data frame for the exam
+        # examDF <- get(glob2rx(searchString, trim.head=TRUE, trim.tail=TRUE), pos=1)
+        examDF <- get(paste0(examName, "_Data"), pos=1)
+        
+        # View(examDF)
+        
+        {
+          examDF$UPneumo <- as.numeric(examDF$UPneumo)
+          examDF$LPneumo <- as.numeric(examDF$LPneumo)
+          examDF$EDA1 <- as.numeric(examDF$EDA1)
+          examDF$Cardio1 <- as.numeric(examDF$Cardio1)
+          if("Move1" %in% names(examDF[5:16])) {
+            examDF$Move1 <- as.numeric(examDF$Move1)
+          }
+          if("PPG1" %in% names(examDF[5:16])) {
+            examDF$PPG1 <- as.numeric(examDF$PPG1)
+          }
         }
-        if("PPG1" %in% names(examDF[5:16])) {
-          examDF$PPG1 <- as.numeric(examDF$PPG1)
-        }
+        
+        # set the first and last rows
+        examOnsetRow <- 1
+        examEndRow <- nrow(examDF)
+        
+        # fix question tags 
+        # source(paste0(RPath, 'NCCAASCIIParseHelperFunctions.R'), echo=FALSE)
+        examDF$Label <- fixTagsFn(examDF$Label)
+        examDF$eventLabel <- fixTagsFn(examDF$eventLabel)
+        # assign("examDF", examDF, pos=1)
+        
+        # print(examName)
+        print(paste("exam:", i, "of", length(uniqueExams), examName))
+        
+        # get the names of unique series
+        uniqueSeries <- as.character(unique(examDF$seriesName))
+        print(paste("unique series: ", paste(uniqueSeries, collapse = " ")))
+        
       }
-      
-      # set the first and last rows
-      examOnsetRow <- 1
-      examEndRow <- nrow(examDF)
-      
-      # fix question tags 
-      # source(paste0(RPath, 'NCCAASCIIParseHelperFunctions.R'), echo=FALSE)
-      examDF$Label <- fixTagsFn(examDF$Label)
-      examDF$eventLabel <- fixTagsFn(examDF$eventLabel)
-      # assign("examDF", examDF, pos=1)
-      
-      # print(examName)
-      print(paste("exam:", i, "of", length(uniqueExams), examName))
-      
-      # get the names of unique series
-      uniqueSeries <- as.character(unique(examDF$seriesName))
-      print(paste("unique series: ", paste(uniqueSeries, collapse = " ")))
       
       ####   get the stimulus events data frame for the exam   ####
       
@@ -486,11 +523,19 @@ preProc <- function(x=uniqueExams, makeDF=TRUE, output=FALSE) {
         # assign("eventDF", eventDF, pos=1)
         # View(eventDF)
         
-        eventDF$Label <- fixTagsFn(eventDF$Label)
-        eventDF$eventLabel <- fixTagsFn(eventDF$eventLabel)
-        
         # initialize a newEventDF for this exam
         newEventDF <- NULL
+        
+      }
+      
+      ### call a function to fix the event labels ###
+      
+      {
+        
+        eventDF$Label <- fixTagsFn(eventDF$Label)
+        eventDF$eventLabel <- fixTagsFn(eventDF$eventLabel)
+        # View(eventDF)
+
         
       }
       

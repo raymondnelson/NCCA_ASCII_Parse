@@ -21,6 +21,8 @@
 #
 # MASmooth() function to create a moving average smoothing filter to reduce the time series to a slow wave form
 #
+# boxcarSmoothFn() another method of smoothing using boxcar convolution
+# 
 # minMaxMean() another method to reduce the diastolic and systolic data to a single line
 #
 # ratePerMin() function to estimate the cyclic rate per min, used to set the buffer length for peak extraction
@@ -244,7 +246,7 @@ minMaxPeakFn <- function(x=chartDF$c_Cardio1, y=round(.25*cps,0)) {
 
 
 interpolatePeaks <- function(x=na.omit(maxOut), y=na.omit(maxVal)) {
-  # private function to interpolate between peak segments of time series input data
+  # R function to interpolate between peak segments of time series input data
   # x is a vector of peak row indices in the data vector
   # y is a vector of peak row values in the data vector
   # output is
@@ -305,7 +307,8 @@ MASmooth <- function(x=myData, y=round(.25*cps,0), times=5) {
     xOut[1:y] <- xOut[y+1]
     xOut[(length(xOut)-y):length(xOut)] <- xOut[length(xOut)-(y+1)]
     # replace the input vector
-    # x <- xOut
+    # 2025Oct23 this was incorrectly commented out, making the loop ineffective
+    x <- xOut
   } # end loop over j times
   return(xOut)
 } # end MASmooth function()
@@ -379,6 +382,58 @@ MASmoothC <- function(x=chartDF$c_SE[1:1000], y=round(.5*cps,0)) {
 
 # plot.ts(chartDF$c_SE[1:5000])
 # plot.ts(MASmoothC(chartDF$c_SE, 4)[1:5000])
+
+
+####
+
+
+boxcarSmoothFn <- function(x, cps=30, mult=c(1,0.5,0.25)) {
+  # R function to compute the cardio midline using a 
+  # Raymond Nelson
+  # October 22, 2025
+  ##
+  # another method of smoothing, instead of cascaded moving averages,
+  # using convolution and private functions for the smoothing cascade
+  # 
+  # output of this filter is identical 
+  # to the cascade of MASmooth() with 1sec, .5sec, and .25sec
+  #
+  ##
+  # x is the time series cardio data
+  # cps is the sampling rate
+  # mult is a vector of time periods (seconds) for each stage of the multi-stage filter
+  outVc <- x
+  # define a private functions
+  .apply_stage <- function(x,y){
+    # private function to call the convolve function with the computed smoothing space
+    # x is the time series cardio data
+    # y is the number of samples in the boxcar (moving window)
+    # this private function will call the .boxcar and .convolv_open functions
+    ##
+    n <- length(x)
+    # compute the boxcar (moving window)
+    boxcar <- rep(1/(2*y+1), 2*y+1)
+    # call the convolve() function to compute the smoothed vector
+    full <- convolve(x,rev(boxcar),type="open")
+    # remove the start values to avoid phasing
+    z <- full[(y+1):(y+n)]
+    # fix the edge values at the start of the z vector
+    z[1:y] <- z[y+1] 
+    # fix the edge values at the end of the z vector
+    z[(n-y+1):n] <- z[n-(y+1)]
+    # output
+    return(z)
+  }
+  # iterate over the items in mult to execute the multi-stage smoothing
+  for(m in mult) {
+    # m will be each item in mult
+    y <- as.integer(round(m*cps,0))
+    # call a function to execute each stage of the convolution and update the outVc
+    outVc <- .apply_stage(outVc,y)
+  }
+  return(outVc)
+} # end boxcarSmoothFn()
+
 
 
 ####

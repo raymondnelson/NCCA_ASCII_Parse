@@ -214,8 +214,8 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
         {
           
           firstLastEvents <- getFirstLastEventFn(x=chartDF)
-          firstEvent <- firstLastEvents[1] - 600
-          lastEventEnd <- firstLastEvents[2] +600
+          firstEvent <- firstLastEvents[1] - 150
+          lastEventEnd <- firstLastEvents[2] + 300
           
           # Nov, 30, 2024
           if(firstEvent < 1) firstEvent <- 1
@@ -484,7 +484,7 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             # scale and offset the additional cardio channels
             
             # compute the cardio mid line 
-            chartDF$c_CardioMid <- MASmooth(x=chartDF$c_Cardio1, y=round(.5*cps,0), times=3)
+            chartDF$c_CardioMid <- MASmooth(x=chartDF$c_Cardio1, y=round(.5*cps,0), times=1)
             # chartDF$c_CardioMid <- MASmooth(x=chartDF$c_Cardio1, y=round(.5*cps,0), times=3)
             
             
@@ -537,9 +537,9 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.5*cps,0), times=1)
             
             # May 19, 2024 - improve the correlation coef
-            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_Cardio1, y=round(1*cps,0), times=3)
-            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.5*cps,0), times=3)
-            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.25*cps,0), times=3)
+            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_Cardio1, y=round(1*cps,0), times=1)
+            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.5*cps,0), times=1)
+            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.25*cps,0), times=1)
             
             
             # 
@@ -601,8 +601,8 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               
               # scale and offset the additional electronic cardio cuff channels
               
-              chartDF$c_eCardioMid <- MASmooth(x=chartDF$c_eCardio, y=round(.5*cps,0), times=3)
-              chartDF$c_eCardioMA <- MASmooth(x=chartDF$c_eCardio, y=round(1.5*cps,0), times=3)
+              chartDF$c_eCardioMid <- MASmooth(x=chartDF$c_eCardio, y=round(.5*cps,0), times=1)
+              chartDF$c_eCardioMA <- MASmooth(x=chartDF$c_eCardio, y=round(1.5*cps,0), times=1)
               
               # chartDF$c_eCardioMA <- MASmooth(x=chartDF$c_eCardioMA, y=round(.5*cps,0), times=2)
               

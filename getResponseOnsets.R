@@ -6,6 +6,12 @@
 #
 ####
 
+
+
+# source("~/Dropbox/R/NCCA_ASCII_Parse/slopeChange.R", echo=FALSE)
+
+
+
 getResponseOnsetsFn <- function(tsData, 
                                 xPeak,
                                 onsetRow,
@@ -60,7 +66,7 @@ getResponseOnsetsFn <- function(tsData,
   
   #### extract a response onset via change in positive slope inflection ####
   
-  # inflection=2
+  # inflection=2 # statistical method
   
   # inflection is set in the NCCAASCII_init.R script
   
@@ -100,8 +106,9 @@ getResponseOnsetsFn <- function(tsData,
     
     xOnset <- unique(xOnset)
     # NAs are retained if any are present
+    l
     
-  }
+  } # end if( inflection == 1 )
   
   #### alternate method use the maxSlopeChangeFn ####
   
@@ -115,9 +122,12 @@ getResponseOnsetsFn <- function(tsData,
     
     if(slopeChangeRule == 1) {
       
+      # always use the slopeChangeRule
+      
       if(any(!is.na(xPeak))) {
         # if there are any valid xPeak indices
         # source the maxSlopeChange script
+        # source("~/Dropbox/R/NCCA_ASCII_Parse/slopeChange.R", echo=FALSE)
         # call the maxSlopeChangeFn()
         theseIdcs <- maxSlopeChangeFn(x=tsData, idx=TRUE)
         # keep only those that are after the latency row
@@ -136,6 +146,7 @@ getResponseOnsetsFn <- function(tsData,
       }
       # set the order and remove NAs
       xOnset <- sort(xOnset)
+      
     }
     
     if(slopeChangeRule == 2) {

@@ -162,7 +162,7 @@
     # for ESS and other scores
     
     showScores <- TRUE
-    showScores <- FALSE
+    # showScores <- FALSE
     
     if(showScores) {
       outputChartFileName <- paste0("_SCORES", outputChartFileName)

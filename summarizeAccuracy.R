@@ -1,4 +1,20 @@
+# R script to summarize the criterion accuracy of NCCA ASCII data sets
+# 2025 Raymond Nelson
+#
+####
 
+# output is a .csv file named "aggSummary.csv"
+
+
+
+#### USAGE NOTES ####
+
+{
+  
+  # 2025Oct12 working with the AFMGQT n=22 sample (multi-issue)
+  
+  
+}
 
 
 #### start by clearing the global envir ####
@@ -114,9 +130,12 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   # exclude cases that consist only of the ACQT
   analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
   
-  examNames <- str_sub(analysisLists, 2, -10)
+  examNames <- str_sub(analysisLists, 1, -10)
+  # start at the 2nd characgter to omit the "D" appended to all NCCA ASCII file names
+  # examNames <- str_sub(analysisLists, 2, -10)
   
   # cases that are missing an ANALYSIS list
+  uniqueExams[which(!(str_sub(uniqueExams, 1, -1) %in% examNames))]
   uniqueExams[which(!(str_sub(uniqueExams, 2, -1) %in% examNames))]
   
 }
@@ -166,8 +185,8 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   # testFormat <- str_sub(seriesTotalFiles, 9, -24)
   
   # initialize a data frame to aggregate the series totals
-  # RQNames <- c("R1", "R2", "R3", "R4")
-  RQNames <- c("R5", "R7", "R10", "none")
+  RQNames <- c("R1", "R2", "R3", "R4")
+  # RQNames <- c("R5", "R7", "R10", "none")
   # RQNames <- c("R5", "R7", "R10")
   # RQNames <- c("R5", "R8", "R11", "NA")
   # RQNames <- c("R1", "R2", "none", "none")
@@ -178,7 +197,7 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   
   
   DRule <- "TSR"
-  # DRule <- "SSR"
+  DRule <- "SSR"
   
   ESSMDecisionRule <- ifelse(DRule=="TSR", "TSR", "SSR")
   # ESSMDecisionRule <- "SSR"
@@ -515,7 +534,9 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
   analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
   
   # keep the last character
-  examNames <- str_sub(analysisLists, 2, -10)
+  # examNames <- str_sub(analysisLists, 1, -10)
+  # start at the 2nd character to omit the "D" appended to all NCCA ASCII files
+  # examNames <- str_sub(analysisLists, 2, -10)
   # omit the last character
   # examNames <- str_sub(analysisLists, 2, -11)
   
@@ -633,6 +654,7 @@ if(isTRUE(summarizeResults)) {
                                  header=TRUE,
                                  stringsAsFactors=FALSE)
   }
+  # View(criterionStateDF)
   
   names(criterionStateDF)[1] <- c("examName")
   # criterionStateDF$examName
@@ -642,7 +664,10 @@ if(isTRUE(summarizeResults)) {
   
   scoreSheetFiles <- list.files(pattern="ESSMScoresheet.csv")
   
-  examNames <- str_sub(scoreSheetFiles, 2, -22)
+  examNames <- str_sub(scoreSheetFiles, 1, -22)
+  # start at the 2nd character to omit the "D" appended to all NCCA ASCII file names
+  # examNames <- str_sub(scoreSheetFiles, 2, -22)
+  
   
   # numbCases <- length(seriesTotalFiles)
   
@@ -710,6 +735,7 @@ if(isTRUE(summarizeResults)) {
     
     # thisExamName <- str_sub(thisExamName, 1, 3)
     
+    # add the exam name to the summary data frame
     seriesTotalsDF[i,'examName'] <- thisExamName
     # series
     thisSeries <- str_sub(scoreSheetFiles[i], -20, -20)
@@ -816,7 +842,7 @@ if(isTRUE(summarizeResults)) {
   
   scoreSheetFiles <- list.files(pattern="ESSMScoresheet.csv")
   
-  examNames <- str_sub(scoreSheetFiles, 2, -22)
+  # examNames <- str_sub(scoreSheetFiles, 2, -22)
   
   # numbCases <- length(seriesTotalFiles)
   
@@ -2937,7 +2963,7 @@ if(isTRUE(summarizeScoresProp)) {
                                "nPneumo", "nAutoEDA", "nCardio", "nPLE", "N",
                                "nScores")
   
-  examNames <- str_sub(scoreSheetFiles, 2, -22)
+  # examNames <- str_sub(scoreSheetFiles, 2, -22)
   
   # iterate over each case
   

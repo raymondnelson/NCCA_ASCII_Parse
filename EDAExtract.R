@@ -7,6 +7,9 @@
 # source(paste0(RPath, 'amplitudeExtractPC.R'), echo=FALSE)
 # source(paste0(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
 
+# source a script of the maxSlopeChangeFn()
+# source(paste0(RPath, 'slopeChange.R'), echo=FALSE)
+
 
 
 EDAExtractFn <- function(x=segmentDF, y=extract.params) {

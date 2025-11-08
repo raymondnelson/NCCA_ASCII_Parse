@@ -818,6 +818,7 @@ if(NCCAASCIIParse == TRUE) {
   
   # stop()
   
+  # call the parseUniqueExams() from the NCCAASCII_Parse.R script
   # parseUniqueExams is vectorized 5-8-2020
   parseUniqueExams(uniqueExamNames=uniqueExamNames,
                    saveCSV=saveCSV,
@@ -828,6 +829,7 @@ if(NCCAASCIIParse == TRUE) {
   print(uniqueExamNames)
 
 } 
+
 
 
 ######## parse the stimulus events ######## 
@@ -2167,7 +2169,7 @@ if(loadRDA2==TRUE) {
 
 
 
-######## save / load .RData ######## 
+ ######## save / load .RData ######## 
 
 
 
@@ -2199,7 +2201,7 @@ if(isTRUE(printCharts)) {
   # source the chartPlot.R script to print the plots
   source(paste0(RPath, 'chartPlot_gg.R'), echo=FALSE)
 }
-
+ 
 
 
 if(!exists("printSegments")) printSegments <- FALSE
@@ -2361,6 +2363,9 @@ if(isTRUE(copyProblems)) {
   # file.copy(paste0("../", theseFiles), theseFiles)
   
   # examList <- str_sub(list.files(pattern="chartPlot.pdf"), 2, -15)
+  
+  # use the chartPlot.pdf files in the cwd
+  problemCaseList <- examList
   
   problemCaseList %in% examList
   

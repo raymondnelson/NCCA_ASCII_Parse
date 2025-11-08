@@ -317,150 +317,162 @@ print("init parameters for the NCCA ASCII work flow")
       
     }
     
-    {
-      # default configuration
-      removeAnnotations <- FALSE
-      trimExcessTime <- TRUE
-      stopXXX <- TRUE
-      
-      fixNonASCIICharacters <- TRUE
-      fixSensorNames <- TRUE
-      
-      EDAFilt="laf18"
-      
-      DRule <- "TSR"
-    }
-    
-    
-    {
-      # reconfig A for LAFAYETTE FIELD CASES
-      removeAnnotations <- FALSE
-      
-      trimExcessTime <- FALSE
-      # trimExcessTime <- TRUE
-      
-      stopXXX <- FALSE
+  }
+  
+}
 
-      fixNonASCIICharacters <- TRUE
-      fixNonASCIICharacters <- FALSE
-      
-      fixDuplicateTags <- FALSE
-      fixDuplicateTags <- TRUE
 
-      fixSensorNames <- TRUE
+    
+######## WORK FLOW PRESETS #########
 
-      EDAFilt="laf18"
 
-      # used to expedite the selection of algorithm decision rules in this script
-      DRule <- "TSR"
-      DRule <- "SSR"
-    }
+
+{
+  
+  {
+    # default configuration
+    removeAnnotations <- FALSE
+    trimExcessTime <- TRUE
+    stopXXX <- TRUE
     
-    {
-      # # reconfig B for LAFAYETTE RESEARCH CASES
-      # removeAnnotations <- FALSE
-      # trimExcessTime <- TRUE
-      # stopXXX <- TRUE
-      # 
-      # fixDuplicateTags <- TRUE
-      # fixDLSTLabels <- FALSE
-      # 
-      # fixNonASCIICharacters <- FALSE
-      # fixFileNames <- FALSE
-      # fixSensorNames <- FALSE
-      # fixStrings <- FALSE
-      # 
-      # EDAFilt="laf18"
-      # EDAFilt="none"
-      # 
-      # DRule <- "TSR"
-      # # DRule <- "SSR"
-    }
+    fixNonASCIICharacters <- TRUE
+    fixSensorNames <- TRUE
     
-    {
-      # # reconfig F for LAFAYETTE EDA Problems
-      # removeAnnotations <- FALSE
-      # fixDuplicateTags <- TRUE
-      # trimExcessTime <- TRUE
-      # stopXXX <- FALSE
-      # 
-      # fixNonASCIICharacters <- TRUE
-      # 
-      # EDAFilt="lafX"
-      # EDAFilt="laf18"
-    }
+    EDAFilt="laf18"
     
+    DRule <- "TSR"
+  }
+  
+  
+  {
+    # reconfig A for LAFAYETTE FIELD CASES
+    removeAnnotations <- FALSE
     
-    {
-      # # reconfig C for LXCAT exams
-      # removeAnnotations <- FALSE
-      # trimExcessTime <- FALSE
-      # stopXXX <- FALSE
-      # 
-      # EDAFilt="leg" # Lafayette (.04/.886)
-    }
+    trimExcessTime <- FALSE
+    # trimExcessTime <- TRUE
     
-    {
-      # # reconfig D for AXCITON RESEARCH SAMPLES
-      # # including Axciton samples that are in Lafayette NCCA ASCII format
-      # removeAnnotations <- FALSE
-      # trimExcessTime <- TRUE
-      # stopXXX <- TRUE
-      # 
-      # fixDuplicateTags <- TRUE
-      # fixDLSTLabels <- FALSE
-      # 
-      # EDAFilt="none"
-      # 
-      # reduceSampleRate <- TRUE
-      # 
-      # fixNonASCIICharacters <- FALSE
-      # fixSensorNames <- FALSE
-      # fixFileNames <- FALSE
-      # fixStrings <- FALSE
-      # 
-      # DRule <- "TSR"
-      # # DRule <- "SSR"
-    }
+    stopXXX <- FALSE
     
-    {
-      # # reconfig E for AXCITON FIELD CASES
-      # removeAnnotations <- FALSE
-      # trimExcessTime <- TRUE
-      # stopXXX <- FALSE
-      # 
-      # EDAFilt="none"
-      # 
-      # fixNonASCIICharacters <- FALSE
-      # fixSensorNames <- FALSE
-      # 
-      # DRule <- "TSR"
-      # # DRule <- "SSR"
-    }
+    fixNonASCIICharacters <- TRUE
+    fixNonASCIICharacters <- FALSE
     
-    {
-      # # reconfig F for STOELTING LAB CASES
-      # removeAnnotations <- FALSE
-      # trimExcessTime <- TRUE
-      # stopXXX <- TRUE
-      # 
-      # fixDuplicateTags <- TRUE
-      # 
-      # fixDLSTLabels <- TRUE
-      # 
-      # # EDAFilt="none"
-      # EDAFilt="laf18"
-      # 
-      # fixNonASCIICharacters <- TRUE
-      # fixFileNames <- TRUE
-      # fixSensorNames <- TRUE
-      # fixStrings <- TRUE
-      # 
-      # # DRule <- "TSR"
-      # DRule <- "SSR"
-    }
+    fixDuplicateTags <- FALSE
+    fixDuplicateTags <- TRUE
     
+    fixDLSTLabels <- FALSE
+     
     
+    fixSensorNames <- TRUE
+    
+    EDAFilt="laf18"
+    
+    # used to expedite the selection of algorithm decision rules in this script
+    DRule <- "TSR"
+    DRule <- "SSR"
+  }
+  
+  {
+    # reconfig B for LAFAYETTE RESEARCH CASES
+    removeAnnotations <- FALSE
+    trimExcessTime <- TRUE
+    stopXXX <- TRUE
+
+    fixDuplicateTags <- TRUE
+    fixDLSTLabels <- FALSE
+
+    fixNonASCIICharacters <- FALSE
+    fixFileNames <- FALSE
+    fixSensorNames <- FALSE
+    fixStrings <- FALSE
+
+    EDAFilt="laf18"
+    EDAFilt="none"
+
+    # DRule <- "TSR"
+    DRule <- "SSR"
+  }
+  
+  {
+    # # reconfig F for LAFAYETTE EDA Problems
+    # removeAnnotations <- FALSE
+    # fixDuplicateTags <- TRUE
+    # trimExcessTime <- TRUE
+    # stopXXX <- FALSE
+    # 
+    # fixNonASCIICharacters <- TRUE
+    # 
+    # EDAFilt="lafX"
+    # EDAFilt="laf18"
+  }
+  
+  
+  {
+    # # reconfig C for LXCAT exams
+    # removeAnnotations <- FALSE
+    # trimExcessTime <- FALSE
+    # stopXXX <- FALSE
+    # 
+    # EDAFilt="leg" # Lafayette (.04/.886)
+  }
+  
+  {
+    # # reconfig D for AXCITON RESEARCH SAMPLES
+    # # including Axciton samples that are in Lafayette NCCA ASCII format
+    # removeAnnotations <- FALSE
+    # trimExcessTime <- TRUE
+    # stopXXX <- TRUE
+    # 
+    # fixDuplicateTags <- TRUE
+    # fixDLSTLabels <- FALSE
+    # 
+    # EDAFilt="none"
+    # 
+    # reduceSampleRate <- TRUE
+    # 
+    # fixNonASCIICharacters <- FALSE
+    # fixSensorNames <- FALSE
+    # fixFileNames <- FALSE
+    # fixStrings <- FALSE
+    # 
+    # # DRule <- "TSR"
+    # DRule <- "SSR"
+  }
+  
+  {
+    # # reconfig E for AXCITON FIELD CASES
+    # removeAnnotations <- FALSE
+    # trimExcessTime <- TRUE
+    # stopXXX <- FALSE
+    # 
+    # EDAFilt="none"
+    # 
+    # fixNonASCIICharacters <- FALSE
+    # fixSensorNames <- FALSE
+    # 
+    # DRule <- "TSR"
+    # # DRule <- "SSR"
+  }
+  
+  {
+    # # reconfig F for STOELTING LAB CASES
+    # removeAnnotations <- FALSE
+    # trimExcessTime <- TRUE
+    # stopXXX <- TRUE
+    # 
+    # fixDuplicateTags <- TRUE
+    # 
+    # fixDLSTLabels <- TRUE
+    # 
+    # # EDAFilt="none"
+    # EDAFilt="laf18"
+    # 
+    # fixNonASCIICharacters <- TRUE
+    # fixFileNames <- TRUE
+    # fixSensorNames <- TRUE
+    # fixStrings <- TRUE
+    # 
+    # # DRule <- "TSR"
+    # DRule <- "SSR"
   }
   
 }

@@ -606,12 +606,13 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # ignoreTonicChange is the length in seconds for which 
   # to ignore small slope changes when evaluating upward slope
   # before inferring a response onset in EDA and cardio
-  ignoreTonicChange = .25
+  ignoreTonicChange = .125
   
   # sChangeLat is the number of seconds of latency 
   # after stimulus onset
   # before inferring a response onset via slope change
-  sChangeLat <- 2.5
+  sChangeLat <- .5
+  # was 2.5 until 2025Oct26
   # was 0.5 until 2025May14
   # was 2.5
   # was .5 20200321
