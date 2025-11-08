@@ -112,7 +112,7 @@ cardioSigProcFn <- function(x=chartDF, first=firstEvent, last=lastEventEnd) {
   
   # very light smoothing of cardio data
   # because some LX4K and LX5K instruments have noisy cardio data
-  chartDF$c_Cardio1 <- MASmooth(x=chartDF$c_Cardio1, y=1, times=1)
+  # chartDF$c_Cardio1 <- MASmooth(x=chartDF$c_Cardio1, y=3, times=1)
   
   # reset the zero-centered cardio data
   chartDF$c_Cardio1 <- chartDF$Cardio1 - chartDF$Cardio1[1]
@@ -124,9 +124,11 @@ cardioSigProcFn <- function(x=chartDF, first=firstEvent, last=lastEventEnd) {
     
     # source("~/Dropbox/R/NCCA_ASCII_Parse/cardioCaliperFunctions.R", echo=FALSE)
     
+    # first make a rough estimate of the cardio rate
     cardioRate <- ratePerMinFn(x=chartDF$c_Cardio1, buffer=10, peaks="upper", lowPass=TRUE)
+    # use the rough estimate to compute the cardio buffer length
     cardioBufferLen <- bufferLenFn(x=cardioRate, y=.6)
-    
+    # use the cardioBufferLen to compute a more precise vector of the cardio rate
     chartDF$c_CardioRate <- cardioRatePerCycleFn(x=chartDF$c_Cardio1, buffer=cardioBufferLen, peaks="upper", lowPass=TRUE)
     
     # cardioCaliperFn(x=cardioRateVc, caliperStart, caliperStop=NULL, caliperLen=15)
