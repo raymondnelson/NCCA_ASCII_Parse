@@ -219,12 +219,12 @@
     
     
     showWarnings <- TRUE
-    showWarnings <- FALSE
+    # showWarnings <- FALSE
     
     if(!showScores) showWarnings <- FALSE
     
     inclChartName <- TRUE
-    inclChartName <- FALSE
+    # inclChartName <- FALSE
     
   }
   
@@ -1358,9 +1358,10 @@ for(i in 1:length(uniqueExams)) {
           
         } # end if showEDAData
         
-        if(isTRUE(showPLEData)) {
+        if(isTRUE(showPLEData) && var(chartDF$c_PPG1) != 0) {
           # photoplethysmograph PLE data
-          if(inclPLE==TRUE) { 
+          if(inclPLE==TRUE && var(chartDF$c_PPG1) != 0) { 
+            # var(chartDF$c_PPG1)
             g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1), color="brown", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1MA), color="brown", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             # systolic diastolic peak lines
@@ -2117,7 +2118,8 @@ for(i in 1:length(uniqueExams)) {
         if(all(isTRUE(showPLEMeasurement),
                isTRUE(showMeasurements),
                isTRUE(showPLEData), 
-               isTRUE(inclPLE) ) ) {
+               isTRUE(inclPLE),
+               var(chartDF$c_PPG1) != 0) ) {
           
           # check to see if the there is any PLE extraction
           if(!is.na(which(chartDF$PPG1Extract=="prestimSegOnset")[1])) {
@@ -3230,7 +3232,7 @@ for(i in 1:length(uniqueExams)) {
           
           ###  PLE  ###
           
-          if(isTRUE(showPLEData) && showPLEScores==TRUE) {
+          if( all(isTRUE(showPLEData), showPLEScores==TRUE, var(chartDF$c_PPG1) != 0) ) {
             
             # get all row indices for the PLE data
             pleSensorRows <- which(chartMeasurementDF$sensorName == "PLE")
@@ -3495,7 +3497,7 @@ for(i in 1:length(uniqueExams)) {
         
         ###  PLE  ###
         
-        if(isTRUE(showPLEData) && showPLEScores==TRUE) {
+        if( all(isTRUE(showPLEData), showPLEScores==TRUE, var(chartDF$c_PPG1) != 0) ) {
           
           # get all row indices for the PLE data
           pleSensorRows <- which(chartMeasurementDF$sensorName == "PLE")
@@ -3735,7 +3737,7 @@ for(i in 1:length(uniqueExams)) {
           
           ###  PLE  ###
           
-          if(isTRUE(showPLEData) && showPLEScores==TRUE) {
+          if( all(isTRUE(showPLEData) && showPLEScores==TRUE, var(chartDF$c_PPG1) != 0) ) {
             
             # get all row indices for the PLE data
             pleSensorRows <- which(chartMeasurementDF$sensorName == "PLE")
@@ -4701,7 +4703,7 @@ for(i in 1:length(uniqueExams)) {
             
             ###  PLE Rank Scores ###
             
-            if(isTRUE(showPLEData) && showPLEScores==TRUE) {
+            if( all(isTRUE(showPLEData), showPLEScores==TRUE, var(chartDF$c_PPG1) != 0) ) {
               
               # get all row indices for the PLE data
               pleSensorRows <- which(chartMeasurementDF$sensorName == "PLE")
