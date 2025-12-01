@@ -1134,5 +1134,13 @@ cardioSRQFn <- function(x=chartDF$c_Cardio1, segLen=15) {
 
 
 
+cardioMAPLineFn <- function(syst=chartDF$c_CardioSystolic, diast=chartDF$c_CardioDiastolic) {
+  # R function to approximate the Stoelting method of computing the carido mid line
+  # November 17, 2025
+  weighted.mean(x=c(syst, diast), w=c(1, 2))
+}
+
+
+
 
 

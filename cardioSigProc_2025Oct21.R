@@ -852,7 +852,7 @@ boxcarSmoothFn <- function(x, cps=30, mult=c(1,0.5,0.25)) {
   # the boxcar function is equivalent to the following cascaded smoothing function
   DAT2 <- MASmooth(x=chartDF$c_Cardio1, y=round(1*cps,0), times=1)
   DAT2 <- MASmooth(x=DAT2, y=round(.5*cps,0), times=1)
-  DAT2 <- DAT2, y=round(.25*cps,0), times=1)
+  DAT2 <-  MASmooth(x=DAT2, y=round(.25*cps,0), times=1)
   
   # the output can be approximated using a 4th order Butterworth filter at .11Hz
   # however the output of Butterworth filter is not conveniently centered 
@@ -923,6 +923,16 @@ boxcarSmoothFn <- function(x, cps=30, mult=c(1,0.5,0.25)) {
   
 }
 
-
-
+{
+  
+  ## approximate the Stoelting method of computing the cardio mid line
+  
+  cardioMAPLineFn <- function(syst=chartDF$c_CardioSystolic, diast=chartDF$c_CardioDiastolic) {
+    # R function to approximate the Stoelting method of computing the carido mid line
+    # November 17, 2025
+    weighted.mean(x=c(syst, diast), w=c(1, 2))
+  }
+  
+  
+}
 
