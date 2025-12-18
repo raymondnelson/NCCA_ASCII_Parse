@@ -349,12 +349,14 @@ print("init parameters for the NCCA ASCII work flow")
     removeAnnotations <- FALSE
     
     trimExcessTime <- FALSE
-    # trimExcessTime <- TRUE
+    trimExcessTime <- TRUE
     
     stopXXX <- FALSE
     
     fixNonASCIICharacters <- TRUE
-    fixNonASCIICharacters <- FALSE
+    # fixNonASCIICharacters <- FALSE
+    
+    fixFileNames <- TRUE
     
     fixDuplicateTags <- FALSE
     fixDuplicateTags <- TRUE
@@ -368,28 +370,32 @@ print("init parameters for the NCCA ASCII work flow")
     
     # used to expedite the selection of algorithm decision rules in this script
     DRule <- "TSR"
-    DRule <- "SSR"
+    # DRule <- "SSR"
   }
   
   {
-    # reconfig B for LAFAYETTE RESEARCH CASES
-    removeAnnotations <- FALSE
-    trimExcessTime <- TRUE
-    stopXXX <- TRUE
-
-    fixDuplicateTags <- TRUE
-    fixDLSTLabels <- FALSE
-
-    fixNonASCIICharacters <- FALSE
-    fixFileNames <- FALSE
-    fixSensorNames <- FALSE
-    fixStrings <- FALSE
-
-    EDAFilt="laf18"
-    EDAFilt="none"
-
-    # DRule <- "TSR"
-    DRule <- "SSR"
+    # # reconfig B for LAFAYETTE RESEARCH CASES
+    # # including cases imported to Lafayette from other instruments 
+    # 
+    # removeAnnotations <- FALSE
+    # trimExcessTime <- TRUE
+    # stopXXX <- TRUE
+    # 
+    # fixDuplicateTags <- TRUE
+    # fixDLSTLabels <- FALSE
+    # 
+    # fixNonASCIICharacters <- FALSE
+    
+    # fixFileNames <- TRUE
+    # fixFileNames <- FALSE
+    # fixSensorNames <- FALSE
+    # fixStrings <- FALSE
+    # 
+    # EDAFilt="laf18"
+    # EDAFilt="none"
+    # 
+    # # DRule <- "TSR"
+    # DRule <- "SSR"
   }
   
   {

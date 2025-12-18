@@ -3,6 +3,8 @@
 # raymond nelson
 #####
 
+
+
 fixNonASCIICharactersFn <- function(searchPattern="^D&+") {
   # function to fix non ASCII characters in NCCA ASCII text files 
   # non-Enlgish characters
@@ -34,3 +36,6 @@ fixNonASCIICharactersFn <- function(searchPattern="^D&+") {
 } # end fixNonASCIICharactersFn() 
 
 # fixNonASCIICharactersFn(searchPattern)
+
+
+

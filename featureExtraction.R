@@ -345,13 +345,14 @@ featureExtraction <- function(x=uniqueExams,
         
         if(!isTRUE(PCATFormat) && chartDF$Cardio1[1] != -9.9) {
         
-          # used by the cardio extract function
-          
+          # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
           cardioRate <- ratePerMin(MASmooth(x=chartDF$Cardio1, y=2, times=1),
                                    buffer=9,
                                    peaks="upper",
                                    lowPass=TRUE)
+          # used by the cardio extract function
           
+          # source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
           rbpfMsg <- rbpfProbFn(x=chartDF, y=NULL)
           
           # print(paste("cardio rate:", cardioRate))

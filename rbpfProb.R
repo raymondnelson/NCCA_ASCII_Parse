@@ -27,6 +27,7 @@ rbpfProbFn <- function(x=chartDF, y=NULL) {
     # y is the number of seeconds  for the evaluation period
   	# y=15
   
+  	# exit if the chart is less than 45 seconds
     if(nrow(chartDF) < 45 * cps) { return("RBPF: NA") }
   
   	uniqueEvents <- unique(chartDF$eventLabel) 
@@ -38,7 +39,7 @@ rbpfProbFn <- function(x=chartDF, y=NULL) {
   	# print(firstLast)
   	firstEvent <- firstLast['firstEvent']
   	lastEvent <- firstLast['lastEventEnd'] - 450
-  
+  	
   	# chartDF is not returned when y == NULL
   	chartDF$CardioRBPF_a <- 0
   	chartDF$CardioRBPFMessage_a <- 0
@@ -75,10 +76,19 @@ rbpfProbFn <- function(x=chartDF, y=NULL) {
   
   #### flat pneumo data ####
   
-  if( var(chartDF$c_UPneumoSm) == 0 || var(chartDF$c_LPneumoSm == 0) ) {
+  if( var(chartDF$c_UPneumoSm) == 0 || var(chartDF$c_LPneumoSm) == 0 ) {
     
     return("none")
     
+  }
+  
+  #### short chart ####
+  
+  # exit if the distance from firstEvent to lastEvent is less than 45 seconds
+  if(lastEvent - firstEvent <= 45 * cps) {
+    
+    return("none")
+  
   }
   
   ###### calculate the respiration rate for upper and lower pneumo sensors ######
@@ -90,6 +100,9 @@ rbpfProbFn <- function(x=chartDF, y=NULL) {
     UPneumoSmooth <- MASmooth(x=chartDF$c_UPneumoSm[firstEvent:lastEvent], y=15, times = 2)
     LPneumoSmooth <- MASmooth(x=chartDF$c_LPneumoSm[firstEvent:lastEvent], y=15, times = 2)
     
+    chartDF$c_UPneumoSm[firstEvent:lastEvent]
+    
+    # plot.ts(chartDF$c_UPneumoSm[firstEvent:lastEvent])
     # plot.ts(UPneumoSmooth[600:2400])
     # plot.ts(LPneumoSmooth[600:2400])
     

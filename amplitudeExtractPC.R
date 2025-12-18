@@ -162,8 +162,8 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   }
   
   
-  # if(all(examName=="DTedTestGlenda0", chartName == "05A", segmentName == "R2", sensorName == "CardioMA")) {
   # if(all(chartName == "03A", segmentName == "C7", sensorName == "AutoEDA")) {
+  # if(all(examName=="D5HPNYP", seriesName=="X", chartName == "01A", segmentName == "C3", sensorName == "AutoEDA")) {
   #     # stop for inspection
   #   assign("AutoExtractList", extractList, envir = .GlobalEnv)
   #   assign("extractList", extractList, envir = .GlobalEnv)
@@ -188,7 +188,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
 
   if(sensorName %in% c("AutoEDA", "ManualEDA")) {
     # additional smoothing to reduce location of response onset due to high frequency noise
-    tsDataB <- MASmooth(tsData, y=7, times=1) 
+    tsDataB <- MASmooth(tsData, y=3, times=1) # was 7
     if(length(tsDataB) < length(tsData)) {
       tsDataB <- c(rep(tsDataB[1], length(tsData) - length(tsDataB)))
     }
@@ -668,9 +668,9 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     
     # plot.ts(tsData)
     
-    # if(all(examName=="DX30062015", seriesName==1, chartName=="03A", segmentName=="R6", sensorName=="AutoEDA")) {
-    # if(all(chartName=="01A", segmentName=="R10", sensorName=="AutoEDA")) {
     # if(all(seriesName==1, chartName=="01A", segmentName=="4", sensorName=="AutoEDA")) {
+    # if(all(chartName=="01A", segmentName=="R10", sensorName=="AutoEDA")) {
+    # if(all(examName=="D5HPNYP", seriesName=="X", chartName=="01A", segmentName=="C3", sensorName=="AutoEDA")) {
     #   assign("extract.params", extract.params, pos=1)
     #   assign("chartDF", chartDF, envir=.GlobalEnv)
     #   assign("segmentDF", segmentDF, pos=1)

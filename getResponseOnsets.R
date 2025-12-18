@@ -72,6 +72,8 @@ getResponseOnsetsFn <- function(tsData,
   
   if(inflection == 1) {
     
+    # inflection==1 will pick the y-axis value at 2.5 seconds for all cases
+    
     if(!exists("addLat")) addLat <- 2
     
     # use the slopeChangeRule parameter
@@ -114,6 +116,8 @@ getResponseOnsetsFn <- function(tsData,
   
   if(inflection == 2) {
     
+    # statistical method
+    
     # source("~/Dropbox/R/NCCA_ASCII_Parse/slopeChange.R", echo=TRUE)
     
     # maxSlopeChangeFn() uses a moving t-test of variance for all
@@ -142,6 +146,7 @@ getResponseOnsetsFn <- function(tsData,
         # August 23, 2023 to reduce the delay of the imputed response onset
         # put the slope change at the end of the pre len segment
         theseIdcs <- theseIdcs + (nPre*cps)
+        # add the imputed onset indices to the xOnset vector
         xOnset <- sort(unique(c(theseIdcs, xOnset)))
       }
       # set the order and remove NAs
@@ -150,10 +155,12 @@ getResponseOnsetsFn <- function(tsData,
     }
     
     if(slopeChangeRule == 2) {
+      # keep the 
       if(all(is.na(xOnset)) && any(!is.na(xPeak))) {
         theseIdcs <- maxSlopeChangeFn(x=tsData, idx=TRUE)
         # keep only those that are after the latency row
-        theseIdcs <- theseIdcs[theseIdcs >= latRow]
+        # theseIdcs <- theseIdcs[theseIdcs >= latRow]
+        theseIdcs <- theseIdcs[theseIdcs >= (onsetRow + (sChangeLat*cps) - 1)]
         xOnset <- c(theseIdcs, xOnset)
         # set the order and remove NAs
         xOnset <- sort(xOnset)

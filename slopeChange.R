@@ -169,8 +169,10 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
       for (i in tonicLen:length(zScore)) {
         preSlope <- slopeDat[rev(i:(i-tonicLen+1))]
         
-        if( sum(preSlope) >= round(tonicLen - (tonicLen * .1)) ) {
-          # these will be unequal of the slope is no + for 90% of the tonicLen
+        # 2025Nov12 modified so that the slope must be 0 or +
+        # if( sum(preSlope) >= round(tonicLen - (tonicLen * .1)) ) {
+        if( sum(preSlope >= 0) >= round(tonicLen - (tonicLen * .1)) ) {
+          # these will be unequal of the slope is not 0 or + for 90% of the tonicLen
           # set the zScore to 0 if not + slope for 90% of the tonicSec period
           zScore[i] <- 0
         }

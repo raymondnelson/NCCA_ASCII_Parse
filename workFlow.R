@@ -667,6 +667,9 @@ if(fixSensorNames==TRUE) {
     fixSensorNameFn(x="D&+", oldSensorName = "PLE1", newSensorName = "PPG1")
     fixSensorNameFn(x="D&+", oldSensorName = "  PL", newSensorName = "PPG1")
     
+    # fixSensorNameFn(x="D&+", oldSensorName = "Move1", newSensorName = "MoveX")
+    # fixSensorNameFn(x="D&+", oldSensorName = "Aux02", newSensorName = "Move1")
+    
     # the NCCA ASCI spec uses "UPneumo" and LPnuemo"
     # while the NCCA pReview application seems to use "Upneumo" and "Lpneumo"
     # fixSensorNameFn(x="D&+", oldSensorName = "Upneumo", newSensorName = "UPneumo")
@@ -2169,7 +2172,7 @@ if(loadRDA2==TRUE) {
 
 
 
- ######## save / load .RData ######## 
+######## save / load .RData ######## 
 
 
 

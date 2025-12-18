@@ -185,8 +185,8 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   # testFormat <- str_sub(seriesTotalFiles, 9, -24)
   
   # initialize a data frame to aggregate the series totals
-  RQNames <- c("R1", "R2", "R3", "R4")
-  # RQNames <- c("R5", "R7", "R10", "none")
+  # RQNames <- c("R1", "R2", "R3", "R4")
+  RQNames <- c("R5", "R7", "R10", "none")
   # RQNames <- c("R5", "R7", "R10")
   # RQNames <- c("R5", "R8", "R11", "NA")
   # RQNames <- c("R1", "R2", "none", "none")
@@ -197,7 +197,7 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   
   
   DRule <- "TSR"
-  DRule <- "SSR"
+  # DRule <- "SSR"
   
   ESSMDecisionRule <- ifelse(DRule=="TSR", "TSR", "SSR")
   # ESSMDecisionRule <- "SSR"
