@@ -489,6 +489,7 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             
             
             
+            
             # {
             # 
             #   ts <- c(1:nrow(chartDF))
@@ -528,32 +529,32 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             # }
             
             
-            
-            # then compute a slower moving average for cardio feature extraction
-            # was 1.5 sec and times=2 3/17/2017
-            # was 1.2 sec and times=3 6/9/2020
-            # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_Cardio1, y=round(1.5*cps,0), times=1)
-            # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(1*cps,0), times=1)
-            # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.5*cps,0), times=1)
+  
             
             # May 19, 2024 - improve the correlation coef
-            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_Cardio1, y=round(1*cps,0), times=1)
-            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.5*cps,0), times=1)
-            chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.25*cps,0), times=1)
+            # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_Cardio1, y=round(1*cps,0), times=1)
+            # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.5*cps,0), times=1)
+            # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_CardioMA, y=round(.25*cps,0), times=1)
             
             
-            # 
+            # October 21, 2025 use a boxcar convolution filter instead of the smoothing
+            # this method produces the same ouput as the moving average cascade from May 2025
+            # chartDF$c_CardioMA <- boxcarSmoothFn(x=chartDF$c_Cardio1, cps=30, mult=c(1,0.5,0.25))
+            
+            
+            
+           # Stern, Ray & Quigley (2001) method of reducing the cardio to a square wave
             chartDF$c_CardioSRQ1 <- SRQ2001_cardioSquareWaveFn(x=chartDF$c_Cardio1, segLen=15)
             chartDF$c_CardioSRQ2 <- cardioSRQFn(x=chartDF$c_Cardio1, segLen=30)
             
-            
-            # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_Cardio1, y=round(1.5*cps,0), times=2)
-            
+        
             # compute the cardio rate to get the buffer to get the peaks
             cardioRate <- ratePerMin(chartDF$c_Cardio1,
                                      buffer=9,
                                      peaks="upper",
                                      lowPass=TRUE)
+            
+            # compute the buffer length for systolic and diastolic peak extraction
             bufferLen <- bufferLenFn(x=cardioRate, y=.6)
             
             # locate the systolic peaks
@@ -570,15 +571,45 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               interpolatePeaks(x=diastPeaks,
                                y=chartDF$c_Cardio1[diastPeaks])[1:nrow(chartDF)]
             
+            
+            
+            assign("chartDF", chartDF, envir=.GlobalEnv)
+            
+            
+            
+            # stop()
+            
+            
+            
+            # # November 19, 2025, 
+            # # use a weighted average to compute the MAP line from the stystolic and diastolic line
+            # chartDF$c_CardioMA <-
+            #   cardioMAPLineFn(syst=chartDF$c_CardioSystolic, diast=chartDF$c_CardioDiastolic)
+            
+            
+            
+            # # November 21, 2025
+            # use the systolic and diastolic peaks to compute the MAP
+            chartDF$c_CardioMA <- cardioMAPLine2Fn(x=chartDF$c_Cardio1)
+            
+            
+            # plot.ts(chartDF$c_CardioMA)
+            
+            
             # add the systolic and diastolic peaks to the data from
             # to use for peak to peak information processing
             chartDF$CardioPeak[systPeaks] <- "systolic"
             chartDF$CardioPeak[diastPeaks] <- "diastolic"
             
+            
+            
+            
             # compute the beat to beat intervals for the systPeaks
             chartDF$c_cardioRateSystolic <- 
               interpolatePeaks(x=systPeaks, 
                                y=(60 / (diff(systPeaks) / 30)))[1:nrow(chartDF)]
+            
+            
             
             ### electronic cardio cuff ###
             
