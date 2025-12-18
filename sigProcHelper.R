@@ -52,6 +52,10 @@
 # SRQ2001_cardioSquareWaveFn() cardio square wave function
 # 
 # cardioSRQFn() cardio reduction using the method of Stern, Ray & Quigley (2001)
+#
+# cardioMAPLineFn() compute the cardio mid-line (mean arterial pressure) Stoelting method
+#
+# cardioMAPLine2Fn() another method to compute the MAP mid-line 
 
 
 ###############################################
@@ -1137,7 +1141,122 @@ cardioSRQFn <- function(x=chartDF$c_Cardio1, segLen=15) {
 cardioMAPLineFn <- function(syst=chartDF$c_CardioSystolic, diast=chartDF$c_CardioDiastolic) {
   # R function to approximate the Stoelting method of computing the carido mid line
   # November 17, 2025
-  weighted.mean(x=c(syst, diast), w=c(1, 2))
+  DAT <- rep(NA, times=length(syst))
+  for(i in 1:length(DAT)) {
+    DAT[i] <- weighted.mean(x=c(syst[i], diast[i]), w=c(1, 2))
+  }
+  return(DAT)
+}
+
+
+
+cardioMAPLineFn <- function(syst=chartDF$c_CardioSystolic, diast=chartDF$c_CardioDiastolic) {
+  # R function to approximate the Stoelting method of computing the carido mid line
+  # November 17, 2025
+  DAT <- rep(NA, times=length(syst))
+  for(i in 1:length(DAT)) {
+    DAT[i] <- weighted.mean(x=c(syst[i], diast[i]), w=c(1, 2))
+  }
+  return(DAT)
+}
+
+
+
+cardioMAPLine2Fn <- function(x=chartDF$c_Cardio1) {
+  # another R function to approximate the Stoelting method of computing the cardio mid line
+  # November 20, 2025
+  ###
+  outDAT <- rep(NA, times=length(x))
+  
+  # get the systolic peak indices and systolic peak values
+  
+  systX <- maxPeak(x)
+  diastX <- minPeak(x)
+
+  # head(systX)
+  # head(diastX)
+  # 
+  # tail(systX)
+  # tail(diastX)
+  # 
+  # length(systX)
+  # length(diastX)
+  
+  # check the 2nd systolic peak to determine 
+  if(systX[2] > diastX[2]) {
+    diastX <- diastX[-2]
+    # systX <- systX[-2]
+  } 
+  
+  # check the length of the systolic and diastolic peaks
+  if(length(systX) > length(diastX)) {
+    lDiff <- length(systX) - length(diastX)
+    diastX <- c(diastX[1:(length(diastX)-1)], rep(diastX[(length(diastX)-1)], times=lDiff), diastX[length(diastX)])
+  } else if(length(diastX) > length(systX)) {
+    lDiff <- length(diastX) - length(systX)
+    systX <- c(systX[1:(length(systX)-1)], rep(systX[(length(systX)-1)], times=lDiff), systX[length(systX)])
+  }
+    
+  # stop if the number of systolic and diastolic peaks is unequal
+  # if(length(systX) != length(diastX)) {
+  #   stop("unequal peak lengths")
+  # }
+    
+  # get the data values for the peaks
+  systY <- x[systX]
+  diastY <- x[diastX]
+  
+  
+  
+  # compute the MAP
+  DAT <- rep(NA, times=length(systX))
+  for(i in 1:length(DAT)) {
+    DAT[i] <- weighted.mean(x=c(systY[i], diastY[i]), w=c(1, 2))
+  }
+  
+  
+  
+  startIdx <- 1
+  
+  
+  
+  i=2
+  for(i in 2:length(systX)) {
+    outDAT[c(startIdx:systX[i])] <- DAT[i]
+    startIdx <- systX[i] + 1
+  }
+  
+  
+  # head(outDAT, 100)
+  # tail(outDAT, 100)
+
+  
+  # # initialize the first part of the vector
+  # outDAT[c(1:(systX[2]-1))] <- DAT[1]
+  # # startIdx <-systX + 1
+  
+  
+  
+  # # compute the cardio mid line 
+  # i=2
+  # for(i in 2:length(diastX)) {
+  #   # if(i == 1) startIdx <- systX + 1
+  #   # startIdx <- systX[i] 
+  #   # if(startIdx > length(diastX)) break()
+  #   # outDAT[c(startIdx:diastX[i])] <- DAT[i]
+  #   startIdx <- systX[i]
+  #   endIdx <- ifelse(i < length(diastX),
+  #                    systX[(i+1)] - 1,
+  #                    length(diastX) )
+  #   # endIdx <- systX[(i)] - 1
+  #   if(endIdx > systX[length(systX)]) endIdx <- systX[length(systX)]
+  #   # outDAT[c(systX[i]:diastX[i])] <- DAT[i]
+  #   outDAT[c(startIdx:endIdx)] <- DAT[i]
+  #   # startIdx <- systX[i] + 1
+  # }
+  
+  return(outDAT)
+  
 }
 
 
