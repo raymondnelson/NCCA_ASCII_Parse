@@ -214,8 +214,15 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
         {
           
           firstLastEvents <- getFirstLastEventFn(x=chartDF)
-          firstEvent <- firstLastEvents[1] - 150
-          lastEventEnd <- firstLastEvents[2] + 300
+          
+          # firstEvent <- firstLastEvents[1] - 150
+          # lastEventEnd <- firstLastEvents[2] + 300
+          
+          # Jan 16, 2026
+          # this works better for Federal examiners 
+          # who release the cuff pressure immediately after tapping the XX
+          firstEvent <- firstLastEvents[1]
+          lastEventEnd <- firstLastEvents[2]
           
           # Nov, 30, 2024
           if(firstEvent < 1) firstEvent <- 1
@@ -539,7 +546,7 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             
             # October 21, 2025 use a boxcar convolution filter instead of the smoothing
             # this method produces the same ouput as the moving average cascade from May 2025
-            # chartDF$c_CardioMA <- boxcarSmoothFn(x=chartDF$c_Cardio1, cps=30, mult=c(1,0.5,0.25))
+            chartDF$c_CardioMA <- boxcarSmoothFn(x=chartDF$c_Cardio1, cps=30, mult=c(1,0.5,0.25))
             
             
             
@@ -590,7 +597,7 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             
             # # November 21, 2025
             # use the systolic and diastolic peaks to compute the MAP
-            chartDF$c_CardioMA <- cardioMAPLine2Fn(x=chartDF$c_Cardio1)
+            # chartDF$c_CardioMA <- cardioMAPLine2Fn(x=chartDF$c_Cardio1)
             
             
             # plot.ts(chartDF$c_CardioMA)
