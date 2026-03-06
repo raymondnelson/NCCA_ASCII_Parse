@@ -96,7 +96,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # EDAFilt="laf" # Lafaytte(.2/.03)
   # EDAFilt="laf0" # Lafaytte(.5/.01)
   # EDAFilt="test" # Lafayette (.0159/.443)
-  # EDAFilt="laf18" # Lafayette (.0159/.443)
+  EDAFilt="laf18" # Lafayette (.0159/.443)
   # EDAFilt="test" # Lafayette (.1/.5)
   # EDAFilt="Det2" # Lafayette Detrended-2 filter (2012)
   # EDAFilt="lafX" # Lafayette (.05/.05)
@@ -271,30 +271,36 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # artifactSeg <- 15
   
   {
-    # 
-    processArtifacts <- FALSE
+    # this is used in the workFlow.R script and also during feature extraction for EDA and Cardio
     processArtifacts <- TRUE
+    # processArtifacts <- FALSE
     
     # used by the feature extraction functions 
-    artifactPneumo <- FALSE
     artifactPneumo <- TRUE
+    artifactPneumo <- FALSE
     
     artifactCardio <- TRUE
+    artifactCardio <- FALSE
     
     artifactEDA <- TRUE
-    
-    artifactPLE <- FALSE
+    artifactEDA <- FALSE
     
     artifactActivity <- TRUE
+    # artifactActivity <- FALSE
+    
+    artifactPLE <- TRUE
+    artifactPLE <- FALSE
     
     artifactFC <- FALSE
     
-    # these parameters are used by the artifactProc function 
+    # these parameters (below) are used by the artifactProc function 
     # in the artifactProc.R script
+    
     pneumoArtifacts <- FALSE
+    
     cardioArtifacts <- FALSE
    
-    edaArtifacts <- TRUE
+    edaArtifacts <- FALSE
     
     pleArtifacts <- FALSE
     
@@ -361,12 +367,14 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # these are actually pre-response seconds not pre-stim
   EDAPrestim <- 4
   # was 2
+  # was 4 2026Feb28
   
   # Dec 8, 2023
   # number of prestim seconds for Cardio artifact extraction
   # these are actually pre-response seconds not pre-stim
   cardioPrestim <- 4
   # was 2
+  # was 4 2026Feb28
   
   # Dec 8, 2023
   # number of prestim seconds for Pneumo artifact extraction
@@ -393,6 +401,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   
   # second EDA sensor
   extractEDA2 <- TRUE
+  extractEDA2 <- FALSE
   
   
   
@@ -558,7 +567,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # 0 = no inflection detection
   # 1 = select the value at 2.5 seconds
   # 2 =  statistical method
-  inflection <- 2
+  inflection <- 0
   
   # slopechangeRule is a switch to control the use of a response onset location
   # as a function of a significant change (increase) in positive slope
