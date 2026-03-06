@@ -13,6 +13,9 @@
   
   # 2025Oct12 working with the AFMGQT n=22 sample (multi-issue)
   
+  # 2026Jan26 work with the MGQT A series from Dollins, Senter & Polina 2001
+  
+  # 2026Feb10 work with the FZCT N60 OSS holdout sample
   
 }
 
@@ -55,6 +58,7 @@
   # this path is prepended to the file path before sourcing a script
   # mac
   if(!exists("RPath")) {
+    # mac
     RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
     # windows
     # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
@@ -186,7 +190,8 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   
   # initialize a data frame to aggregate the series totals
   # RQNames <- c("R1", "R2", "R3", "R4")
-  RQNames <- c("R5", "R7", "R10", "none")
+  RQNames <- c("R5", "R7", "R10", "none") # use this for column alignment during aggregation
+  # RQNames <- c("R4", "R6", "R8", "none")
   # RQNames <- c("R5", "R7", "R10")
   # RQNames <- c("R5", "R8", "R11", "NA")
   # RQNames <- c("R1", "R2", "none", "none")
@@ -542,7 +547,8 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
   
   # examNames <- str_sub(seriesTotalFiles, 2, -25)
   
-  
+  # FZCT N60 2026Jan
+  examNames <- str_sub(analysisLists, 2, -10)
   
 }
 
@@ -730,6 +736,9 @@ if(isTRUE(summarizeResults)) {
     # thisExamName <- str_sub(scoreSheetFiles[i], 2, -23)
     # thisExamName <- str_sub(seriesTotalFiles[i], 2, 8)
     
+    # for Dollins et al 2001 
+    # thisExamName <- str_sub(thisExamName, 2, 6)
+    
     # for Ohio, but not for simulation
     # thisExamName <- str_sub(thisExamName, 1, -2)
     
@@ -895,6 +904,9 @@ if(isTRUE(summarizeResults)) {
     # thisExamName <- str_sub(scoreSheetFiles[i], 2, -23)
     # thisExamName <- str_sub(seriesTotalFiles[i], 2, 8)
     
+    # for Dollins et al 2001 
+    # thisExamName <- str_sub(thisExamName, 2, 6)
+    
     # ohio cases have the criterion state coded at the end of the exam name
     # thisExamName <- str_sub(thisExamName, 1, -2)
     
@@ -1005,6 +1017,11 @@ if(isTRUE(summarizeSensorInfo)) {
   
   # initialize a vector of file names
   sensorTotalsFiles <- list.files(pattern="ESSMSensorTotals.csv")
+
+  examNames <- str_sub(sensorTotalsFiles, 1, -24)
+  
+  # FZCT N60 2026Jan
+  # examNames <- str_sub(sensorTotalsFiles, 2, -24)
   
   # get the criterion state for all exams
   # criterionStateDF <- read.csv(list.files(pattern="criterionState.csv"), 
@@ -1060,6 +1077,9 @@ if(isTRUE(summarizeSensorInfo)) {
     thisExamName <- examNames[i]
     # thisExamName <- str_sub(sensorTotalsFiles[i], 2, -25)
     # thisExamName <- str_sub(sensorTotalsFiles[i], 2, 8)
+    
+    # for Dollins et al 2001 
+    # thisExamName <- str_sub(thisExamName, 2, 6)
     
     # ohio
     # thisExamName <- str_sub(thisExamName, 1, -2)
@@ -1181,6 +1201,10 @@ if(isTRUE(summarizeOSS3)) {
   
   # analysisLists <- ls(pattern =".ANALYSIS$")
   
+  examNames <- str_sub(analysisLists, 1, -10)
+  # FZCT N60 2026Jan
+  # examNames <- str_sub(analysisLists, 2, -10)
+  
   # exclude cases that consist only of the ACQT
   # analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
   
@@ -1233,10 +1257,18 @@ if(isTRUE(summarizeOSS3)) {
       #length will be equal to the number of series
       thisAnalysis <-  get(analysisLists[i], pos=1)
       # View(thisAnalysis)
+
+      examName <- str_sub(analysisLists[i], 1, -10)
       
-      examName <- examNames[i]
+      # FZCT N60
+      # examName <- str_sub(analysisLists[i], 2, -10)
+      
+      # examName <- examNames[i]
       # examName <- str_sub(analysisLists[i], 2, -11)
       # examName <- str_sub(analysisLists[i], 2, 8)
+      
+      # for Dollins et al 2001 
+      # examName <- str_sub(examName, 2, 6)
       
       # ohio
       # examName <- str_sub(examName, 1, -2)
@@ -1356,10 +1388,18 @@ if(isTRUE(summarizeOSS3Sensors)) {
 
   fileNames <- list.files(pattern="OSS3SensorMeans")
   
+  examNames <- str_sub(fileNames, 1, -23)
+  
+  # FZCT N60
+  # examNames <- str_sub(fileNames, 2, -23)
+  
   # examNames <- str_sub(fileNames, 2, -24)
   
   # examNames <- str_sub(fileNames, 2, 8)
   # examNames <- str_sub(examNames, 1, 3)
+  
+  # for Dollins et al 2001
+  # examNames <- str_sub(fileNames, 2, 6)
 
   # Initialize an object
   OSS3SensorMeansDF <- NA
@@ -1504,6 +1544,10 @@ if(isTRUE(summarizePA)) {
       # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
+      
+      # for Dollins et al 2001
+      # examName <- examNames[i]
+      # examName <- str_sub(examName, 2, 6)
       
     }
     
@@ -2250,7 +2294,7 @@ if(isTRUE(summarizeBootstrap)) {
 
 
 summarizeLXCAT <- TRUE
-# summarizePCAT <- FALSE
+summarizePCAT <- FALSE
 
 
 if(isTRUE(summarizeLXCAT)) {
@@ -3669,6 +3713,7 @@ if(aggregateOutputSummaries) {
   
   # View(criterionStateDF)
   
+  # slice exams from the criterion state data frame if they match examNames
   theseCaseRows <- which(criterionStateDF$examName %in% examNames)
   
   # criterionStateDF needs to be sorted in alphabetic order
@@ -3676,10 +3721,16 @@ if(aggregateOutputSummaries) {
   criterionStateDF2 <- criterionStateDF[order(criterionStateDF$examName),]
   # View(criterionStateDF2)
   
-  aggSummaryDF <- cbind(criterionStateDF$examName[theseCaseRows], 
-                        criterionStateDF2$criterionState[theseCaseRows] )
+  aggSummaryDF <- cbind(examNames = criterionStateDF$examName[theseCaseRows], 
+                        criterionState = criterionStateDF2$criterionState[theseCaseRows] )
+  
+  # colnames(aggSummaryDF) <- c("examName", "criterionState")
+  # View(aggSummaryDF)
+  
+  colnames(ESSMSummaryDF)
                         
   aggSummaryDF <- cbind(aggSummaryDF, ESSMSummaryDF[,c(13,14,8,11)])
+  
   
   aggSummaryDF <- cbind(aggSummaryDF, ESSMPSummaryDF[,c(13,14,8,11)])
   
@@ -3947,6 +3998,7 @@ ipsativeZSummaryDF$examName[ipsativeZSummaryDF$correctCode %in% c(4)]
 #      FZCT  2AFMGQT3rq  FZCT    FZCT
 
 ipsativeZSummaryDF$examName[ipsativeZSummaryDF$correctCode %in% c(6)]
+
 # [1] "7FSAGH" "XDSP42"
 
 
