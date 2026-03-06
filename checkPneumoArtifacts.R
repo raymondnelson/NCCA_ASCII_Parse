@@ -461,12 +461,14 @@ respDBFn2 <- function(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3,
     # to reduce hypersensitivity a min iqr value 
     # can be obtained from the scalVals in the NCCAASCII_init.R scripe
     minIQR <- scaleVals['uPneumo'] * .15
-    if(iqr <= minIQR) iqr <- minIQR
+    # commented out 2026Mar01
+    # if(iqr <= minIQR) iqr <- minIQR
     # sensitivity to DBs decreases when the data are unstable
     # this is because the IQR becomes larger with more variation
     # to reduce hyposensitivyt the iqr can be replace with a max value
     maxIQR <- scaleVals['uPneumo'] * .67
-    if(iqr >= maxIQR) iqr <- maxIQR
+    # commented out 2026Mar01
+    # if(iqr >= maxIQR) iqr <- maxIQR
   }
   
   ### call a function to get the inhalation peaks peaks
