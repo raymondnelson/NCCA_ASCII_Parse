@@ -3,7 +3,7 @@
 
 
 
-maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
+maxSlopeChangeFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
   # new function to determine the max sig value 
   # in a series of significant changes in positive slope
   # supercedes the slopeChangeFn 
@@ -21,6 +21,7 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
   # including 10 prestimulus seconds 
   # a 15 second stimulus segment
   # and 10 additional seconds after the evaluation window
+  # idx is a boolean value to control the output as a vector of sample indices
   #### these parameters are set in the global environment by the init script
   # nPre is the number of pre change seconds
   # nPost is the number of post change seconds
@@ -86,6 +87,7 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
     
     # calculate all preDiff means 
     # calculate all preDiff standard deviations
+    i=preLen
     for (i in preLen:length(xDiff)) {
       # xDiff is a vector of population standard deviations
       preDiffMean[i] <- mean(xDiff[(i-preLen+1):i], na.rm=TRUE)
@@ -98,8 +100,11 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
     preDiffSD[which(preDiffSD < .01)] <- .01
     
     # calculate all postDiff means
-    for (i in (preLen+postLen):length(xDiff)) {
-      postDiffMean[i] <- mean(xDiff[(i-postLen+1):i], na.rm=TRUE)
+    # for (i in (preLen+postLen):length(xDiff)) {
+    # 2026Mar03
+    for (i in preLen:length(xDiff)) {
+      # postDiffMean[i] <- mean(xDiff[(i-postLen+1):i], na.rm=TRUE)
+      postDiffMean[i] <- mean(xDiff[i:(i+postLen-1)], na.rm=TRUE)
     } 
   }
   
@@ -110,17 +115,25 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
     
     # for (i in (preLen+1):(length(xDiff)-postLen+1)) {
     # iterate starting at the end of the postDiff window
-    for (i in (preLen+postLen):length(xDiff)) {
+    # for (i in (preLen+postLen):length(xDiff)) {
+    # 2026Mar03
+    i=preLen
+    for (i in preLen:length(xDiff)) {
       # increment the loop if preDiffSD[(i-1)] == 0
       # to avoid NaN result when divide by zero
       # when the SD is zero because the data are flat
       if(preDiffSD[(i)] == 0) next()
       # calculate the zScore for each postDiff mean,
       # using the mean and SD from the preDiff window
-      thisVal <- (postDiffMean[i] - preDiffMean[(i-postLen)]) / preDiffSD[(i-postLen)]
+      # thisVal <- (postDiffMean[i] - preDiffMean[(i-postLen)]) / preDiffSD[(i-postLen)]
+      # 2026Mar03
+      thisVal <- (postDiffMean[i] - preDiffMean[i]) / preDiffSD[i]
       if(is.infinite(thisVal)) next()
       # put the zScore at the beginning of the postLen segment
-      zScore[(i-postLen)] <- thisVal
+      # zScore[(i-postLen)] <- thisVal
+      # 2026Mar03
+      # zScore[round(i-preLen/2)] <- thisVal
+      zScore[round(i-preLen/2)] <- thisVal
       # this will put the zScore at the beginning of the preLen segment
       # zScore[i-(preLen+postLen)] <- thisVal
     }
@@ -135,7 +148,8 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
     
     # which(zScore != 0)
     
-    zScore[1:tonicLen] <- 0
+    # 2026Mar03 commented out because it is not doing anything 
+    # zScore[1:tonicLen] <- 0
     # tonicLen is initialized in the NCCAASCII_init.R script
     # is is the period of time where a + slope is required
     # prior to a response onset imputed as a change in inflection
@@ -171,8 +185,10 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
         
         # 2025Nov12 modified so that the slope must be 0 or +
         # if( sum(preSlope) >= round(tonicLen - (tonicLen * .1)) ) {
-        if( sum(preSlope >= 0) >= round(tonicLen - (tonicLen * .1)) ) {
-          # these will be unequal of the slope is not 0 or + for 90% of the tonicLen
+        # if( sum(preSlope >= 0) >= round(tonicLen - (tonicLen * .1)) ) {
+        # 2026Mar03 fixed this, it needs to be less than or equal to 0% of the tonicLen
+        if( sum(preSlope >= 0) <= round(tonicLen - (tonicLen * .1)) ) {
+          # these will be unequal -f the slope is not 0 or + for 90% of the tonicLen
           # set the zScore to 0 if not + slope for 90% of the tonicSec period
           zScore[i] <- 0
         }
@@ -193,7 +209,9 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
   #### remove zScore indices during a latency period ####
   
   {
-    zScore[1:(301+(sChangeLat*cps)-1)] <- 0
+    # latRow is scoped lexically, from the environment (getResponseOnsetsFn) where this function is called
+    # 2026Mar03
+    zScore[1:(latRow+(sChangeLat*cps)-1)] <- 0
     
     # zIdx <- which(zScore != 0)
   }
@@ -210,9 +228,10 @@ maxSlopeChangeFn <- function(x=tsData, idx=TRUE) {
     # to locate the max zScore in each run of non-zero values
     # and remove zScores for which the data are not,
     # ascending throughout the preDiff
-    i=507
+    i=1
     for (i in 1:length(zScore)) {
       # increment the loop if the current value is zero
+      if(is.na(zScore[i])) next()
       if(zScore[i] == 0) next()
       # set the z holding variable to the non-zero i index
       z <- i
