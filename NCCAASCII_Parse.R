@@ -54,6 +54,7 @@
 
 # print("source the NCCAASCIIParseHelperFunctions.R script")
 # source(paste0(RPath, 'NCCAASCIIParseHelperFunctions.R'), echo=FALSE)
+# source(paste0(RPath, 'NCCAASCII_dataParse.R'), echo=FALSE)
 
 
 
@@ -244,6 +245,8 @@ parseUniqueExams <- function(uniqueExamNames=uniqueExamNames,
       assign("dataNames", dataNames, envir=.GlobalEnv)
       assign("thisExamName", thisExamName, envir=.GlobalEnv)
       # stop()
+      
+      # source(paste0(RPath, 'NCCAASCII_dataParse.R'), echo=FALSE)
       
       # call the dataParse function from the NCCAASCII_dataParse.R script
       outName <- dataParse(x=dataNames, 
