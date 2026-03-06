@@ -27,6 +27,9 @@ getResponseOnsetsFn <- function(tsData,
   # abstracted from the amplituceExtractPCFn() in the amplitudeExtractPC.R script
   #
   ####
+  # tsData is the time series vector for EDA or cardio data
+  # xPeak is a vector of response peaks from the getResponsePeaksFn() in the getResponsePeaks.R script
+  # 
   
   options(warn = 2)
   
@@ -67,6 +70,7 @@ getResponseOnsetsFn <- function(tsData,
   #### extract a response onset via change in positive slope inflection ####
   
   # inflection=2 # statistical method
+  # inflection=1 # will pick the value at 2.5 seconds for all segments
   
   # inflection is set in the NCCAASCII_init.R script
   
@@ -126,20 +130,23 @@ getResponseOnsetsFn <- function(tsData,
     
     if(slopeChangeRule == 1) {
       
-      # always use the slopeChangeRule
+      # slopeChangeRule=1 will always use the slopeChangeRule
       
-      if(any(!is.na(xPeak))) {
+      if( any(!is.na(xPeak)) ) {
         # if there are any valid xPeak indices
         # source the maxSlopeChange script
         # source("~/Dropbox/R/NCCA_ASCII_Parse/slopeChange.R", echo=FALSE)
         # call the maxSlopeChangeFn()
-        theseIdcs <- maxSlopeChangeFn(x=tsData, idx=TRUE)
+        # 2026Mar04 had to add the latRow paramter to the maxSlopeChangeFn()
+        theseIdcs <- maxSlopeChangeFn(x=tsData, latRow=latRow, idx=TRUE)
         # keep only those that are after the latency row
-        theseIdcs <- theseIdcs[theseIdcs >= latRow]
+        # 2026Mar02 # fixed this
+        theseIdcs <- theseIdcs[theseIdcs >= (latRow + (sChangeLat*cps) - 1)]
         # Aug 4, 2022
         # keep only those that are after sChangeLat
         # Aug 11, 2023 onsetRow was previously hardcoded to 301
-        theseIdcs <- theseIdcs[theseIdcs >= (onsetRow + (sChangeLat*cps) - 1)]
+        # commented out 2026Mar02
+        # theseIdcs <- theseIdcs[theseIdcs >= (onsetRow + (sChangeLat*cps) - 1)]
         # Aug 4, 2022
         # put the slope change at the end of the pre and post segs
         # theseIdcs <- theseIdcs + (nPre*cps + nPost*cps)
