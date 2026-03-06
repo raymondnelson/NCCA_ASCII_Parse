@@ -36,7 +36,7 @@ print("init parameters for the NCCA ASCII work flow")
   library(readr)
   
   # init parameters for processing and analyzing NCCA ASCII data
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   
   # list of events to exclude from analysis
   source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
@@ -329,6 +329,8 @@ print("init parameters for the NCCA ASCII work flow")
 
 {
   
+  # many of these are initialized in the NCCASCII_init.R script
+  
   {
     # default configuration
     removeAnnotations <- FALSE
@@ -374,27 +376,27 @@ print("init parameters for the NCCA ASCII work flow")
   }
   
   {
-    # # reconfig B for LAFAYETTE RESEARCH CASES
-    # # including cases imported to Lafayette from other instruments 
-    # 
-    # removeAnnotations <- FALSE
-    # trimExcessTime <- TRUE
-    # stopXXX <- TRUE
-    # 
-    # fixDuplicateTags <- TRUE
-    # fixDLSTLabels <- FALSE
-    # 
-    # fixNonASCIICharacters <- FALSE
-    
-    # fixFileNames <- TRUE
-    # fixFileNames <- FALSE
-    # fixSensorNames <- FALSE
-    # fixStrings <- FALSE
-    # 
-    # EDAFilt="laf18"
+    # reconfig B for LAFAYETTE RESEARCH CASES
+    # including cases imported to Lafayette from other instruments
+
+    removeAnnotations <- FALSE
+    trimExcessTime <- FALSE
+    stopXXX <- FALSE
+
+    fixDuplicateTags <- TRUE
+    fixDLSTLabels <- FALSE
+
+    fixNonASCIICharacters <- FALSE
+
+    fixFileNames <- FALSE
+    fixFileNames <- FALSE
+    fixSensorNames <- FALSE
+    fixStrings <- FALSE
+
+    EDAFilt="laf18"
     # EDAFilt="none"
-    # 
-    # # DRule <- "TSR"
+
+    DRule <- "TSR"
     # DRule <- "SSR"
   }
   
