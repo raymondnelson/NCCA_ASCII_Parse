@@ -315,15 +315,15 @@ featureExtraction <- function(x=uniqueExams,
           chartDF$CardioExtract_v <- "" # very slow
           
           # Aug 31, 2023
-          # chartDF$AutoEDA_a <- 0
-          # chartDF$Artifacts_a <- 0
-          # chartDF$UPneumo_a <- 0
-          # chartDF$LPneumo_a <- 0
-          # chartDF$Pneumo_a <- 0
-          # chartDF$Cardio1_a <- 0
-          # if(sum(pmatch(names(chartDF), "c_PPG1", nomatch=0))!=0) {
-          #   chartDF$PPG1_a <- 0
-          # }
+          chartDF$AutoEDA_a <- 0
+          chartDF$Artifacts_a <- 0
+          chartDF$UPneumo_a <- 0
+          chartDF$LPneumo_a <- 0
+          chartDF$Pneumo_a <- 0
+          chartDF$Cardio1_a <- 0
+          if(sum(pmatch(names(chartDF), "c_PPG1", nomatch=0))!=0) {
+            chartDF$PPG1_a <- 0
+          }
           
           # Aug 29, 2023
           chartDF$UPneumoExtract <- ""
@@ -461,7 +461,7 @@ featureExtraction <- function(x=uniqueExams,
         
         #######  loop over all the events in the chart data frame  #######
         
-        l=2
+        l=1
         for (l in 1:length(eventNames)) {
           
           {
@@ -565,18 +565,19 @@ featureExtraction <- function(x=uniqueExams,
             # print(answerRow)
             # print(stimEndRow)
 
-            # august 7, 2020
-            # increment the loop if examiner marked artifact or event during 5 prestim seconds
-            if(stimOnsetRow-150 < 1) {
-              fixSecPreRow <- 1 
-            } else {
-              fixSecPreRow <- stimOnsetRow-150
-            }
-            
-            if(length(which(segmentDF$Events[fixSecPreRow:(stimOnsetRow-1)] != "")) > 0) {
-              # increment without feature extraction if artifacts in the prestim segment
-              next()
-              # extract columns will hold the "" value
+            {
+              # august 7, 2020
+              # increment the loop if examiner marked artifact or other event during 5 prestim seconds
+              if(stimOnsetRow-150 < 1) {
+                fixSecPreRow <- 1 
+              } else {
+                fixSecPreRow <- stimOnsetRow-150
+              }
+              if( length(which(segmentDF$Events[fixSecPreRow:(stimOnsetRow-1)] != "")) > 0 ) {
+                # increment without feature extraction if artifacts in the prestim segment
+                next()
+                # extract columns will hold the "" value
+              }
             }
             
             # increment if the segment is too short
@@ -620,7 +621,7 @@ featureExtraction <- function(x=uniqueExams,
             }
           }
           
-          ############# pneumo RLE extraction #############
+          #############  pneumo RLE extraction #############
           
           # assign("extract.params", extract.params, pos=1)
           # assign("chartDF", chartDF, envir=.GlobalEnv)
@@ -871,7 +872,13 @@ featureExtraction <- function(x=uniqueExams,
   
 } # end featureExtraction() function
 
+
+
+
 # featureExtraction(x=uniqueExams)
+
+
+
 
 # Feb 6, 2022 to extract respiration patterns
 # featureExtraction(x=uniqueExams,
