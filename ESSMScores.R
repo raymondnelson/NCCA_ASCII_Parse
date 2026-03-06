@@ -978,17 +978,20 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     if(!exists("ESSMDecisionRule")) ESSMDecisionRule <- "TSR"
     
     ESSMTestResult <- switch(ESSMDecisionRule,
-                         "eTSR"=TSRResult$testResult,
-                         "SSR"=SSRResult$testResult,
-                         "GTR"=GTRResult$testResult,
-                         "FZR"=)
+                             "TSR"=TSRResult$testResult,
+                             "eTSR"=TSRResult$testResult,
+                             "SSR"=SSRResult$testResult,
+                             "GTR"=GTRResult$testResult,
+                             "FZR"=)
     
     ESSMQuestionResults <- switch(ESSMDecisionRule,
+                                  "TSR"=TSRResult$subtotalResults,
                                   "eTSR"=TSRResult$subtotalResults,
                                   "SSR"=SSRResult$subtotalResults,
                                   "GTR"=GTRResult$subtotalResults)
 
     resultUsing <- switch(ESSMDecisionRule,
+                          "TSR"=TSRResult$resultUsing,
                           "eTSR"=TSRResult$resultUsing,
                           "SSR"=SSRResult$resultUsing,
                           "GTR"=GTRResult$resultUsing)

@@ -564,6 +564,8 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       if(isTRUE(checkRQCQs)) {
         
+        # the checkRQCQs parameter is initialized in the global envir in the workFlow_init.R script
+        
         # check if equal number of RQs and CQs
         # set in the workFlow_init.R script
         
@@ -588,7 +590,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       {
         # scores are calculated for each series
         # some scoring methods work chart by chart
-        # some aggregate between charts before assigning scores
+        # some methods will aggregate between charts before assigning scores
       }
       
       ####    calculate the rank scores for the chart    ####
