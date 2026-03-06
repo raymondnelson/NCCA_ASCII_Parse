@@ -73,6 +73,8 @@ extractMeasurementsFn<- function(x=uniqueExams,
   if(!exists("showNames")) showNames <- TRUE
   if(!exists("output")) output <- FALSE
   
+  numberExams <- length(uniqueExams)
+  
   ###### iterate over each exam in the list ######
   
   i=1
@@ -97,7 +99,7 @@ extractMeasurementsFn<- function(x=uniqueExams,
       assign("examDF", examDF, pos=1)
       assign("examName", examName, pos=1)
 
-      if(showNames==TRUE) print(examName)
+      if(showNames==TRUE) print(paste(examName, "exam number", i, "of", numberExams))
       
       # initialize the output data frame
       outputDF <- NULL
