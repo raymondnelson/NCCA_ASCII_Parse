@@ -169,49 +169,52 @@ EDAMvtArtifactFn <- function(tsData=chartDF$c_AutoEDA, preSec=4, zCut=3) {
 
 
 
-EDAPrestimActivityFn <- function(tsData, prestimRows, newPrestimRow, asc=2, dsc=2) {
+EDAPrestimActivityFn <- function(tsData, prestimRows, asc=1, dsc=1) {
   # R function to identify EDA artifacts prior to stimulus onset
   # also used to identify EDA artifacts prior to response onset
   # abstracted from the main function Dec 5, 2023
   # Raymond Nelson
   ####
   # called by the checkEDATonicityFn()
-  # non-tonic activity might be in the form of NSPAs prior to stimulus onset
+  # non-tonic activity might be in the form of NSPAs prior to stimulus onset (or response onset)
   # tsData input is is the time series EDA data for the stimulus segment
-  # prestimRows is a vector of row indices for the prestimulus segment
-  # newPresetimRow
+  # prestimRows is a vector of row indices for the prestimulus segment (or pre-response segment)
   # asc input is the ascent ratio constraint
   # dsc input is the desceht ratio constraint
   # output is a vector of indices where significant movement was found
   ####
-  if(!exists("dsc")) dsc <- 2
-  if(!exists("asc")) asc <- 2
+  if(!exists("dsc")) dsc <- 1
+  if(!exists("asc")) asc <- 1
   ## initialize the output vector
   prestimVc <- rep(0, times=length(tsData))
   ## compute the prestim range
   {
-    prestimMaxIdx <- which.max(tsData[prestimRows]) + newPrestimRow - 1
-    prestimMinIdx <- which.min(tsData[prestimRows]) + newPrestimRow - 1
+    # 2026FEB28 cleaned this up to make more sense
+    prestimMaxIdx <- which.max(tsData[prestimRows]) + (prestimRows[1] - 1)
+    prestimMinIdx <- which.min(tsData[prestimRows]) + (prestimRows[1] - 1)
     prestimMaxVal <- tsData[prestimMaxIdx]
     prestimMinVal <- tsData[prestimMinIdx]
     # now get the absolute range
     prestimRange <- prestimMaxVal - prestimMinVal
-    # and adjust the prestim rows
+    # and adjust the prestim rows to the max-min segment
+    # used to mark the artifact 
     ifelse(prestimMaxIdx > prestimMinIdx, 
            prestimRows <- c(prestimMinIdx:prestimMaxIdx),
            prestimRows <- c(prestimMaxIdx:prestimMinIdx) )
   }
   ## calculate the ratio of prestimulus ascent and descent
   {
-    if(prestimMaxIdx > prestimMinIdx){
+    if(prestimMaxIdx > prestimMinIdx) {
       # max index is after the min index
       # ascending prestim to response onset
+      # ychangeValue is obtained from the parent environment
       prestimAscentRatio <- abs(prestimRange) / yChangeValue
       prestimDescentRatio <- 0
     } else {
       # max index is before the min index
       # descending prestim 
       prestimAscentRatio <- 0
+      # ychangeValue is obtained from the parent environment
       prestimDescentRatio <- abs(prestimRange) / yChangeValue
     }
   }
@@ -222,7 +225,7 @@ EDAPrestimActivityFn <- function(tsData, prestimRows, newPrestimRow, asc=2, dsc=
     # Sep 14, 2024
     if(abs(prestimRange) >= (1.5 * yChangeValue)) {
       # for both ascending and descending eda data
-      # mark an artifact when the prestimulus range is 3x the y-change EDA response
+      # mark an artifact when the prestimulus range is 1.5x the y-change EDA response
       prestimVc[prestimRows] <- "Artifact"
       # return(prestimVc)
       # return(0)
@@ -428,7 +431,8 @@ checkEDATonicityFn <- function(segmentName,
   #### evaluate the pre-stimulus activity for NSPA ####
   
   {
-    prestimVc <- EDAPrestimActivityFn(tsData, prestimRows, newPrestimRow, asc=4, dsc=2)
+    # was dsc=.75 2026Feb28
+    prestimVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=prestimRows, asc=4, dsc=3)
     # prestimVc is a vector of0s and "Artifact" marks at rows where sig activity was observed
     
     # submit the artifacts to the output vector
@@ -437,8 +441,8 @@ checkEDATonicityFn <- function(segmentName,
   #### next evaluate the pre-response activity for NSPA ####
   
   {
-    # was dsc=.75 2024Sep02
-    preresponseVc <- EDAPrestimActivityFn(tsData, preResponseRows, preResponseIdx, asc=3, dsc=.75)
+    # was dsc=.75 2026Feb28
+    preresponseVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=preResponseRows, asc=3, dsc=.75)
     # preresponseVc is a vector of 0s and "Artifact" marks at rows where sig activity was observed
     
     # submit the artifacts to the output vector
@@ -458,7 +462,7 @@ checkEDATonicityFn <- function(segmentName,
   #### and check the range and ratio of the preWOE and postWOE segments ####
   
   {
-    # call a function to calculate the ratio of activity in the pre-WOE and WOE 
+    # call a function to calculate the ratio of activity in the pre-WOE and WOE
     preWOEVc <- preWOERatioFn(tsData, preWOERows, preWOEOnset)
     # call the same function for the post-WOE segment
     postWOEVc <- preWOERatioFn(tsData, postWOERows, postWOEOnset)
