@@ -817,7 +817,7 @@ if(NCCAASCIIParse == TRUE) {
   
   source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
   
-  source("~/Dropbox/R/NCCA_ASCII_Parse/NCCAASCII_dataParse.R", echo = FALSE)
+  source(paste0(RPath, "NCCAASCII_dataParse.R"), echo = FALSE)
   
   # stop()
   
@@ -832,6 +832,46 @@ if(NCCAASCIIParse == TRUE) {
   print(uniqueExamNames)
 
 } 
+
+
+
+######## reset the _Data data frame ######## 
+
+
+
+resetDataColumns <- FALSE
+if(!exists("reset")) resetDataColumns <- FALSE
+# resetDataColumns <- TRUE
+
+
+
+if(resetDataColumns == TRUE) {
+  
+  # the _Data data frame is initialized by the parseUniqueExams function 
+
+  # this script will re-initialize the added columns
+  
+  print("reset columns in the _Data data frames")
+  
+  
+  
+  source(paste0(RPath, "NCCAASCII_dataParse.R"), echo = FALSE)
+  
+  source(paste0(RPath, 'addColumns.R'), echo=FALSE)
+  
+  
+  source(paste0(RPath, 'NCCAASCII_resetDataCols.R'), echo=FALSE)
+  
+  
+  
+  # call the function
+  reset_Data_Fn(x=uniqueExamNames, saveCSV=FALSE, makeDF=TRUE, output=FALSE)
+  
+  
+  
+  resetDataColumns <- FALSE
+  
+}
 
 
 
@@ -1295,6 +1335,17 @@ if(loadRDA1==TRUE) {
   
   rm(list=rmVector)
   
+  # this path is prepended to the file path before sourcing a script
+  if(!exists("RPath")) {
+    # mac
+    RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+    # windows
+    # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
+    
+    # use this
+    # source(paste0(RPath, <filePath>), echo=FALSE)
+  }
+  
   source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
   
   myRdaNames <- list.files(pattern="*_1.Rda$")
@@ -1554,7 +1605,8 @@ if(processArtifacts == TRUE) {
   
   # print("artifact extraction")
 
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  
   # source('~/Dropbox/NCCAASCII_init.R', echo=FALSE)
 
   # source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
