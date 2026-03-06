@@ -45,7 +45,7 @@
   # # define a function to calculate finger movement artifacts
   # source(paste0(RPath, 'TukeyFences.R'), echo=FALSE)
   
-  # Sep 2, 2023
+ # Sep 2, 2023
   source(paste0(RPath, "checkEDATonicity.R"), echo=FALSE)
   
   # source(paste0(RPath, "CardioArtifacts.R"), echo=FALSE)
@@ -326,6 +326,7 @@ artifactProcFn<- function(x=uniqueExams) {
         
         if(isTRUE(activityArtifacts)) {
         
+          # initialize this before the if statement
           inclActivity <- FALSE
           
           # check to see if activity sensor data are present in the examDF
