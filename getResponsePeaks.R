@@ -59,16 +59,18 @@ getResponsePeaksFn <- function(tsData,
     # there may be no peak indices if the data descend persistently
     if(length(xPeak) == 0) xPeak <- NA
     
-    # keep only those xPeak indices after latency
-    xPeak <- xPeak[which(xPeak >= (latRow + (addLat*cps)))]
+    
   }
   
   #### remove peaks prior to the latency row ####
   
   {
   
-    xPeak <- xPeak[xPeak > latRow]
-  
+    # 2026Mar02
+    # keep only those xPeak indices after latency
+    xPeak <- xPeak[which( xPeak >= (latRow + (addLat*cps)) )]
+    # addLat is sChangeLat when using the slope change rule
+    
   }
   
   ####  add the endRow as a peak ####
@@ -83,7 +85,7 @@ getResponsePeaksFn <- function(tsData,
     if(all(theSlope[endRow:length(theSlope)]==1)) {
       # if the time series data are all + slope from endRow to the end of the segment
       # add the end row for the segment
-      xPeak <- c(xPeak, length(theSlope))
+      xPeak <- sort(unique(c(xPeak, length(theSlope))))
     }
     
     # there will always be at least 1 xPeak at this point
@@ -118,11 +120,14 @@ getResponsePeaksFn <- function(tsData,
     xPeak <- xPeak[xPeak <= endRow]
     #  xPeakAdd (late peak) is added next 
     
+    # strictWOE <- EDAStrictROW
+    # EDAStrictROW is initialized in the init script
+    
     if(!isTRUE(strictWOE)) {
       # add one peak after the endRow  
       # contingent upon the strictWOE environment parameter
       # set in the NCCAASCII_init.R script
-      xPeak <- sort(c(xPeak, xPeakAdd))
+      xPeak <- sort(unique(c(xPeak, xPeakAdd)))
     }
   }
   
