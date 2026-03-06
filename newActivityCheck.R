@@ -5,7 +5,7 @@
 # 
 # activityRestrictionFn() # ceasation of activity due to breath holding
 # 
-# activityFn() # deep breath activity
+# activityDBFn() # deep breath activity that influences the activity sensor data
 # 
 # activityPatternFn() # significant changes in normal activity pattern
 #
@@ -18,20 +18,23 @@
 ####
 
 
+activityRestrictionFn <- function(DAT=chartDF$c_Move1Proc, w=3.75, y=(scaleVals['activity']/3), seg=10) {
 
-activityRestrictionFn <- function(DAT=chartDF$c_Move1Proc, w=3.75, y=(scaleVals['activity']/5), seg=15) {
   # R function to extract artifact from seat activity sensor data
-  # activity freeze artifacts occur when an examinee remains unusually still 
+  # activity restriction artifacts occur when an examinee remains unusually still 
   # such as when holding one's breath
   # April 8, 2025
   # Raymond Nelson
   ###
-  # DAT is the smooothed time series data for the seat activity sensor
+  # DAT is the smoothed time series data for the seat activity sensor
   # w is the width in seconds for a moving window 
   # a respiration rate of 16 (median) will have 3.75 sec cycles
   # y is the threshold value (y scale of the polygraph chart) where 20 is 1% of the range
-  # an artifact is marked if the abs sum y distance is less than y for each w segment
+  # the scaleVals vector is initialized in the NCCAASCII_init.R script,
+  # and has the value 50 for the activity data size (2.5% of the y-axis range)
+  # 50/5 = 10 or 0.5% of the y-axis range 
   # seg is the number of measurements to check for each 3.75 sec segment
+  # an artifact is marked if the abs sum y distance is less than y for each w segment
   # 
   # output is a vector with the sample indices where artifacts were observed
   ##
@@ -55,7 +58,7 @@ activityRestrictionFn <- function(DAT=chartDF$c_Move1Proc, w=3.75, y=(scaleVals[
 
 
 
-activityDBFn <- function(DAT=chartDF$c_Move1Proc, inF=1.5, outF=3, fences=NULL, side=NULL) {
+activityDBFn <- function(DAT=chartDF$c_Move1Proc, inF=1.5, outF=3, fences="both", side="both") {
   # R function to extract deep breaths from the seat activity sensor data
   # using a Tukey fence method
   # by extracting the inhalation peaks and comparing them to the median and the interquartile range
@@ -233,12 +236,16 @@ newActivityCheckFn <- function(chartDF=chartDF) {
     seriesName <- chartDF$seriesName[1]
     chartName <- chartDF$chartName[1]
     sensorName <- "activity"
+    
     # get the activity sensor column
     tsData <- chartDF$c_Move1Proc
+    
     # exit for short charts less than 20 seconds
     if(nrow(chartDF) < 600) { return(chartDF) }
+    
     # exit if the data are NA
     if(length(which(is.na(chartDF$c_Move1)))==nrow(chartDF)) return(chartDF)
+    
     # exit if the data are unresponsive
     if(max(chartDF$c_Move1) == min(chartDF$c_Move1)) return(chartDF)
   }
@@ -250,7 +257,7 @@ newActivityCheckFn <- function(chartDF=chartDF) {
   #### create a pre and post buffer for verbal answers #### 
   
   {
-    answerRows <- which(chartDF$Label %in% c("YES", "Yes", "No", "NO", "ANS", "Ans"))
+    answerRows <- which(chartDF$Label %in% c("YES", "Yes", "No", "NO", "yes", "no", "ANS", "Ans", "ans"))
     answerBuffOn <- answerRows - 1.5 * cps
     answerBuffOff <- answerRows + 1.5 * cps
     answerBuffer <- NULL
@@ -282,16 +289,16 @@ newActivityCheckFn <- function(chartDF=chartDF) {
     iqr <- abs(q75[1] - q25[1])
     ## fix the iqr for very stable or very unstable data
     {
-      # sensitivity to DBs may increass when the activity data are scaled to a small display value
-      # this occurs because the iqr becomes restricted as a result of little variation
+      # Sensitivity to DBs may increase when the activity data are scaled to a small display value.
+      # This occurs because the iqr becomes restricted as a result of little variation.
       # to reduce hypersensitivity a min iqr value
       # can be obtained from the scalVals in the NCCAASCII_init.R scripe
-      minIQR <- round(scaleVals['activity'] * .15)
+      minIQR <- round(scaleVals['activity'] * .20)
       if(iqr <= minIQR) iqr <- minIQR
-      # sensitivity to DBs may decrease when the data are unstable
+      # sensitivity to DBs and movement may decrease when the data are unstable
       # this is because the IQR becomes larger with more variation
       # to reduce hyposensitivity the iqr can be replace with a max value
-      maxIQR <- round(scaleVals['activity'] * .67)
+      maxIQR <- round(scaleVals['activity'] * .8)
       if(iqr >= maxIQR) iqr <- maxIQR
     }
   }
@@ -322,13 +329,10 @@ newActivityCheckFn <- function(chartDF=chartDF) {
     DBVc2 <- NULL
     DBVc3 <- NULL
     
+    #s inhalation peaks only
     # call a function to locate deep breaths that influence the activity sensor data
     # DBVc1 <- activityDBFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="both")
     
-    # remove artifacts associated with the verbal answer
-    # DBVc1 <- DBVc1[which(!(DBVc1 %in% answerBuffer))]
-    
-    #s inhalation peaks only
     DBVc2 <- activityDBFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="upper")
     
     # 2025Apr21 use the exhalation peaks to improve sensitivity to movement artifacts
@@ -336,6 +340,9 @@ newActivityCheckFn <- function(chartDF=chartDF) {
     
     # combine them
     DBVc <- sort(unique(c(DBVc1, DBVc2, DBVc3))) 
+    
+    # remove artifacts associated with the verbal answer
+    # DBVc1 <- DBVc1[which(!(DBVc1 %in% answerBuffer))]
     
     # DBVc <- NULL
   }
@@ -345,12 +352,7 @@ newActivityCheckFn <- function(chartDF=chartDF) {
   {
     ## cessation of normal movement activity during respiration apnea and other unusual behavior ##
     
-    # 2025Apr21
-    # use 1/2 the IQR as the min range for freeze/apnea artifacts
-    
-    # call a function to check for cesation of activity due to respiration apnea
-    # 2025Apr21 segments are computed to sample the moving window at .25 sec intervals
-    # 2025Apr21 w (moving window) approximates the width of the median respiration rate (16 cpm)
+     # 2025Apr21 w (moving window) approximates the width of the median respiration rate (16 cpm)
     APVc <- activityRestrictionFn(DAT=chartDF$c_Move1Proc, w=3.75, y=iqr/3, seg=10)
     
     # scaleVals['activity'] / 5
