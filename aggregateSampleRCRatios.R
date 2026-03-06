@@ -4,6 +4,19 @@
 ####
 
 
+# used to create 2 skiny data frames
+# one for RC Ratios
+# and another for ESS Scores
+
+
+# this script does not contain a function,
+# but is instead sourced in the global environment
+
+
+# _Measurements.csv is a data frame for each case in a sample, created after feature extraction
+# it holds feature extraction measurements and scores for scoring algorithms
+
+
 
 # rm(list=ls())
 
@@ -100,9 +113,11 @@ measurementFileNames <- list.files(path = ".",
   sensorNames0 <- c("UPneumo", "LPneumo", "AutoEDA", "Cardio", "PLE")
   numberSensors <- length(sensorNames)
   
+  # initialize a vector of data frame columns names
   questionCols <- paste0(rep(paste0("m", rep(c(1:numberSensors), each=numberEvents), "_", rep(1:numberEvents), "_"), each=numberSensors), sensorNames)
   columnNames <- c("examName", "technique", "criterionState", paste0("Q", c(1:numberEvents)), questionCols)
   
+  # inititalize a data frome for the RC ratios
   aggRCRatiosDF <- as.data.frame(matrix(nrow=length(measurementFileNames), ncol=length(columnNames)))
   names(aggRCRatiosDF) <- columnNames
   
@@ -158,7 +173,7 @@ measurementFileNames <- list.files(path = ".",
 {
   criterionStateDF <- read_csv(file="criterionState.csv")
   
-  criterionStateDF$examName <- criterionStateDF$shortName
+  # criterionStateDF$examName <- criterionStateDF$shortName
 }
 
 
