@@ -25,7 +25,6 @@
   # source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
   # source(paste0(RPath, "abstractScale.R"), echo=TRUE)
   
-  
 }
 
 
@@ -192,6 +191,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     if(length(tsDataB) < length(tsData)) {
       tsDataB <- c(rep(tsDataB[1], length(tsData) - length(tsDataB)))
     }
+    # plot.ts(tsData)
     # plot.ts(tsDataB)
   } 
   
@@ -200,9 +200,9 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   if(processArtifacts) {
     
     if(sensorName == "AutoEDA") {
-      # segmentDF$AutoEDA_a <- 0
+      segmentDF$AutoEDA_a <- 0
     } else if(sensorName == "ManualEDA") {
-      # segmentDF$ManualEDA_a <- 0
+      segmentDF$ManualEDA_a <- 0
     } else if(sensorName == "CardioMA") {
       segmentDF$Cardio1_a <- 0
     }
@@ -288,7 +288,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # when using the non-strict EW
   }
   
-  ####   initialize the event indices   ####
+  ####   initialize the event indices: onset, offset, answer, etc.  ####
   
   {
     # prestimRow is usually the first row (1) of the time series vector
@@ -387,16 +387,17 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   #### exclude peaks after the data descend below the onset value ####
   
   {
-    # initialize this to NA to avoid problems
+    # intitialize a variable for xOnset indices after the ROW
+    # initialize this to NULL to avoid problems
     postROWXOnset <- NULL
-    # use the xPosSlope vector from earlier
-    
-    # August 2023
+
     # call a function to get the + slope indices
     xPosSlope <- getPosSlopeFn(getTheSlopeFn(tsData))
     
     # get the pos slope onset indices after ROWEndRow
-    postROWXOnset <- which(xPosSlope[ROWEndRow:endRow] == 1) + ROWEndRow - 1
+    # postROWXOnset <- which(xPosSlope[ROWEndRow:endRow] == 1) + ROWEndRow - 1
+    # 2026Mar02
+    postROWXOnset <- which(xPosSlope[(ROWEndRow+1):endRow] == 1) + ROWEndRow - 1
     
     if(length(postROWXOnset) > 0) {
       # get the data values for onset indices after the ROW
@@ -409,11 +410,11 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
       minOnsetVal <- tsData[thisMinOnset]
       # exclude peaks after thisMinOnset
       # if the min post ROW onset val < minOnsetVal
-      if(any(postROWXOnsetVals <= minOnsetVal)) {
+      if( any(postROWXOnsetVals <= minOnsetVal) ) {
         # remove xPeak indices 
         # after the data have descended below the minOnsetVal
         # select the first if several
-        stopHere <- postROWXOnset[which(postROWXOnsetVals < minOnsetVal)[1]]
+        stopHere <- postROWXOnset[which(postROWXOnsetVals <= minOnsetVal)[1]]
         # keep only xPeak indices before data descend below the lowest point in the ROW
         xPeak <- xPeak[which(xPeak < stopHere)]
         # Aug 22, 2023 
@@ -430,6 +431,13 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   {
     # Feb 03, 2024
     xOnset <- xOnset[which(xOnset < xPeak[length(xPeak)])]
+  }
+  
+  #### discard xPeak indices before the first xOnset ####
+  
+  {
+    # 2026Feb26
+    xPeak <- xPeak[which(xPeak > xOnset[1])]
   }
   
   #### check for no usable response at this point #####
@@ -655,7 +663,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     
   } # end cardio artifact section 
   
-  ############################################
+  #########
   
   #### check the EDA data for artifacts and tonicity Aug 8, 2023 ####
   
@@ -663,6 +671,10 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
          sensorName %in% c("AutoEDA", "ManualEDA"), 
          artifactEDA, 
          processArtifacts)) {
+    
+    # artifactEDA and processArtifacts parameters were initialized in the NCCAASCII_init.R script
+    # and are located in the .globalEnvir
+    
     
     # source("~/Dropbox/R/NCCA_ASCII_Parse/checkEDATonicity.R", echo=FALSE)
     
@@ -726,15 +738,15 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     artifactRows <- artifactRowsE[which(artifactRowsE %in% responseRows)]
     
     # if(all(integrateArtifacts)) {
-      if(sensorName == "AutoEDA") {
-        segmentDF$AutoEDA_a[artifactRows] <- "Artifact"
-      }
-      if(sensorName == "ManualEDA") {
-        segmentDF$ManualEDA_a[artifactRows] <- "Artifact"
-      }
+    if(sensorName == "AutoEDA") {
+      segmentDF$AutoEDA_a[artifactRows] <- "Artifact"
+    }
+    if(sensorName == "ManualEDA") {
+      segmentDF$ManualEDA_a[artifactRows] <- "Artifact"
+    }
     # }
     
-    #############################################################
+    ########
     
     #### Oct 15, 2023 integrate artifacts from other sensors ####
     
@@ -764,7 +776,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     
   } # end EDA artifact section
   
-  #### August 24, 2023 - need to make sure this exists, for output ####
+  ####  August 24, 2023 - need to make sure this exists, for output  ####
   
   {
     
@@ -775,7 +787,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     
   }
   
-  #################################
+  ########
   
   #### output ####
   
@@ -815,6 +827,8 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   return(output)
   
 } # end amplitudeExtractFn() function 
+
+
 
 
 
