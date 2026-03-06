@@ -291,7 +291,7 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
     {
       
       # 2025Aug12 NA rows can occur with LX Edge charts b
-      # ecause of differences in the time scale
+      # Because of differences in the time scale
       
       # NARows <- which(is.na(chartDF$Label))
       
@@ -322,7 +322,8 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
         k=1
         for(k in 2:length(thisColDAT)) {
           
-          if(thisColDAT[k] == -9.9 || thisColDAT[k] == "NA") {
+          # if(thisColDAT[k] == -9.9 || thisColDAT[k] == "NA") {
+          if(thisColDAT[k] == -9.9 || is.na(thisColDAT[k])) {
             errCount <- errCount + 1
             thisColDAT[k] <- thisColDAT[(k-1)]
           }
@@ -477,7 +478,7 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
   
   {
     
-    # make a vector of names for some new columns for the centered data
+    # make a vector of names of the data columns for some new columns for the centered data
     newColNames <- paste0("c_", names(outDF[11:ncol(outDF)]))
     
     # add the names to the output data frame
@@ -494,7 +495,7 @@ dataParse <- function(x=dataNames, y=thisExamName, saveCSV=FALSE, makeDF=TRUE) {
   outDF <- addColumnsFn(x=outDF)
   
   #### construct the output ####
-  
+   
   {
     
     # create the output file name
