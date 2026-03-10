@@ -152,7 +152,7 @@ maxSlopeChangeFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
     # zScore[1:tonicLen] <- 0
     # tonicLen is initialized in the NCCAASCII_init.R script
     # is is the period of time where a + slope is required
-    # prior to a response onset imputed as a change in inflection
+    # prior to a response onset imputed as a change in positive slope inflection
     
   }
   

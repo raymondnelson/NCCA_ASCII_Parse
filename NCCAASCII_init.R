@@ -277,19 +277,19 @@ print("init parameters for parsing and processing NCCA ASCII data")
     
     # used by the feature extraction functions 
     artifactPneumo <- TRUE
-    artifactPneumo <- FALSE
+    # artifactPneumo <- FALSE
     
     artifactCardio <- TRUE
-    artifactCardio <- FALSE
+    # artifactCardio <- FALSE
     
     artifactEDA <- TRUE
-    artifactEDA <- FALSE
+    # artifactEDA <- FALSE
     
     artifactActivity <- TRUE
     # artifactActivity <- FALSE
     
     artifactPLE <- TRUE
-    artifactPLE <- FALSE
+    # artifactPLE <- FALSE
     
     artifactFC <- FALSE
     
@@ -567,7 +567,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # 0 = no inflection detection
   # 1 = select the value at 2.5 seconds
   # 2 =  statistical method
-  inflection <- 2
+  inflectionMethod <- 2
   
   # slopechangeRule is a switch to control the use of a response onset location
   # as a function of a significant change (increase) in positive slope

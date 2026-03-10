@@ -123,7 +123,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     descentRule <- env.params$descentRule
     descProp <- env.params$descProp
     slopeChangeRule <- env.params$slopeChangeRule
-    inflection <- env.params$inflection
+    inflectionMethod <- env.params$inflectionMethod
     nothingIsSomething <- env.params$nothingIsSomething
     prestim <- env.params$prestim # Aug 8, 2023
   }

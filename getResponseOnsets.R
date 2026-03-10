@@ -69,14 +69,14 @@ getResponseOnsetsFn <- function(tsData,
   
   #### extract a response onset via change in positive slope inflection ####
   
-  # inflection=2 # statistical method
-  # inflection=1 # will pick the value at 2.5 seconds for all segments
+  # inflectionMethod=2 # statistical method
+  # inflectionMethod=1 # will pick the value at 2.5 seconds for all segments
   
-  # inflection is set in the NCCAASCII_init.R script
+  # inflectionMethod is set in the NCCAASCII_init.R script
   
-  if(inflection == 1) {
+  if(inflectionMethod == 1) {
     
-    # inflection==1 will pick the y-axis value at 2.5 seconds for all cases
+    # inflectionMethod==1 will pick the y-axis value at 2.5 seconds for all cases
     
     if(!exists("addLat")) addLat <- 2
     
@@ -114,11 +114,11 @@ getResponseOnsetsFn <- function(tsData,
     # NAs are retained if any are present
     l
     
-  } # end if( inflection == 1 )
+  } # end if( inflectionMethod == 1 )
   
   #### alternate method use the maxSlopeChangeFn ####
   
-  if(inflection == 2) {
+  if(inflectionMethod == 2) {
     
     # statistical method
     
