@@ -259,9 +259,9 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     DFRows <- length(tsData)
     
     # additional latency for ascending reactions
-    # addLat <- 2 # maybe use the sChangeLat environment variable
+    # addLat <- 2 # maybe use the inflectionLat environment variable
     # 2024Jul29
-    addLat <- sChangeLat
+    addLat <- inflectionLat
     # will be added to the .5 sec latency
     # so that the value at  2.5seconds may be used as an onset
     # if there is no positive slope onset

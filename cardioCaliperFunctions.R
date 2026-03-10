@@ -11,7 +11,7 @@ source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
 source(paste0(RPath, "getResponseOnsets.R"), echo=FALSE)
 source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
 source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
-source(paste0(RPath, "slopeChange.R"), echo=FALSE)
+source(paste0(RPath, "inflectionRule.R"), echo=FALSE)
 
 
 

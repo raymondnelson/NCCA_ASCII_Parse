@@ -80,12 +80,12 @@ getResponseOnsetsFn <- function(tsData,
     
     if(!exists("addLat")) addLat <- 2
     
-    # use the slopeChangeRule parameter
+    # use the inflectionRule parameter
     # 1 for EDA and 0 for cardio
     # this is a blunt approximation
     # instead of evaluating the change in slope activity
     # works surprisingly well
-    if(slopeChangeRule == 1) {
+    if(inflectionRule == 1) {
       # but only if there are any non-NA peak indices
       # possible this could work OK under all conditions
       if(any(!is.na(xPeak))) {
@@ -98,7 +98,7 @@ getResponseOnsetsFn <- function(tsData,
     }
     
     # impute the response onset only if no XOnset indices
-    if(slopeChangeRule == 2) {
+    if(inflectionRule == 2) {
       # xOnset will be NA if no changes from - or 0 slope to + slope
       if(all(is.na(xOnset))) {
         if(any(!is.na(xPeak))) {
@@ -116,37 +116,37 @@ getResponseOnsetsFn <- function(tsData,
     
   } # end if( inflectionMethod == 1 )
   
-  #### alternate method use the maxSlopeChangeFn ####
+  #### alternate method use the maxInflectionFn ####
   
   if(inflectionMethod == 2) {
     
     # statistical method
     
-    # source("~/Dropbox/R/NCCA_ASCII_Parse/slopeChange.R", echo=TRUE)
+    # source("~/Dropbox/R/NCCA_ASCII_Parse/inflectionRule.R", echo=TRUE)
     
-    # maxSlopeChangeFn() uses a moving t-test of variance for all
+    # maxInflectionFn() uses a moving t-test of variance for all
     # for adjacent 1s segments
     # with alpha=.001
     
-    if(slopeChangeRule == 1) {
+    if(inflectionRule == 1) {
       
-      # slopeChangeRule=1 will always use the slopeChangeRule
+      # inflectionRule=1 will always use the inflectionRule
       
       if( any(!is.na(xPeak)) ) {
         # if there are any valid xPeak indices
-        # source the maxSlopeChange script
-        # source("~/Dropbox/R/NCCA_ASCII_Parse/slopeChange.R", echo=FALSE)
-        # call the maxSlopeChangeFn()
-        # 2026Mar04 had to add the latRow paramter to the maxSlopeChangeFn()
-        theseIdcs <- maxSlopeChangeFn(x=tsData, latRow=latRow, idx=TRUE)
+        # source the script with the maxInflectionFn()
+        # source("~/Dropbox/R/NCCA_ASCII_Parse/inflectionRule.R", echo=FALSE)
+        # call the maxInflectionFn()
+        # 2026Mar04 had to add the latRow paramter to the maxInflectionFn()
+        theseIdcs <- maxInflectionFn(x=tsData, latRow=latRow, idx=TRUE)
         # keep only those that are after the latency row
         # 2026Mar02 # fixed this
-        theseIdcs <- theseIdcs[theseIdcs >= (latRow + (sChangeLat*cps) - 1)]
+        theseIdcs <- theseIdcs[theseIdcs >= (latRow + (inflectionLat*cps) - 1)]
         # Aug 4, 2022
-        # keep only those that are after sChangeLat
+        # keep only those that are after MRL + inflectionLat
         # Aug 11, 2023 onsetRow was previously hardcoded to 301
         # commented out 2026Mar02
-        # theseIdcs <- theseIdcs[theseIdcs >= (onsetRow + (sChangeLat*cps) - 1)]
+        # theseIdcs <- theseIdcs[theseIdcs >= (onsetRow + (inflectionLat*cps) - 1)]
         # Aug 4, 2022
         # put the slope change at the end of the pre and post segs
         # theseIdcs <- theseIdcs + (nPre*cps + nPost*cps)
@@ -161,13 +161,13 @@ getResponseOnsetsFn <- function(tsData,
       
     }
     
-    if(slopeChangeRule == 2) {
+    if(inflectionRule == 2) {
       # keep the 
       if(all(is.na(xOnset)) && any(!is.na(xPeak))) {
-        theseIdcs <- maxSlopeChangeFn(x=tsData, idx=TRUE)
+        theseIdcs <- maxInflectionFn(x=tsData, idx=TRUE)
         # keep only those that are after the latency row
         # theseIdcs <- theseIdcs[theseIdcs >= latRow]
-        theseIdcs <- theseIdcs[theseIdcs >= (onsetRow + (sChangeLat*cps) - 1)]
+        theseIdcs <- theseIdcs[theseIdcs >= (onsetRow + (inflectionLat*cps) - 1)]
         xOnset <- c(theseIdcs, xOnset)
         # set the order and remove NAs
         xOnset <- sort(xOnset)

@@ -3,9 +3,9 @@
 
 
 
-maxSlopeChangeFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
+maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
   # new function to determine the max sig value 
-  # in a series of significant changes in positive slope
+  # in a series of significant changes in positive slope inflection
   # supercedes the slopeChangeFn 
   # located in the slopChange.R script
   # which always selected the first sig value in a run 
@@ -211,7 +211,7 @@ maxSlopeChangeFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
   {
     # latRow is scoped lexically, from the environment (getResponseOnsetsFn) where this function is called
     # 2026Mar03
-    zScore[1:(latRow+(sChangeLat*cps)-1)] <- 0
+    zScore[1:(latRow+(inflectionLat*cps)-1)] <- 0
     
     # zIdx <- which(zScore != 0)
   }
@@ -284,7 +284,7 @@ maxSlopeChangeFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
   
   return(y)
   
-} # end maxSlopeChangeFn
+} # end maxInflectionFn
 
 
 

@@ -111,8 +111,8 @@ EDAExtractFn <- function(x=segmentDF, y=extract.params) {
                        strictROW=EDAStrictROW, 
                        descentRule=descentRule, 
                        descProp=descProp, 
-                       slopeChangeRule=slopeChangeRule,
-                       inflection=inflection, 
+                       inflectionRule=inflectionRule,
+                       inflectionMethod=inflectionMethod, 
                        nothingIsSomething=nothingIsSomething,
                        prestim=EDAPrestim ) # prestim added Aug 8, 2023
     

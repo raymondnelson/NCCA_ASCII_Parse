@@ -576,8 +576,8 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # slopeChangeRule = 1 will enable the use of significant changes in positive slope as a response onset
   # slopeChangeRule = 2 will enable the use of significant changes in positive slope 
   # but only when there is no normal onset of a positive slope segment during the ROW
-  slopeChangeRule <- 1
-  cardioSlopeChangeRule <- 0
+  inflectionRule <- 1
+  cardioInflectionRule <- 0
   
   # aChange is the quantile threshold to interpret a sig increase in upward slope activity
   # .9986501 = 3 standard deviations
@@ -617,17 +617,17 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # before inferring a response onset in EDA and cardio
   ignoreTonicChange = .125
   
-  # sChangeLat is the number of seconds of latency 
-  # after stimulus onset
+  # inflectionLat is the number of seconds of added latency 
+  # after the MRL
   # before inferring a response onset via slope change
-  sChangeLat <- .5
+  inflectionLat <- .5
   # was 2.5 until 2025Oct26
   # was 0.5 until 2025May14
   # was 2.5
   # was .5 20200321
   # was 1.5 20200223
   
-  # sep 27, 2021 need to sort out the diff and uses of sChangeLat and tonicSec
+  # sep 27, 2021 need to sort out the diff and uses of inflectionLat and tonicSec
   
   #### PLE 
   

@@ -64,7 +64,7 @@ cardioSRQFn <- function(x=chartDF$c_Cardio1, segLen=15) {
 
 # source the script with the functions computing the cardio caliper 
 
-source("~/Dropbox/R/NCCA_ASCII_Parse/cardioCaliperFunctions.R", echo=FALSE)
+source(paste0(RPath, "cardioCaliperFunctions.R"), echo=FALSE)
 
 
 

@@ -122,8 +122,8 @@ CardioExtractFn <- function(x=segmentDF,
                      strictROW=cardioStrictROW, 
                      descentRule=descentRule, 
                      descProp=descProp, 
-                     slopeChangeRule=cardioSlopeChangeRule,
-                     inflection=inflection, 
+                     inflectionRule=cardioInflectionRule,
+                     inflectionMethod=inflectionMethod, 
                      nothingIsSomething=nothingIsSomething,
                      prestim=cardioPrestim ) # prestim added Aug 8, 2023
   

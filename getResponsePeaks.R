@@ -69,7 +69,7 @@ getResponsePeaksFn <- function(tsData,
     # 2026Mar02
     # keep only those xPeak indices after latency
     xPeak <- xPeak[which( xPeak >= (latRow + (addLat*cps)) )]
-    # addLat is sChangeLat when using the slope change rule
+    # addLat is inflectionLat when using the slope change rule
     
   }
   

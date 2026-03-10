@@ -51,7 +51,7 @@
   # amplitude extraction for EDA and cardio
   source(paste0(RPath, 'amplitudeExtractPC.R'), echo=FALSE)
   source(paste0(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
-  source(paste0(RPath, 'slopeChange.R'), echo=FALSE)
+  source(paste0(RPath, 'inflectionRule.R'), echo=FALSE)
   
   # August 2023 functions were abstracted from amplitudeExtractPC.R
   source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
