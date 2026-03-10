@@ -92,7 +92,8 @@ response peaks during the WOE.
 6. Pre-response segment
 
 A period of several seconds prior to the onset of a physiological
-response. The pre-response segment will normally exhibit stable tonic activity.
+response. The pre-response segment will normally exhibit stable tonic
+activity.
 
 7. Pre-stimulus Segment
 
@@ -261,7 +262,7 @@ caliper window.
 
 
 
-EDA CALIPER REQUIREMENTS
+EDA FEATURE EXTRACTION
 
 1. EDA measurement shall be in dimensionless units proportional to the
 y-axis scale.
@@ -336,7 +337,7 @@ the inflection of the positive slope activity during the ROW.
 or responseEndX indices, and the responseOnsetY and responseEndY values
 shall be empty.
 
-CARDIO CALIPER REQUIREMENTS
+CARDIO FEATURE EXTRACTION
 
 1. Cardio measurement shall be in dimensionless unit proportional to the
 y-axis scale.
@@ -403,7 +404,7 @@ slope or zero slope to positive slope) within the ROW.
 or responseEndX indices, and the responseOnsetY and responseEndY values
 shall be empty.
 
-VASOMOTOR CALIPER REQUIREMENTS
+VASOMOTOR FEATURE EXTRACTION
 
 1. Vasomotor measurements shall be in dimensionless unit proportional to
 the y-axis scale.

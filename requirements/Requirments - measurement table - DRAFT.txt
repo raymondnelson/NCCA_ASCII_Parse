@@ -1,6 +1,5 @@
-LX Edge Requirements - MEASUREMENT TABLE - DRAFT 
-June 10, 2025 
-Raymond Nelson
+LX Edge Requirements - MEASUREMENT TABLE - DRAFT June 10, 2025 Raymond
+Nelson
 
 
 
@@ -116,7 +115,7 @@ same Label).
 
 8. Series
 
-A series consists of all charts with the same test stimulus questions. 
+A series consists of all charts with the same test stimulus questions.
 Data for each series is stored in a separate folder within a PF. Some
 exams, consist of one single series. For example, a Concealed
 Information Test (CIT) format may have a single series with multiple
@@ -328,7 +327,7 @@ is also the pre-stimulus segment for the next event.
 
 22. preStimX
 
-Shall be used to capture the sample index for the pre-stimulus segment 
+Shall be used to capture the sample index for the pre-stimulus segment
 (10 seconds prior to stimulus onset) for each stimulus event.
 
 23. latencyEndX
