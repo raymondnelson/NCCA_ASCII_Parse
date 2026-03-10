@@ -365,7 +365,8 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # Dec 8, 2023
   # number of prestim seconds for EDA artifact extraction
   # these are actually pre-response seconds not pre-stim
-  EDAPrestim <- 4
+  EDAPrestim <- 5
+  # was 4 until Mar 10, 2026
   # was 2
   # was 4 2026Feb28
   
@@ -607,7 +608,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # 11-15-2016 nPre=1 nPost=1
   
   # tonicSec is the number of seconds for which to 
-  # check for upward slope before inferring a response onset
+  # check for upward slope before inferring a response onset via the inflection rule
   tonicSec <- 2 # was 3
   # was 2.5
   # was 1.5 # 20190425

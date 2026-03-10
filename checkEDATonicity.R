@@ -441,8 +441,8 @@ checkEDATonicityFn <- function(segmentName,
   #### next evaluate the pre-response activity for NSPA ####
   
   {
-    # was dsc=.75 2026Feb28
-    preresponseVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=preResponseRows, asc=3, dsc=.75)
+    # was asc=3, dsc=.75 2026Feb28
+    preresponseVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=preResponseRows, asc=3, dsc=3)
     # preresponseVc is a vector of 0s and "Artifact" marks at rows where sig activity was observed
     
     # submit the artifacts to the output vector
