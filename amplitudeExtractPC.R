@@ -122,7 +122,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     strictWindow <- env.params$strictWindow
     descentRule <- env.params$descentRule
     descProp <- env.params$descProp
-    slopeChangeRule <- env.params$slopeChangeRule
+    inflectionRule <- env.params$inflectionRule
     inflectionMethod <- env.params$inflectionMethod
     nothingIsSomething <- env.params$nothingIsSomething
     prestim <- env.params$prestim # Aug 8, 2023
@@ -183,7 +183,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   tsDataB <- tsData
   # tsDataB is used by the getResponsePeaksfn() and getResponseOnsetsFn()
-  # tsDataB is passed to the maxSlopechangeFn()
+  # tsDataB is passed to the maxInflectionFn()
 
   if(sensorName %in% c("AutoEDA", "ManualEDA")) {
     # additional smoothing to reduce location of response onset due to high frequency noise
@@ -370,7 +370,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
                                 latRow=latRow, 
                                 ROWEndRow=ROWEndRow,
                                 endRow=endRow,
-                                slopeChangeRule=slopeChangeRule, 
+                                inflectionRule=inflectionRule, 
                                 addLat=addLat)
   # plot.ts(tsData)
   # plot.ts(tsDataB)

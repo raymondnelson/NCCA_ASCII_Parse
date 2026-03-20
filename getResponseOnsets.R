@@ -8,7 +8,7 @@
 
 
 
-# source("~/Dropbox/R/NCCA_ASCII_Parse/slopeChange.R", echo=FALSE)
+# source("~/Dropbox/R/NCCA_ASCII_Parse/inflectionRule", echo=FALSE)
 
 
 
@@ -18,7 +18,7 @@ getResponseOnsetsFn <- function(tsData,
                                 latRow, 
                                 ROWEndRow,
                                 endRow,
-                                slopeChangeRule, 
+                                inflectionRule, 
                                 addLat) {
   # R Function to identify response onset indices in the EDA and cardio mid-line
   # August 18, 2023

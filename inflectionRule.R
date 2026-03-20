@@ -1,6 +1,8 @@
 # Sep. 2, 2021
 # Raymond Nelson
-
+# was previosly named slopeChange.R but this was ambiguous,
+# because this function handles changes in + slope inflection (+ slope, then more + slope),
+# whereas "slope change" implies a change from - slope to + slope or + change to - slope
 
 
 maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
@@ -11,6 +13,8 @@ maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
   # which always selected the first sig value in a run 
   # 11-24-2016 raymond nelson
   # improved 10-7-2018
+  # renamed on 3/10/26 this script was slopeChange.R and this function was maxSlopeChangeFn()
+  ####
   # called by the getResponseOnsetsFn() function in the getResponseOnsets.R script
   # used to impute a response onset 
   # within a positive slope segment 
@@ -74,11 +78,12 @@ maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
       xStDev[i] <- sdp(tsData[i:(i+preLen-1)])
     }
     
-    # use the standard deviations of the iffinstead of difference values
+    # use the standard deviations of the diff instead of difference values
     xDiff <- xStDev
+    # xDiff is not the standard deviations of the absolute diffs, using a window length = preLen
   }
   
-  #### calaculate the preDiff and postDiff values ####
+  #### calculate the preDiff and postDiff values ####
   
   {
     preDiffMean <- rep(0, times=length(xDiff))
@@ -132,10 +137,8 @@ maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
       # put the zScore at the beginning of the postLen segment
       # zScore[(i-postLen)] <- thisVal
       # 2026Mar03
-      # zScore[round(i-preLen/2)] <- thisVal
       zScore[round(i-preLen/2)] <- thisVal
-      # this will put the zScore at the beginning of the preLen segment
-      # zScore[i-(preLen+postLen)] <- thisVal
+      # this will put the zScore at the middle of the preLen segment
     }
   }
   
@@ -154,6 +157,10 @@ maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
     # is is the period of time where a + slope is required
     # prior to a response onset imputed as a change in positive slope inflection
     
+    # 2026Mar18
+    # at this point the zScore vector is the same length as the input data,
+    # and includes only 0s and statistically significant z-test values, 
+    # obtained when comparing the preLen and postlen
   }
   
   #### check the slope of the data ####
@@ -196,6 +203,11 @@ maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
     }
     
     # which(zScore != 0)
+    
+    # 2026Mar18
+    # at this point the zScore vector includes 0s and statistically significant values,
+    # and only when the slope is + for 90% of the tonicLen
+    # this reduces the tendency to impute reactions when data are labile at stimulus onset 
   }
   
   #### remove zScore indices for non-ascending segments ####
@@ -204,16 +216,26 @@ maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
     zScore[which(slopeDat != 1)] <- 0
     
     # zIdx <- which(zScore != 0)
+    
+    # 2026Mar18
+    # zScore vector now excludes statistically sig values for - slope segments
   }
   
   #### remove zScore indices during a latency period ####
   
   {
     # latRow is scoped lexically, from the environment (getResponseOnsetsFn) where this function is called
+    # inflectionLat is 0.5 seconds and is initialized in the NCCA ASCII init.R script
     # 2026Mar03
     zScore[1:(latRow+(inflectionLat*cps)-1)] <- 0
     
     # zIdx <- which(zScore != 0)
+    
+    # 2026Mar18
+    # zScore vector now excludes statistically sig values during a slightly MRL,
+    # extended MRL is only for this function, and reduces the tendency to impute
+    # a reaction immediately after the MRL, 
+    # which might appear to be bothersome to experienced field examiners
   }
   
   #### use a loop to locate the max z-Score in each run ####
@@ -237,16 +259,19 @@ maxInflectionFn <- function(x=tsData, latRow=latRow, idx=TRUE) {
       z <- i
       # end iteration at the end of the zScore vector
       if(z==length(zScore)) next()
-      # another loop to the max index for each non-zero run,
+      # another loop to get the max index for each non-zero run,
       # in the zScore vector
       # cannot use which.max() because there may be,
       # multiple non-zero runs in the zScore vector
       j=z+1
       for (j in (z+1):length(zScore)) {
         # stop the loop if the zScore value is zero
+        # inspected on 2026Mar18 and commented out
         if(zScore[j] == 0) {
-          z <= j+1
-          break()
+          # z <= j+1 # this line is not necessary
+          # 2026Mar018 
+          # it is necessary to stop the j loop if the next value is 0
+          break() # stop the j loop if the next value is 0
         }
         # change the z index to advance the loop
         # if zScore[j] is greater than zScore[z]
