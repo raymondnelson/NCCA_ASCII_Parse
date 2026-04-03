@@ -5,6 +5,7 @@
 newMaxOnsetPeakDistFn <- function(tsData, 
                                   xOnset, 
                                   xPeak, 
+                                  onsetRow,
                                   ROWEndRow,
                                   sensorName ) {
   # R function to select the EDA and cardio response onset and peak with the max distance
@@ -33,15 +34,18 @@ newMaxOnsetPeakDistFn <- function(tsData,
   
   {
     
+    # check and fix if xOnset == xPeak 
+    xOnset[which(xOnset %in% xPeak)] <- xOnset[which(xOnset %in% xPeak)] - 1
+    
     xPeakVals <- tsData[xPeak]
     xOnsetVals <- tsData[xOnset]
     
     # some vectors to hold the xOnset indices and values
-    onsetIdx <- rep(NA, length=length(xOnset))
-    onsetVals <- rep(NA, length=length(xOnset))
+    onsetIdx <- rep(NA, length=length(xPeak))
+    onsetVals <- rep(NA, length=length(xPeak))
     
-    peakIdx <- rep(NA, length=length(xOnset))
-    peakVals <- rep(NA, length=length(xOnset))
+    # peakIdx <- rep(NA, length=length(xPeak))
+    # peakVals <- rep(NA, length=length(xPeak))
     
     # initialize a vector for the max y distance for xOnset to xPeak
     yDistance <- rep(NA, length=length(xPeak))
@@ -55,13 +59,10 @@ newMaxOnsetPeakDistFn <- function(tsData,
   
   if( any(!is.na(xPeak)) && any(!is.na(xOnset)) ) { 
     
-    # iterate foward over the xOnset indices
+    # iterate over the xOnset indices to get select the xPeak with the max distance
     n=1
-    for (n in 1:length(xOnset)) {
-      # use a loop to iteratively shorten the comparison of peak values
-      # if the data descend below onset value,
-      # or if the data descend by more than a proportion (descProp),
-      # within a - slope segment after the peak of a + slope segment
+    #  for (n in 1:length(xOnset)) {
+    for (n in 1:length(xPeak)) {
       
       # this loop will call the descentProp() helper function
       # descentProp() is in the amplitudeExtractHelperFunctions.R script
@@ -69,27 +70,16 @@ newMaxOnsetPeakDistFn <- function(tsData,
       # plot.ts(tsData[(xOnset[n]):length(tsData)])
       # plot.ts(tsData)
       
+      if(length(which(xOnset < xPeak[n])) == 0) next()
+      
       # set the stopRow to stop including xPeak values if the data descend below the xOnset[n] value
-      stopRow <- which( tsData[ c( (xOnset[n]+1):length(tsData) ) ] <= xOnsetVals[n] )[1] + xOnset[n] - 1
+      # stopRow <- which( tsData[ c( (xOnset[n]+1):length(tsData) ) ] <= xOnsetVals[n] )[1] + xOnset[n] - 1
+      stopRow <- which( tsData[ c( ROWEndRow:length(tsData) ) ] <= min(xOnsetVals ))[1] + ROWEndRow - 1
+      
       # there is no stop row when the data do not descend below onset, so use the last row instead
       if(is.na(stopRow)) stopRow <- length(tsData)
       
-      tsData[((xOnset[n]):(xOnset[n]+1+10))] <= xOnsetVals[n]
-      
-      # initialize a vector of xPeak indices for each iteration of the n loop, 
-      # ignore xPeak indices after the stopRow 
-      # because data have descended below the value at xOnset[n]
-      # use xPeak indices betweeen xOnset[n] and the stopRow
-      xPeakLoop <- xPeak[ which( xPeakVals > tsData[xOnset[n]] & xPeak <= stopRow ) ]
-      # for this iteration of the loop keep only xPeak indices after xOnset[n] and before stopRow
-      
-      if(length(xPeakLoop) == 0) next()
-      
-      # initialize the default stopRow2
-      # stopRow2 is the default descent cutoff row after which xPeaks are excluded
-      # initialize the stopRow2 to the length of the time series data
-      stopRow2 <- length(tsData)
-      # this stopRow2 will be used when descentRule = 0
+      if(length(which(xOnset < stopRow)) == 0) next()
       
       # descentRule=0 will disable the descent rule, 
       # all peaks in the EW are used until the data descend below the y-axis value at xOnset[n]
@@ -120,72 +110,113 @@ newMaxOnsetPeakDistFn <- function(tsData,
         # descentRule 0 will disable the rule
         # and will only exclude xPeakLoop indices after the data have descended below the response onset yValue
         
-        # inititalize a vector of xPeak indices between xOnset[n] and the stopRow
-        xPeakLoop <- xPeak[which(xPeak >= xOnset[n])]
-        # xPeakLoop <- xPeakLoop[which(xPeakLoop <= stopRow)]
+        # check the xOnsetVals prior to xPeak[n]
+        thisMax <- which.max( xPeakVals[n] - xOnsetVals[which(xOnset < xPeak[n])] )
+        thisOnsetVal <- xOnsetVals[thisMax] 
+        yDistance[n] <- xPeakVals[n] - thisOnsetVal
         
-        if(length(xPeakLoop) == 0) next()
+        if(sign(yDistance[n]) == -1) {
+          yDistance[n] <- 0
+          # next() 
+        }
         
-        # compute the peak - onset distances
-        xPeakDistances <- tsData[xPeakLoop] - tsData[xOnset[n]]
+        onsetIdx[n] <- xOnset[thisMax]
+        onsetVals[n] <- thisOnsetVal
+        # onsetVals[n] <- xOnsetVals[thisMax]
         
-        # save the max distance
-        yDistance[n] <- xPeakDistances[which.max(xPeakDistances)]
         
-        peakIdx[n] <- xPeakLoop[which.max(xPeakDistances)]
-        peakVals[n] <- tsData[peakIdx[n]]
         
-        onsetIdx[n] <- xOnset[n]
-        onsetVals[n] <- tsData[onsetIdx[n]]
+        # peakIdx[n] <- xPeak[n]
+        # peakVals[n] <- xPeakVals[n]
+        
+        
+        # # inititalize a vector of xPeak indices between xOnset[n] and the stopRow
+        # xPeakLoop <- xPeak[which(xPeak >= xOnset[n])]
+        # # xPeakLoop <- xPeakLoop[which(xPeakLoop <= stopRow)]
+        #
+        # if(length(xPeakLoop) == 0) next()
+        #
+        # # compute the peak - onset distances
+        # xPeakDistances <- tsData[xPeakLoop] - tsData[xOnset[n]]
+        #
+        # # save the max distance
+        # yDistance[n] <- xPeakDistances[which.max(xPeakDistances)]
+        #
+        # peakIdx[n] <- xPeakLoop[which.max(xPeakDistances)]
+        # peakVals[n] <- tsData[peakIdx[n]]
+        #
+        # onsetIdx[n] <- xOnset[n]
+        # onsetVals[n] <- tsData[onsetIdx[n]]
         
       } # end if descentRule == 0
       
       
-      if(descentRule == 2) {
-        # rule 2 will include all positive slope segments that begin in the ROW,
-        # and positive slope segments beginning withing the WOE after ROWEndRow,
-        # if the data have not descended more than a proportion prop from the max peak
-        
-        # 10-24-2016 use the xOnset[n] only if is == or after the last xOnset before ROWEndRow
-        
-        # to do this locate a stopRow2 only after xPeakLoop indices after the ROW
-        
-        if( length(which(xPeakLoop <= ROWEndRow)) != 0 ) {
-          # if there are any xPeakLoop indices before the end of the ROW,
-          # get the last xPeakLoop before the ROWEndRow
-          xPeakStart <- xPeakLoop[max(which(xPeakLoop <= ROWEndRow))]
-          
-          # initialize a subset of xPeakLoop values after the xPeakStart
-          xPeakLoop2 <- xPeakLoop[xPeakLoop >= xPeakStart] # do not use >= here
-          # not using >= means that xPeakLoop2 does not include the xPeakStart
-          
-          # call the descentProp function to get the stopRow2
-          # source the amplitudeExtractHelperFunctions.R script
-          # xPeakLoop2 includes only the last xPeak in the ROW
-          stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop2, tsData=tsData, descProp=descProp)
-        } else {
-          # xPeakLoop includes all xPeaks after xOnset[n]
-          stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=descProp)
-          # stopRow2 <- length(tsData)
-        }
-        
-        # if(xOnset[n] > xOnsetStart) {
-        #   stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=prop, ROWEnd=ROWEndRow)
-        # } else {
-        #   stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=prop, ROWEnd=ROWEndRow)
-        # }
-        
-      } # end if descentRule == 2
+      
+      # initialize a vector of xPeak indices for each iteration of the n loop, 
+      # ignore xPeak indices after the stopRow 
+      # because data have descended below the value at xOnset[n]
+      # use xPeak indices betweeen xOnset[n] and the stopRow
+      
+      
+      # xPeakLoop <- xPeak[ which( xPeakVals > tsData[xOnset[n]] & xPeak <= stopRow ) ]
+      # for this iteration of the loop keep only xPeak indices after xOnset[n] and before stopRow
+      
+      # if(length(xPeakLoop) == 0) next()
+      
+      # initialize the default stopRow2
+      # stopRow2 is the default descent cutoff row after which xPeaks are excluded
+      # initialize the stopRow2 to the length of the time series data
+      # stopRow2 <- length(tsData)
       
       
       
-      if(descentRule == 1) {
-        
-        # descentRule == 1 will use all xOnset indices
-        # descentProp will use the ROWEndRow from the parent env
-        stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=descProp)
       
-      } # end if descentRule == 1
+      
+      # if(descentRule == 2) {
+      #   # rule 2 will include all positive slope segments that begin in the ROW,
+      #   # and positive slope segments beginning withing the WOE after ROWEndRow,
+      #   # if the data have not descended more than a proportion prop from the max peak
+      #   
+      #   # 10-24-2016 use the xOnset[n] only if is == or after the last xOnset before ROWEndRow
+      #   
+      #   # to do this locate a stopRow2 only after xPeakLoop indices after the ROW
+      #   
+      #   if( length(which(xPeakLoop <= ROWEndRow)) != 0 ) {
+      #     # if there are any xPeakLoop indices before the end of the ROW,
+      #     # get the last xPeakLoop before the ROWEndRow
+      #     xPeakStart <- xPeakLoop[max(which(xPeakLoop <= ROWEndRow))]
+      #     
+      #     # initialize a subset of xPeakLoop values after the xPeakStart
+      #     xPeakLoop2 <- xPeakLoop[xPeakLoop >= xPeakStart] # do not use >= here
+      #     # not using >= means that xPeakLoop2 does not include the xPeakStart
+      #     
+      #     # call the descentProp function to get the stopRow2
+      #     # source the amplitudeExtractHelperFunctions.R script
+      #     # xPeakLoop2 includes only the last xPeak in the ROW
+      #     stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop2, tsData=tsData, descProp=descProp)
+      #   } else {
+      #     # xPeakLoop includes all xPeaks after xOnset[n]
+      #     stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=descProp)
+      #     # stopRow2 <- length(tsData)
+      #   }
+      #   
+      #   # if(xOnset[n] > xOnsetStart) {
+      #   #   stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=prop, ROWEnd=ROWEndRow)
+      #   # } else {
+      #   #   stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=prop, ROWEnd=ROWEndRow)
+      #   # }
+      #   
+      # } # end if descentRule == 2
+      
+      
+      
+      # if(descentRule == 1) {
+      #   
+      #   # descentRule == 1 will use all xOnset indices
+      #   # descentProp will use the ROWEndRow from the parent env
+      #   stopRow2 <- descentProp(x=xOnset[n], xPeakLoop=xPeakLoop, tsData=tsData, descProp=descProp)
+      #   
+      # } # end if descentRule == 1
       
       
       
@@ -215,33 +246,37 @@ newMaxOnsetPeakDistFn <- function(tsData,
       
     } # end of evil n loop to select the max change for each xOnset row
     
+    #### select the onset and peak with the max distance ####
     
-    
-    
-    # print(yDistance)
-    
-    # at this point yDistance is a vector of max distance vals for each xPeak 
-    # and a preceeding xOnset
-    # onsetIdx and onsetVals are also vectors
-    
-    # get the output values using the max yDistance
-    yChangeOnset <- onsetIdx[which.max(yDistance)]
-    yChangeOnsetValue <- tsData[yChangeOnset]
-    
-    yChangePeak <- peakIdx[which.max(yDistance)]
-    yChangePeakValue <- tsData[yChangePeak]
-    
-    # yChangeValue <- yDistance[which.max(yDistance)]
-    # should be the same this way
-    yChangeValue <- yChangePeakValue - yChangeOnsetValue
+    {
+      
+      # print(yDistance)
+      
+      # at this point yDistance is a vector of max distance vals for each xPeak 
+      # and a preceeding xOnset
+      # onsetIdx and onsetVals are also vectors
+      
+      # get the output values using the max yDistance
+      yChangeOnset <- onsetIdx[which.max(yDistance)]
+      yChangeOnsetValue <- tsData[yChangeOnset]
+      
+      yChangePeak <- xPeak[which.max(yDistance)]
+      yChangePeakValue <- tsData[yChangePeak]
+      
+      # yChangeValue <- yDistance[which.max(yDistance)]
+      # should be the same this way
+      yChangeValue <- yChangePeakValue - yChangeOnsetValue
+      
+    }
     
   } else {
-    # return NA if there are no xPeaks or xOnset indices
+    # if there are no xPeaks or xOnset indices
     return(list(yChangeOnset=NA, 
                 yChangeOnsetValue=NA, 
                 yChangePeak=NA, 
                 yChangePeakValue=NA, 
-                yChangeValue=NA))
+                yChangeValue=NA,
+                sensorName=sensorName ))
   }
   
   #### Nov 17, 2023 abstract the measured value from the display gain ####

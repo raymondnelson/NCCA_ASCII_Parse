@@ -384,7 +384,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # xOnset <- xOnset[which(xOnset < xPeak[length(xPeak)])]
   }
   
-  #### exclude peaks after the data descend below the onset value ####
+  #### exclude peaks after the data descend below the min onset value in the ROW ####
   
   {
     # intitialize a variable for xOnset indices after the ROW
@@ -392,19 +392,22 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     postROWXOnset <- NULL
 
     # call a function to get the + slope indices
+	  # getSlopeDirection.R
     xPosSlope <- getPosSlopeFn(getTheSlopeFn(tsData))
+	  # xPosSlope is a vector 0 with 1 at the onset of each + slope segment
     
     # get the pos slope onset indices after ROWEndRow
     # postROWXOnset <- which(xPosSlope[ROWEndRow:endRow] == 1) + ROWEndRow - 1
     # 2026Mar02
     postROWXOnset <- which(xPosSlope[(ROWEndRow+1):endRow] == 1) + ROWEndRow - 1
+    # postROWXOnset is a vector of sample indices where + slope segments begin
     
-    if(length(postROWXOnset) > 0) {
-      # get the data values for onset indices after the ROW
+    if( length(postROWXOnset) > 0 ) {
+      # get the data values for the onset indices after the ROW
       postROWXOnsetVals <- tsData[postROWXOnset]
       minPostROWVal <- min(tsData[postROWXOnset])
       
-      # get min xOnset
+      # get min xOnset during the ROW
       # August 19, 2023 # restricted to xOnset during the ROW
       thisMinOnset <- xOnset[which.min(tsData[xOnset[xOnset <= ROWEndRow]])]
       minOnsetVal <- tsData[thisMinOnset]
@@ -415,9 +418,11 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
         # after the data have descended below the minOnsetVal
         # select the first if several
         stopHere <- postROWXOnset[which(postROWXOnsetVals <= minOnsetVal)[1]]
+        # the next line does not work 2026Apr02
+        # stopHere <- which(tsData[c(postROWXOnsetVals[1]:length(tsData))] <= minOnsetVal)[1] + postROWXOnsetVals[1] - 1
+        if(is.na(stopHere)) stopHere <- lenth(tsData)
         # keep only xPeak indices before data descend below the lowest point in the ROW
         xPeak <- xPeak[which(xPeak < stopHere)]
-        # Aug 22, 2023 
         xOnset <- xOnset[xOnset < stopHere]
       }
     }
@@ -450,8 +455,12 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   #### strict ROW option ####
   
-  # August 2023
-  # now occurs in the getOnsets function that was abstracted from this function
+  {
+    # August 2023
+    # now occurs in the getOnsets function that was abstracted from this function 
+  }
+  
+  ###########################################################################
   
   #### extract max distance for each xPeak to all preceding xOnset vals ####
   
@@ -465,12 +474,42 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # the max distance function appears to do a better job 
     # when the onset is imputed via slope change
     
+    # 2026Apr02
+    # if(all(chartName=="02A", segmentName=="C2", sensorName=="AutoEDA")) {
+    #   assign("segmentDF", segmentDF, pos=1)
+    #   # assign("extract.params", extract.params, pos=1)
+    #   assign("extractList", extractList, envir=.GlobalEnv)
+    #   assign("env.params", env.params, envir=.GlobalEnv)
+    #   assign("tsData", tsData, envir=.GlobalEnv)
+    #   assign("tsDataB", tsDataB, envir=.GlobalEnv)
+    #   assign("xOnset", xOnset, envir=.GlobalEnv)
+    #   assign("xPeak", xPeak, envir=.GlobalEnv)
+    #   assign("onsetRow", onsetRow, envir=.GlobalEnv)
+    #   assign("ROWEndRow", ROWEndRow, envir=.GlobalEnv)
+    #   assign("sensorName", sensorName, envir=.GlobalEnv)
+    #   stop()
+    # }
+    
     # August 2023
     # now abstracted to a separate function
-    yChangeList <- maxOnsetPeakDistFn(tsData=tsData, 
-                                      xOnset=xOnset, 
-                                      xPeak=xPeak, 
-                                      sensorName )
+	  # source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
+	  # 2026Apr01 commented out
+    # yChangeList <- maxOnsetPeakDistFn(tsData=tsData,
+    #                                   xOnset=xOnset,
+    #                                   xPeak=xPeak,
+    #                                   sensorName )
+									  
+    # 2026Apr01
+	  # to include the descent rule
+    # this new function works identical to the old one,
+    # when descentRule == 0 in the NCCAASCII_init.R script
+	  # source(paste0(RPath, "newMaxOnsetPeakDistance.R"), echo=FALSE)
+    yChangeList <- newMaxOnsetPeakDistFn(tsData=tsData,
+                                         xOnset=xOnset,
+                                         xPeak=xPeak,
+                                         onsetRow=onsetRow,
+                                         ROWEndRow=ROWEndRow,
+                                         sensorName )
     
     yChangeOnset <-yChangeList[['yChangeOnset']]
     yChangeOnsetValue <- yChangeList[['yChangeOnsetValue']]
@@ -518,19 +557,29 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
       yChangeValue <- NA
     }
     
-    # Sep 27, 2021 
-    # use an environment parameter to set NA response value to 0
-    if(isTRUE(nothingIsSomething)) {
-      yChangeOnset <- NA
-      yChangeOnsetValue <- NA
-      yChangePeak <- NA
-      yChangePeakValue <- NA
-      yChangeValue <- 0
-      # yChangeValue will be NA if no response and nothingIsSomething=FALSE
-    }
-    
   }
   
+  #### something vs nothing is something rule ####
+  
+  if(isTRUE(nothingIsSomething) && yChangeValue < 20) {
+    
+    # Sep 27, 2021 
+    # use an environment parameter to set NA response value to 0
+    
+    # nothingIsSomething is initialized in the NCCAASCII_init.R script
+    
+    yChangeOnset <- NA
+    yChangeOnsetValue <- NA
+    yChangePeak <- NA
+    yChangePeakValue <- NA
+    
+    yChangeValue <- 0
+    # 2026Mar21 what happens when a min value is used
+    yChangeValue <- 20 # 20 is 1% of the y-axis range
+    # yChangeValue will be NA if no response and nothingIsSomething=FALSE
+    
+  }
+    
   ##############################################################
   
   #### check the respiration data for artifacts Sep 11, 2023 ####
@@ -826,7 +875,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   return(output)
   
-} # end amplitudeExtractFn() function 
+} # end amplitudeExtractFnPC() function 
 
 
 
