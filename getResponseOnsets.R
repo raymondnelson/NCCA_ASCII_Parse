@@ -21,15 +21,14 @@ getResponseOnsetsFn <- function(tsData,
                                 inflectionRule, 
                                 addLat) {
   # R Function to identify response onset indices in the EDA and cardio mid-line
+  # located in the getResponseOnsets.R script
   # August 18, 2023
-  # Raymond Nelson
-  #
   # abstracted from the amplituceExtractPCFn() in the amplitudeExtractPC.R script
-  #
+  # Raymond Nelson
   ####
   # tsData is the time series vector for EDA or cardio data
   # xPeak is a vector of response peaks from the getResponsePeaksFn() in the getResponsePeaks.R script
-  # 
+  ####
   
   options(warn = 2)
   

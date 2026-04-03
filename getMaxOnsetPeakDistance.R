@@ -15,13 +15,13 @@ maxOnsetPeakDistFn <- function(tsData,
                                xPeak, 
                                sensorName ) {
   # R function to select the EDA and cardio response onset and peak with the max distance
+  # located in the getMaxOnsetPeakDistance.R script
+  # abstracted from the amplitudeExtractPCFn()
   # August 18, 2023
   # Raymond Nelson
-  #
-  # abstracted from the amplitudeExtractPCFn()
   # called by the amplitudeExtractPCFn()
-  #
-  # tsData input is the time series data for a stimmulus segment
+  ####
+  # tsData input is the time series data for a stimulus segment
   # including the prestimulus and poststimulus segments 
   #
   # xOnset input is a vector of indices at which + slope segments begin
@@ -33,7 +33,6 @@ maxOnsetPeakDistFn <- function(tsData,
   # yChangePeak 
   # yChangePeakValue 
   # yChangeValue 
-  #
   ####
   
   #### extract max distance from each xPeak to all preceding xOnset vals ####
@@ -48,21 +47,21 @@ maxOnsetPeakDistFn <- function(tsData,
     xPeakVals <- tsData[xPeak]
     xOnsetVals <- tsData[xOnset]
     
-    # initialize a vector for the max y distance for xOnset to xPeak
-    yDistance <- rep(NA, length=length(xPeak))
-    
     # some vectors to hold the xOnset indices and values
     onsetIdx <- rep(NA, length=length(xPeak))
     onsetVals <- rep(NA, length=length(xPeak))
     
-    # iterate over the xPeaks to get the max distance to a preceding xOnset
+	# initialize a vector for the max y distance for xOnset to xPeak
+    yDistance <- rep(NA, length=length(xPeak))
+    
+    # iterate over the xPeaks to get select the preceding xOnset with the max distance
     n=1
     for(n in 1:length(xPeakVals)) {
-      # increment the loop if no xOnset prior to xPeak[n]
+      # increment the loop if there are no xOnset indices prior to xPeak[n]
       if(length(which(xOnset < xPeak[n])) == 0) next()
       # check the xOnsetVals prior to xPeak[n]
-      thisMax <- 
-        which.max( xPeakVals[n] - xOnsetVals[which(xOnset < xPeak[n])] )
+      thisMax <- which.max( xPeakVals[n] - xOnsetVals[which(xOnset < xPeak[n])] )
+      # thisOnsetVal <- xOnsetVals[which(xOnset < xPeak[n])][thisMax] 
       thisOnsetVal <- xOnsetVals[thisMax] # simpler and works the same
       yDistance[n] <- xPeakVals[n] - thisOnsetVal
       # increment the loop if the distance is negative
@@ -72,11 +71,26 @@ maxOnsetPeakDistFn <- function(tsData,
       }
       onsetIdx[n] <- xOnset[thisMax]
       onsetVals[n] <- thisOnsetVal
+      
+      # 2026Mar30
+      # possibly include the descentRule here
+      # if(isTRUE(descentRule)) {
+      #   # descentRule is a boolean initialized in the NCCAASCII_init.R script
+      #   # descProp is a decimal proportion (.632 = 1 time constant) initialized in the NCCASASCII_init.R script
+      #   
+      #   # a scalar initiated in the NCCAASCII_init.R script
+      #   # descProp
+      #   
+      #   # a function
+      #   # descentProp
+      #   
+      # }
+      
     } # end loop n over xPeakVals
     
-    # at this point yDistance is a vector of max distance vals for each peak
-    # onsetIdx and onsetVals are vectors
-    # for the distance from each peak to each preceding onset 
+    # at this point yDistance is a vector of max distance vals for each xPeak 
+    # and a preceeding xOnset
+    # onsetIdx and onsetVals are also vectors
     
     # get the output values using the max yDistance
     yChangeOnset <- onsetIdx[which.max(yDistance)]
@@ -85,18 +99,23 @@ maxOnsetPeakDistFn <- function(tsData,
     yChangePeak <- xPeak[which.max(yDistance)]
     yChangePeakValue <- tsData[yChangePeak]
     
+    # yChangeValue <- yDistance[which.max(yDistance)]
+    # should be the same this way
     yChangeValue <- yChangePeakValue - yChangeOnsetValue
+	
   } else {
+    # return NA if there are no xPeaks or xOnset indices
     return(list(yChangeOnset=NA, 
                 yChangeOnsetValue=NA, 
                 yChangePeak=NA, 
                 yChangePeakValue=NA, 
-                yChangeValue=NA))
+                yChangeValue=NA, 
+                sensorName=sensorName ))
   }
   
   #### Nov 17, 2023 abstract the measured value from the display gain ####
   
-  if(all(useGainCorrection, !is.na(yChangeValue), !is.null(yChangeValue), yChangeValue!=0, yChangeValue!="")) {
+  if(all(useGainCorrection, !is.na(yChangeValue), !is.null(yChangeValue), !is.na(yChangeValue), yChangeValue!=0, yChangeValue!="")) {
     
     # source("~/Dropbox/R/NCCA_ASCII_Parse/abstractScale.R", echo=TRUE)
     
@@ -104,13 +123,15 @@ maxOnsetPeakDistFn <- function(tsData,
     
   }
   
+  #### output ####
   
   # output is a list
   return(list(yChangeOnset=yChangeOnset, 
               yChangeOnsetValue=yChangeOnsetValue, 
               yChangePeak=yChangePeak, 
               yChangePeakValue=yChangePeakValue, 
-              yChangeValue=yChangeValue))
+              yChangeValue=yChangeValue,
+              sensorName=sensorName ))
   
 } # end maxOnsetPeakDistFn()
 

@@ -188,7 +188,7 @@ EDAExtractFn <- function(x=segmentDF, y=extract.params) {
     
     ## stop for inspection ##
     # if(all(seriesName=="1", chartName=="01A" && segmentName=="4")) {
-    # if(all(chartName=="01A" && segmentName=="R7")) {
+    # if(all(chartName=="02A" && segmentName=="R1")) {
     #   assign("segmentDF", segmentDF, pos=1)
     #   assign("extract.params", extract.params, pos=1)
     #   assign("extractList", extractList, envir=.GlobalEnv)
