@@ -169,7 +169,7 @@ EDAMvtArtifactFn <- function(tsData=chartDF$c_AutoEDA, preSec=4, zCut=3) {
 
 
 
-EDAPrestimActivityFn <- function(tsData, prestimRows, asc=1, dsc=1) {
+EDAPrestimActivityFn <- function(tsData, prestimRows, asc=4, dsc=4) {
   # R function to identify EDA artifacts prior to stimulus onset
   # also used to identify EDA artifacts prior to response onset
   # abstracted from the main function Dec 5, 2023
@@ -183,8 +183,8 @@ EDAPrestimActivityFn <- function(tsData, prestimRows, asc=1, dsc=1) {
   # dsc input is the desceht ratio constraint
   # output is a vector of indices where significant movement was found
   ####
-  if(!exists("dsc")) dsc <- 1
-  if(!exists("asc")) asc <- 1
+  # if(!exists("dsc")) dsc <- 1
+  # if(!exists("asc")) asc <- 1
   ## initialize the output vector
   prestimVc <- rep(0, times=length(tsData))
   ## compute the prestim range
@@ -206,7 +206,7 @@ EDAPrestimActivityFn <- function(tsData, prestimRows, asc=1, dsc=1) {
   {
     if(prestimMaxIdx > prestimMinIdx) {
       # max index is after the min index
-      # ascending prestim to response onset
+      # ascending prestim 
       # ychangeValue is obtained from the parent environment
       prestimAscentRatio <- abs(prestimRange) / yChangeValue
       prestimDescentRatio <- 0
@@ -219,11 +219,11 @@ EDAPrestimActivityFn <- function(tsData, prestimRows, asc=1, dsc=1) {
     }
   }
   ## interpret the activity during the prestimulus segment
-  if(yChangeValue <= 50) {
-    # yChange value < 2.5% of the y-axis range
+  if(yChangeValue <= 20) {
+    # yChange value < 1% of the y-axis range
     # if(abs(prestimRange) >= 150) {
     # Sep 14, 2024
-    if(abs(prestimRange) >= (1.5 * yChangeValue)) {
+    if(abs(prestimRange) >= (5 * yChangeValue)) {
       # for both ascending and descending eda data
       # mark an artifact when the prestimulus range is 1.5x the y-change EDA response
       prestimVc[prestimRows] <- "Artifact"
@@ -231,12 +231,11 @@ EDAPrestimActivityFn <- function(tsData, prestimRows, asc=1, dsc=1) {
       # return(0)
     }
   } else {
-    # yChange values greater than 2.5% of the y-axis range 
-    # if(prestimDescentRatio >= 1.5) { # was 2
-    if(prestimDescentRatio >= dsc) { # was 1.5
+    # yChange values greater than 1 of the y-axis range 
+    if(prestimDescentRatio >= dsc) { 
       prestimVc[prestimRows] <- "Artifact"
-    } else if(prestimAscentRatio >= asc) { # was >= .85
-      # } else if(prestimAscentRatio >= .85) { # was >= 2
+    } else if(prestimAscentRatio >= asc) { 
+      # } else if(prestimAscentRatio >= .85) { 
       prestimVc[prestimRows] <- "Artifact"
       # which(prestimVc!=0)
     } 
@@ -432,7 +431,7 @@ checkEDATonicityFn <- function(segmentName,
   
   {
     # was dsc=.75 2026Feb28
-    prestimVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=prestimRows, asc=4, dsc=3)
+    prestimVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=prestimRows, asc=5, dsc=5)
     # prestimVc is a vector of0s and "Artifact" marks at rows where sig activity was observed
     
     # submit the artifacts to the output vector
@@ -442,7 +441,7 @@ checkEDATonicityFn <- function(segmentName,
   
   {
     # was asc=3, dsc=.75 2026Feb28
-    preresponseVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=preResponseRows, asc=3, dsc=3)
+    preresponseVc <- EDAPrestimActivityFn(tsData=tsData, prestimRows=preResponseRows, asc=5, dsc=5)
     # preresponseVc is a vector of 0s and "Artifact" marks at rows where sig activity was observed
     
     # submit the artifacts to the output vector
