@@ -59,6 +59,7 @@ smoothSlope <- function(x=mySlope, nSmooth=ignore) {
   # x is a time series vector of positive (1) negative (-1) and zero (0) slope changes
   # input is the output from the slopeDir() function
   # nSmooth is the number of samples to ignore small slope change segments
+  # ignore=7  parameter is initialized in the NCCAASCII_init.R script
   # output is a vector of slope values including the run length after slope change
   # # a value of -51 will mean that there are 51 samples after slope onset or runLength=52
   ###### positive slope segments
@@ -133,7 +134,7 @@ positiveSlope <- function(x=mySlope2) {
   # output is a vector of positive slope segments and zero slope for all other segments
   y <- x # to make a container
   # if else is vectorized and requires no control loop
-  y <- ifelse(x>=1,
+  y <- ifelse(x >= 1,
               y <- 1,
               y <- 0)
   return(y)  
@@ -380,44 +381,46 @@ positiveOnset <- function(x=posSlope) {
 
 
 # helper function to exclude peak row indices after the data descend more than a proportion p from the previous highest peak
-descentProp <- function(x=xOnset[1], y=xPeakLoop, z=tsData, dProp=descProp) {
+descentProp <- function(x=xOnset[1], xPeakLoop=xPeakLoop, tsData=tsData, descProp=descProp) {
   # helper function to exclude peak row indices after the data descend more than a proportion p from the previous highest peak
-  # called by the amplitudeExtractFn() function
   # from a the previous highest peak after response onset
   # this function is called iteratively in a a loop that selects the max change,
   # from each onset value to subsequent peak values
-  #
+  # located in the amplitudeExtractHelperFunctions.R script
+  # Raymond Nelson
+  # called by the getMaxOnsetPeakDistanctFn() function in the getMaxOnsetPeakDistanct.R script,
+  # also called by the newMaxOnsetPeakDistanceFn() in the newMaxOnsetPeakDistance.R script
+  ####
   # input
-  # x is a variable for a single reponse onset row index (x is a scalar)
-  # y is a is a vector of peak indices after onset and prior to decsent below the onset value
-  # z is a vector of time series values
-  # dProp is a proportion for which the data are evaluated 
+  # x is a variable for a single response onset row index (x is a scalar)
+  # xPeakLoop is a is a vector of peak indices after onset and prior to descent below the onset value
+  # tsData is a vector of time series values
+  # descProp is a proportion for which the data are evaluated 
+  # descProp = .632 is initialized in the NCCAASCII_init.R script
   # ROWEnd is the end of the response onset window (typically 5 seconds after the verbal answer)
-  # 
+  ####
   # output
   # output is a stop row with the row index for the time series input, 
-  # after which the data have descended more than a proportion dProp,
+  # after which the data have descended more than a proportion descProp,
   # from the previous max peak - onset value
-  # 
   #### 
-  yChangeOnset <- x
-  xPeakLoop <- y
-  tsData <- z
+  
   # get the time series values for all peak points in xPeakLoop
   xPeakLoopValues <- tsData[xPeakLoop]
   # compute the difference for each peak - response onset value
-  xPeakLoopDiffs <- xPeakLoopValues - tsData[yChangeOnset]
+  xPeakLoopDiffs <- xPeakLoopValues - tsData[x]
   # determine the cut value for each peak in the xPeakLoopDiffs vector
-  cutValues <- (1-dProp) * xPeakLoopDiffs
+  cutValues <- (1-descProp) * xPeakLoopDiffs
   # get the vector of time series values after response onset
   
   # this may be a problem 12-4-2016 
-  tsValues <- tsData[(yChangeOnset+1):length(tsData)]
+  tsValues <- tsData[(x+1):length(tsData)]
   # ROWEndRow is obtained from the parent env
   # tsValues <- tsData[(ROWEndRow+1):length(tsData)] # 10-15-2015 to apply the 50% rule after ROWEnd
   
   # compute the difference for all time series values after response onset
-  tsDiffs <- tsValues - tsData[yChangeOnset]
+  tsDiffs <- tsValues - tsData[x]
+  
   # make a vector of the slope direction for all time series samples after response onset
   # ifelse is vectorized when the result is taken from the ifelse function (not vectorized within ifelse) 
   tsSlope <- c( 0, ifelse( diff(tsValues)>0, 
@@ -425,14 +428,16 @@ descentProp <- function(x=xOnset[1], y=xPeakLoop, z=tsData, dProp=descProp) {
                            ifelse(diff(tsValues)<0, 
                                   -1, 
                                   0) ) )
+  
   # initialize a cutVector 
   # to look for descending tsValues that are less than the cutValues for previous peaks
   cutVector <- numeric(length=length(tsDiffs))
+  
   # then populate the cutVector by iterating over the time series from the yChange Onset to end
   i=1
   for (i in 1:length(tsDiffs)) {
     # first make a scalar for the current row index 
-    currentRow <- i + yChangeOnset - 1
+    currentRow <- i + x - 1
     # make a vector of myCutValues for the vector tsDiffs
     # check the diff from the preceeding max peak
     cutVector[i] <- ifelse( length(which(xPeakLoop <= currentRow)) > 0,
@@ -441,19 +446,23 @@ descentProp <- function(x=xOnset[1], y=xPeakLoop, z=tsData, dProp=descProp) {
     # ignore the first several descending rows to avoid over sensitivity to high frequency noise
     cutVector <- c(rep(0, times=90), cutVector[91:length(cutVector)])
   } # end for loop to make the cutVector
+  
   # for each item in tsDiffs, cutVector now has the cutValues for the previous maximum Peak Value
   # if the value in tsDiffs is less than the corresponding value in cutVector
   # then the data have descended more than the cutoff proportion
   # print(cutVector)
+  
   # use the tsSlope vector to locate descending slope segments
   descRows <- which(tsSlope == -1)
   # determine the descending row indices for which 
   # the amount of descent is smaller than the corresponding index in cutVector
   cutRows <- descRows[ tsDiffs[descRows] < cutVector[descRows] ]
   # use the first row index smaller than cutVector as the stopRow after which data are not used
-  stopRow2 <- cutRows[1] + yChangeOnset - 1
+  stopRow2 <- cutRows[1] + x - 1
+  
   # use the last row in the data vector if stopRow2 is NA
   if(is.na(stopRow2) == TRUE) stopRow2 <- length(tsData)
+  
   # return a scalar with the stop row after which peaks are excluded 
   return(stopRow2)
 } # end descentProp function
