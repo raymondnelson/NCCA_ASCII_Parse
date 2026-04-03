@@ -57,6 +57,7 @@
   source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
   source(paste0(RPath, "getResponseOnsets.R"), echo=FALSE)
   source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
+  source(paste0(RPath, "newMaxOnsetPeakDistance.R"), echo=FALSE)
   source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
   source(paste0(RPath, "abstractScale.R"), echo=FALSE)
   
@@ -780,7 +781,7 @@ featureExtraction <- function(x=uniqueExams,
           
           # if(all(examName == "DX01602001FLAT", chartName == "01A", segmentName == "2")) {
           # if(all(seriesName=="1", chartName=="01A" && segmentName=="4")) {
-          # if(chartName == "01A" && segmentName == "R7") {
+          # if(chartName == "02A" && segmentName == "R1") {
           #   assign("segmentDF", segmentDF, pos=1)
           #   assign("extract.params", extract.params, pos=1)
           #   stop()
