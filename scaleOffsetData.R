@@ -40,6 +40,10 @@
 
 {
   # load the scaleDataFn() and offsetDataFn()
+  source(paste0(RPath, "scaleData.R"), echo = TRUE)
+  source(paste0(RPath, "offsetData.R"), echo = TRUE)
+  
+  # load the getFirstLastEventFn()
   source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
   
   # digital filters
@@ -79,22 +83,19 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
   # 5/30/2016
   # modified 1/25/2019
   # Raymond Nelson
-  #
+  ####
   # this function will call the scaleDataFn() and offsetDataFn() from the sigProcHelper.R script
   # x input is a vector of unique exam names in the working directory
   # loop over the time series data frames from the global environment
-  # the time series data are after signal processing (AutoEDA, pneumo smoothing, etc.)
-  # and after feature extraction
-  # showNames=TRUE will print the exam names, series names, and chart names to the console
-  
-  # data frames are saved to the global environment as a side effect
-  
-  # makeDF=TRUE will save the examDF to the global environment
   # using examName, "_Data"
+  # the time series data are after signal processing (AutoEDA, pneumo smoothing, etc.)
+  # and before feature extraction
+  ####
+  # data frames are saved to the global environment as a side effect
+  # showNames=TRUE will print the exam names, series names, and chart names to the console
+  # makeDF=TRUE will save the examDF to the global environment
   # output=TRUE will output the time series data frame for the last exam in the input vector of exam names
-  #
   # saveChartDF=TRUE will save the chartDF and chart name to the global envir for inspetion 2024Jul29
-  #
   ####
 
   # set.seed(1234567890)
@@ -110,14 +111,13 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
   }
   
   {
-    
+    # initialize these variables to control which sensors are scaled and offset
     pneumoScale=TRUE
     EDAScale=TRUE
     cardioScale=TRUE
     PLEScale=TRUE
     activityScale=TRUE
     PTTScale=TRUE
-    
   }
   
   # loop over each exam in the list 
@@ -225,6 +225,7 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
           lastEventEnd <- firstLastEvents[2]
           
           # Nov, 30, 2024
+          # in case of problems after calling the getFirstLastEventFn()
           if(firstEvent < 1) firstEvent <- 1
           if(lastEventEnd > nrow(chartDF)) lastEventEnd <- nrow(chartDF)
           
