@@ -59,6 +59,10 @@ offsetDataFn <- function(x=chartDF$c_Cardio1,
     
     # get the offset value for the first event
     offsetVal <- x[firstRow]
+    
+    # 2026Apr15 new method using the median
+    offsetVal <- median(x[c(firstRow:lastRow)])
+    
     # compute the offset adjustment
     offsetAdjust <- y - offsetVal
     # offset the data
@@ -73,6 +77,7 @@ offsetDataFn <- function(x=chartDF$c_Cardio1,
     # plot.ts(xOut)
     # summary(xOut)
     
+    # commented out 2026Apr15
     offsetAdjust2 <- y - quantile(xOut, .2, na.rm=TRUE)
     xOut <- xOut + offsetAdjust2
     
