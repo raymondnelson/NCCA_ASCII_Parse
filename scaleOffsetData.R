@@ -40,8 +40,10 @@
 
 {
   # load the scaleDataFn() and offsetDataFn()
-  source(paste0(RPath, "scaleData.R"), echo = TRUE)
-  source(paste0(RPath, "offsetData.R"), echo = TRUE)
+  source(paste0(RPath, "newScaleData.R"), echo = TRUE)
+  source(paste0(RPath, "newOffsetData.R"), echo = TRUE)
+  # source(paste0(RPath, "scaleData.R"), echo = TRUE)
+  # source(paste0(RPath, "offsetData.R"), echo = TRUE)
   
   # load the getFirstLastEventFn()
   source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
