@@ -102,6 +102,7 @@ scaleDataFn <- function(x=chartDF$c_UPneumoSm,
           sampleOnset <- sampleOnset[sampleOnset < (lastRow-sampleLength)]
           if(length(sampleOnset) == 0 ) sampleOnset <- firstRow
         } else { 
+          # when the number of sampling times is 1
           sampleOnset <- firstRow
         } 
         
@@ -158,7 +159,7 @@ scaleDataFn <- function(x=chartDF$c_UPneumoSm,
         # for flat-line data
         scaleVal <- 1 
       }
-    } # end else
+    } # end else for charts shorter than the sampling length
     # scale the output vector
     xOut <- x * scaleVal
     # get the offset max value and offset the data if necessary

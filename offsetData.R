@@ -51,9 +51,12 @@ offsetDataFn <- function(x=chartDF$c_Cardio1,
   # initialize a new scale value
   newScaleVal <- 1
   
-  # offset the data
-  if(dataLength > (30*cps)) {
-    # for charts greater than 30 seconds
+  ## offset the data ##
+  
+  if(dataLength > (60*cps)) {
+    
+    # for charts greater than 60 seconds
+    
     # get the offset value for the first event
     offsetVal <- x[firstRow]
     # compute the offset adjustment
@@ -96,8 +99,11 @@ offsetDataFn <- function(x=chartDF$c_Cardio1,
       newOffsetAdjust <- maxY - max(xOut[firstRow:lastRow], na.rm=TRUE)
       xOut <- xOut + newOffsetAdjust
     } 
+    
   } else { 
-    # for shart charts less than 30 seconds
+    
+    # for shart charts less than 60 seconds
+    
     offsetVal <- median(x)
     # use the median of x instead of the onset of the first event
     offsetAdjust <- y - offsetVal
@@ -123,9 +129,12 @@ offsetDataFn <- function(x=chartDF$c_Cardio1,
       xOut <- xOut + newOffsetAdjust
     }
   } # end short charts < 30 seconds
+  
   assign("newScaleVal", newScaleVal, pos=1)
   assign("offsetVal", offsetVal + newOffsetAdjust, pos=1)
+  
   return(xOut)
+  
 } # end offsetDataFn() function
 
 
