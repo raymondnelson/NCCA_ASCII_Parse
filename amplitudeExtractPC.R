@@ -394,7 +394,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # call a function to get the + slope indices
 	  # getSlopeDirection.R
     xPosSlope <- getPosSlopeFn(getTheSlopeFn(tsData))
-	  # xPosSlope is a vector 0 with 1 at the onset of each + slope segment
+	  # xPosSlope is a vector of 0s with 1 at the onset of each + slope segment
     
     # get the pos slope onset indices after ROWEndRow
     # postROWXOnset <- which(xPosSlope[ROWEndRow:endRow] == 1) + ROWEndRow - 1
@@ -405,7 +405,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     if( length(postROWXOnset) > 0 ) {
       # get the data values for the onset indices after the ROW
       postROWXOnsetVals <- tsData[postROWXOnset]
-      minPostROWVal <- min(tsData[postROWXOnset])
+      # minPostROWVal <- min(tsData[postROWXOnset])
       
       # get min xOnset during the ROW
       # August 19, 2023 # restricted to xOnset during the ROW
@@ -420,6 +420,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
         stopHere <- postROWXOnset[which(postROWXOnsetVals <= minOnsetVal)[1]]
         # the next line does not work 2026Apr02
         # stopHere <- which(tsData[c(postROWXOnsetVals[1]:length(tsData))] <= minOnsetVal)[1] + postROWXOnsetVals[1] - 1
+        # set stopHere to the end of the data segment if the data do not descent below minOnsetVal
         if(is.na(stopHere)) stopHere <- lenth(tsData)
         # keep only xPeak indices before data descend below the lowest point in the ROW
         xPeak <- xPeak[which(xPeak < stopHere)]
