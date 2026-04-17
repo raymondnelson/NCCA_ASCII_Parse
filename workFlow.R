@@ -39,24 +39,35 @@ if(getOption("warn") !=2) {
 
 
 
-{
-  
+if(!exists("RPath")) {
   # this path is prepended to the file path before sourcing a script
-  if(!exists("RPath")) {
-    # mac
-    RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
-    # windows
-    # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
-  
-    # use this
-    # source(paste0(RPath, <filePath>), echo=FALSE)
-  }
-  
-  # Mac
-  NCCADataPath <-  "/Users/raymondnelson/Dropbox/R/NCCAASCII_data/"
+  # mac
+  RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
   # windows
-  # NCCADataPath <-  "C://Users/raymo/Dropbox/R/NCCAASCII_data/"
+  # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
   
+  # use this
+  # source(paste0(RPath, <filePath>), echo=FALSE)
+}
+
+
+
+########  set the data path ######## 
+
+
+
+if(!exists("NCCADataPath")) {
+    # mac
+    NCCADataPath <- "/Users/raymondnelson/Dropbox/R/NCCAASCII_data/"
+    # windows
+    # NCCADataPath <- "C://Users/raymo/Dropbox/R/NCCAASCII_data/"
+    
+    # NCCADataPath <- 
+    
+    # NCCADAtaPath <- "~/Dropbox/DATASETS/FZCT_N100_NCCAASCII_LAF_2025Mar"
+    
+    # setwd("~/Dropbox/R/NCCA_ASCII_Parse")
+
 }
 
 
@@ -66,12 +77,10 @@ if(getOption("warn") !=2) {
 
 
 {
-  
   source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
   
-  source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   # this is sourced by the workFlow_init.R script
-  
+  source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
 }
 
 
@@ -85,10 +94,15 @@ if(getOption("warn") !=2) {
   # setwd(NCCADataPath)
   
   # setwd("~/Dropbox/R/NCCA_ASCII_Parse")
+  
   # setwd("~/Dropbox/R/NCCAASCII_data")
+  
   # setwd("~/Dropbox//QC")
   
+  # setwd("~/Dropbox/DATASETS")
+  
   # setwd("~/Dropbox/DATASETS/fromDavidCrawford")
+  
   # setwd("~/Dropbox/DATASETS/fromDavidCrawford/NCCAASCII_N100")
   
   # setwd("~/Dropbox/Court Cases")
@@ -97,88 +111,28 @@ if(getOption("warn") !=2) {
   
   # setwd("~/Dropbox/PRACTICA")
   
-  # setwd("~/Dropbox/LAFAYETTE/Lafayette2023")
-  # setwd("~/Dropbox/LAFAYETTE/Lafayette2024")
   # setwd("~/Dropbox/LAFAYETTE/Lafayette2023/LXCAT")
   
-  # setwd("~/Desktop/South Africa Practica 2023 Nov")
-  # setwd("~/Dropbox/IPTC_Courses/Ukraine Nov 2024")
-  
-  # setwd("~/Dropbox/NCCAASCII_data/fromAlanJennerich/Brackeen_NCCAASCII")
   # setwd("~/Dropbox/DATASETS/fromDonKrapohl2019")
-  # setwd("~/Dropbox/TRAINING/Poland - forensic lab - May 2019/practica")
-  # setwd("~/Dropbox/PFFOLDER/19N0401Steyn")
   
-  # setwd("~/Dropbox/R/chartSimulator")
-  # setwd("~/Dropbox/R/chartSym_data/")
-  # setwd("~/Dropbox/R/chartSym_data/cardio and respiration rates/afmgqt20250515/check")
+  # setwd("~/Dropbox/TRAINING/Poland - forensic lab - May 2019/practica")
   
   # setwd("~/Dropbox/DATASETS_BACKUP/Axciton_confirmed_casesN44/AxcitonN44_NCCAASCII")
   
   # setwd("~/Dropbox/LAFAYETTE/Lafayette2024/PTT")
   
-  # setwd("~/Dropbox/R/chartSimulator/data/PCASS")
-  # setwd("~/Dropbox/R/chartSimulator/chartSym_data/PCASS")
-  # setwd("~/Desktop")
-  # setwd("~/Dropbox/data/PCASS_starter")
-  # setwd("~/Dropbox/PRACTICA")
-  # setwd("~/Dropbox/PFFOLDER")
-  # setwd("~/Dropbox/TRAINING")
-  # setwd("~/Dropbox/data/artifacts")
-  # setwd("~/Dropbox/DATASETS")
-  # setwd("~/Dropbox/NCCAASCII_data/TDA Exercise Charts/NCCAASCII")
-  # setwd("~/Dropbox/NCCAASCII_data/Jan_6_2021")
-  
-  # setwd("~/Dropbox/Court Cases")
-  # setwd("~/Dropbox/Court Cases/WarrenCtyNY2021")
-  # setwd("~/Dropbox/Court Cases/Garberding July 2021/Garberding Justin 20210712")
-  
   # setwd("~/Dropbox/Polygraph Cases")
-  # setwd("~/Dropbox/RAYMOND/Polygraph Cases/Record June 2021/NCCAASCII")
-  # setwd("~/Dropbox/Court Cases/Raylin Dwayne James 2021/James_NCCAASCII")
-  
+
   # setwd("~/Dropbox/DATASETS/LEPET/LEPET_NCCAASCII")
-  # setwd("~/Dropbox/DATASETS/LEPET/LEPET_NCCAASCII/LEPET_NDI_NCCAASCII")
-  # setwd("~/Dropbox/DATASETS/LEPET/LEPET_NCCAASCII/LEPET_N60_NCCAASCII/noScores/checkThese")
-  # setwd("~/Dropbox/DATASETS/LEPET/LEPET_NCCAASCII/LEPET_N60_NCCAASCII")
-  # setwd("~/Dropbox/DATASETS/LEPET/LEPET_NCCAASCII/LEPET_N60_NCCAASCII/new")
-  
-  # setwd("~/Dropbox/DATASETS")
-  # setwd("~/Dropbox/DATASETS_BACKUP")
-  
+
   # setwd("~/Dropbox/RAYMOND/QC")
-  # setwd("~/Dropbox/RAYMOND/From Mark/Private 07-13-19 Jerry Russell (LIsa Johnson Esq)")
-  # setwd("~/Dropbox/CURRENT_PROJECTS")
-  
-  # setwd("~/Dropbox")
+
   # setwd("~/Dropbox/IPTC_Courses")
-  # setwd("~/Dropbox/data/simulatorCharts")
-  # setwd("~/Dropbox/RAYMOND/Court Cases")
-  # setwd("~/Dropbox/RAYMOND/Court Cases/Grigsby 2020")
-  # setwd("D:/761")
-  # setwd("~/Dropbox/data/student_TDA")
   
   # setwd("~/Dropbox/LAFAYETTE/Lafayette2019/PCASS_test") 
+  
   # setwd("~/Dropbox/LAFAYETTE/Lafayette2022/")
   
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N100/FZCT_N100_NCCAASCII/FZCT_N100_NCCA-ASCII_AXC_renamed/N100_AXC_renamed_all")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N100_NCCAASCII")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N100_NCCAASCII/FZCT_N100_NCCA-ASCII_LAF/ALL_CASES")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N60/NCCA_ASCII_OSS3_holdoutN60")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N60/NCCA_ASCII_OSS3_holdoutN60/problems")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N60/NCCA_ASCII_OSS3_holdoutN60/NCCAASCIIOutputLAF")
-  
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N60/NCCA_ASCII_OSS3_holdoutN60/NCCAASCIIOutputLAF/NCCAASCIIOutputLAF2")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/FZCT_N60/NCCA_ASCII_OSS3_holdoutN60/NCCAASCIIOutputLAF/NCCAASCIIOutputLAF2/NCCAASCIIOutputLAF3")
-  
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Algorithm Comparison - Handler 2020/data/Axciton_confirmed_cases44")
-  
-  # setwd("~/Dropbox/DATASETS/LEPET/LEPET_NCCAASCII/LEPET_N60_NCCAASCII/noScores/checkThese/NCCAASCIIOutputLAF")
-  
-  # setwd("~/Dropbox/DATASETS/Ohio_PPG_data/Ohio2015_n40_nccascii_2024Mar")
-  # setwd("~/Dropbox/DATASETS/Ohio_PPG_data/Utah_Exams_PLE_NCCA_ASCII")
-  # setwd("~/Dropbox/DATASETS/Ohio_PPG_data/Ohio_NCCAASCII")
   # setwd("~/Dropbox/R/NCCAASCII_data/Ohio_PPG_data")
   
   # setwd("~/Dropbox/R/NCCAASCII_data/respiration artifacts 2024/ncca")
@@ -190,75 +144,11 @@ if(getOption("warn") !=2) {
   # axciton N44 sample transformed to Lafayette NCCA ASCII data
   # setwd("~/Dropbox/R/NCCAASCII_data/AxcitonN44_NCCAASCIIOutputLAF")
   
-  # setwd("~/Dropbox/QC/Assess/May2019")
-  # setwd("~/Dropbox/IPTC_Courses/South Africa March 2019/practica South Africa 3-2019")
-  # setwd("~/Dropbox/data/feature_extraction/slopeChange")
-  # setwd("~/Dropbox/data/GF")
-  # setwd("~/Dropbox/R/NCCAASCII_data/GF")
-  # setwd("~/Dropbox/PRACTICA/IPTC practica 10-2018")
-  # setwd("~/Dropbox/data/feature_extraction")
-  # setwd("~/Dropbox/PRACTICA/Honduras practica 4-2018/ACQT_4-3-2-2018")
-  # setwd("~/Dropbox/data/fromDonKrapohl")
-  # setwd("~/Dropbox/data/feature_extraction/Utah_features/EDA_complexity")
-  # setwd("~/Dropbox/PRACTICA/Bulgaria_PEAK_practica_10-2018")
-  # setwd("~/Dropbox/PRACTICA/Practica_ElSalvador_9-2017")
-  # setwd("~/Dropbox/PRACTICA/Honduras practica 3-2017")
-  # setwd("~/Dropbox/data/LafayetteGraphics")
-  # setwd("~/Dropbox/data/Marin_pepsichallenge_2018/MarinN100_NCCAASCII")
-  # setwd("~/Dropbox/data/Marin_pepsichallenge_2018/MarinN100_NCCAASCII/new_test_04302018")
-  # setwd("~/Dropbox/data/artifacts/artifacts_cardio")
-  # setwd("~/Dropbox/PRACTICA/Argentina_practica_2-2017")
-  # setwd("~/Dropbox/PRACTICA/Practica_Peru_Dec_2016")
-  # setwd("~/Dropbox/RAYMOND/Court Cases/WhiteMarlinOpen2017/WMO Polygraph")
-  # setwd("~/Dropbox/TRAINING/Backster_physiology_3-2017/practica")
-  # setwd("~/Dropbox/DATASETS_BACKUP/DoDPI_confirmed_case_database_050302")
-  # setwd("~/Dropbox/DATASETS_BACKUP/MarinN100")
   # setwd("~/Dropbox/DATASETS_BACKUP")
-  # setwd("~/Dropbox/DATASETS_BACKUP/MarinN100/MarinN100_NCCAASCII")
-  # setwd("~/Dropbox/DATASETS_BACKUP/MarinN100/MarinN100_NCCAASCII/MarinN100_NCCA_innocent")
-  # setwd("~/Dropbox/DATASETS_BACKUP/MarinN100/MarinN100_NCCAASCII/MarinN100_NCCA_guilty")
-  # setwd("~/Dropbox/RAYMOND/Court Cases/Scott Beebe 2016/polygraphs 2006-2007")
-  # setwd("~/Dropbox/TRAINING/Poland - advanced training Dec 2017")
-  # setwd("~/Dropbox/TRAINING/Poland - advanced training Dec 2017/practica 12-2107")
-  # setwd("~/Dropbox/data/EDA_signal_processing_2017")
-  # setwd("~/Dropbox/TRAINING/Data Science Indy 1-10-2018")
-  # setwd("~/Dropbox/CURRENT_PROJECTS/Practical polygraph - seven things about EDA feature extraction/graphic examples")
-  # setwd("~/Dropbox/data/EDA_signal_processing_2017/Poland_cases_2017")
-  # setwd("~/Dropbox/TRAINING/Texas DPS 1-2018/practica")
-  # setwd("~/Dropbox/IPTC_Courses/South Africa 2017/practica")
-  # setwd("~/Dropbox/RAYMOND/Court Cases/Ohio 2017/Cara L. Young (Sexual Battery) Harrison Co. SO)")
-  # setwd("~/Dropbox/data/Marin_pepsichallenge_2018/MarinN100_NCCAASCII/new_test_04302018/result")
-  # setwd("~/Dropbox/IPTC_Courses/Mexico August 2018")
-  # setwd("~/Dropbox/data/OSS2/replaced")
-  # setwd("~/Dropbox/IPTC_Courses/Poland 2018/Training documents Poland/S6 CMs/Practice Exams DLST 2/0995")
-  # setwd("~/Dropbox/IPTC_Courses/Poland 2018/Training documents Poland/S6 CMs")
-  # setwd("~/Dropbox/data/fromBenBlalock/Nov302018")
-  # setwd("~/Dropbox/LAFAYETTE/Lafayette2020/ESS-M online training June 2020")
-  # source('~/Dropbox/PCASSScores.R', echo=TRUE)
   
   # setwd("~/Dropbox/LAFAYETTE/Lafayette2022")
-  # setwd("~/Dropbox/LAFAYETTE/Lafayette2020/PFs/2020 - test 11.8.6 Oct132020")
-  
-  # setwd("~/Dropbox/RAYMOND/Polygraph cases")
-  # setwd("~/My LXSoftware/PFFOLDER")
-  # setwd("~/My LXSoftware/PFFOLDER/Apawu 20210114")
   
   # setwd("C:/Axciton/Sessions")
-  
-  # Honduras 20160527ACQT
-  # artifacted cardio 6-14-2016
-  # uniqueExams <- uniqueExams[c(3,6,7,9,12,13,14,15)]
-  # un-artifacted cardio 6-14-2016
-  # uniqueExams <- uniqueExams[c(1,2,4,,5,8,10,11,16)]
-  # artifacted activity sensor
-  # uniqueExams <- uniqueExams[c(1,3,15)]
-  # normal activity sensor
-  # uniqueExams <- uniqueExams[c(2,3,4,5,7,8,9,10,11,12,14,16)]
-  # clean activity
-  # uniqueExams <- uniqueExams[c(3,4,16)]
-  
-  # print("unique exams in this directory")
-  # print(uniqueExams)
   
 }
 
@@ -642,7 +532,7 @@ if(isTRUE(fixStrings)) {
 
 
 
-######## fix the sensor names in the NCCA ASCII text files if necessary ######## 
+######## fix the SENSOR NAMES in the NCCA ASCII text files if necessary ######## 
 
 
 
@@ -664,11 +554,13 @@ if(fixSensorNames==TRUE) {
   if(!is.null(searchPattern1)) {
     
     # PLE sensor name should be PPG1
-    fixSensorNameFn(x="D&+", oldSensorName = "PLE1", newSensorName = "PPG1")
-    fixSensorNameFn(x="D&+", oldSensorName = "  PL", newSensorName = "PPG1")
+    # fixSensorNameFn(x="D&+", oldSensorName = "PLE1", newSensorName = "PPG1")
+    # fixSensorNameFn(x="D&+", oldSensorName = "  PL", newSensorName = "PPG1")
     
     # fixSensorNameFn(x="D&+", oldSensorName = "Move1", newSensorName = "MoveX")
-    # fixSensorNameFn(x="D&+", oldSensorName = "Aux02", newSensorName = "Move1")
+    
+    fixSensorNameFn(x="D&+", oldSensorName = "Aux01", newSensorName = "Move1")
+    fixSensorNameFn(x="D&+", oldSensorName = "Aux02", newSensorName = " PPG1")
     
     # the NCCA ASCI spec uses "UPneumo" and LPnuemo"
     # while the NCCA pReview application seems to use "Upneumo" and "Lpneumo"
@@ -2118,7 +2010,7 @@ if(saveRDA2==TRUE) {
   
   library(stringr)
   
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(paste0(RPath, 'workFlow_init.R'), echo=FAL SE)
   
   # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   
@@ -2260,7 +2152,7 @@ if(isTRUE(printCharts)) {
 
 
 if(!exists("printSegments")) printSegments <- FALSE
-# printSegments <- TRUE
+ # printSegments <- TRUE
 
 
 
