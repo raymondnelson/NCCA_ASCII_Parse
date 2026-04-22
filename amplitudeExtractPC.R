@@ -386,7 +386,20 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   #### exclude peaks after the data descend below the min onset value in the ROW ####
   
-  {
+  if(isTRUE(descentToOriginStop)) {
+
+    # descentToOriginStop is initialized in the NCCAASCII_init.R script
+
+    # this section is necessary when using hte getMaxOnsetPeakDistanceFn() in the
+    # getMaxOnsetPeakDistance.R script
+    # it is not necessary when using the newMaxOnsetPeak/DistanceFn() in the
+    # newMaxOnsetPeakDistance.R script
+
+    # get min xOnset during the ROW
+    # August 19, 2023 # restricted to xOnset during the ROW
+    thisMinOnset <- xOnset[which.min(tsData[xOnset[xOnset <= ROWEndRow]])]
+    minOnsetVal <- tsData[thisMinOnset]
+
     # intitialize a variable for xOnset indices after the ROW
     # initialize this to NULL to avoid problems
     postROWXOnset <- NULL
@@ -394,43 +407,49 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # call a function to get the + slope indices
 	  # getSlopeDirection.R
     xPosSlope <- getPosSlopeFn(getTheSlopeFn(tsData))
+    # this function call is necessary because the getResponseOnsetFn() does not output,
+    # response output indices after ROWEndROW
+
 	  # xPosSlope is a vector of 0s with 1 at the onset of each + slope segment
-    
+
     # get the pos slope onset indices after ROWEndRow
-    # postROWXOnset <- which(xPosSlope[ROWEndRow:endRow] == 1) + ROWEndRow - 1
-    # 2026Mar02
     postROWXOnset <- which(xPosSlope[(ROWEndRow+1):endRow] == 1) + ROWEndRow - 1
-    # postROWXOnset is a vector of sample indices where + slope segments begin
-    
+
+    # if(segmentName == "R5" && sensorName == "AutoEDA") {
+    #   print(segmentTitle)
+    #   print(sensorName)
+    #   print(ROWEndRow)
+    #   print(xOnset)
+    #   print(postROWXOnset)
+    #   stop()
+    # }
+
+    # postROWXOnset is a vector of sample indices where + slope segments begin after ROW
+
     if( length(postROWXOnset) > 0 ) {
       # get the data values for the onset indices after the ROW
       postROWXOnsetVals <- tsData[postROWXOnset]
       # minPostROWVal <- min(tsData[postROWXOnset])
-      
-      # get min xOnset during the ROW
-      # August 19, 2023 # restricted to xOnset during the ROW
-      thisMinOnset <- xOnset[which.min(tsData[xOnset[xOnset <= ROWEndRow]])]
-      minOnsetVal <- tsData[thisMinOnset]
+
       # exclude peaks after thisMinOnset
       # if the min post ROW onset val < minOnsetVal
       if( any(postROWXOnsetVals <= minOnsetVal) ) {
-        # remove xPeak indices 
+        # remove xPeak indices
         # after the data have descended below the minOnsetVal
         # select the first if several
         stopHere <- postROWXOnset[which(postROWXOnsetVals <= minOnsetVal)[1]]
-        # the next line does not work 2026Apr02
-        # stopHere <- which(tsData[c(postROWXOnsetVals[1]:length(tsData))] <= minOnsetVal)[1] + postROWXOnsetVals[1] - 1
         # set stopHere to the end of the data segment if the data do not descent below minOnsetVal
         if(is.na(stopHere)) stopHere <- lenth(tsData)
-        # keep only xPeak indices before data descend below the lowest point in the ROW
+        # keep only xPeak and xOnset indices before stopHere
         xPeak <- xPeak[which(xPeak < stopHere)]
         xOnset <- xOnset[xOnset < stopHere]
       }
+
     }
-    
-    # xPeak may be NA or empty at this point 
-    # if the data are descending from 2.5 seconds
-  }
+
+    # xPeak may be NA or empty at this point
+
+  } # end if(isTRUE(descentToOriginStop))
   
   #### discard xOnset indices after the last xPeak ####
   
@@ -463,7 +482,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   ###########################################################################
   
-  #### extract max distance for each xPeak to all preceding xOnset vals ####
+  #### get max distance for each xPeak to all preceding xOnset vals ####
   
   if( any(!is.na(xPeak)) && any(!is.na(xOnset)) ) {
     
@@ -495,22 +514,25 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # now abstracted to a separate function
 	  # source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
 	  # 2026Apr01 commented out
-    # yChangeList <- maxOnsetPeakDistFn(tsData=tsData,
-    #                                   xOnset=xOnset,
-    #                                   xPeak=xPeak,
-    #                                   sensorName )
+    yChangeList <- maxOnsetPeakDistFn(tsData=tsData,
+                                      xOnset=xOnset,
+                                      xPeak=xPeak,
+                                      ROWEndRow=ROWEndRow,
+                                      sensorName=sensorName,
+                                      segmentName=segmentName,
+                                      segmentTitle=segmentTitle )
 									  
     # 2026Apr01
-	  # to include the descent rule
+	  # preparing to include the descent rule
     # this new function works identical to the old one,
     # when descentRule == 0 in the NCCAASCII_init.R script
 	  # source(paste0(RPath, "newMaxOnsetPeakDistance.R"), echo=FALSE)
-    yChangeList <- newMaxOnsetPeakDistFn(tsData=tsData,
-                                         xOnset=xOnset,
-                                         xPeak=xPeak,
-                                         onsetRow=onsetRow,
-                                         ROWEndRow=ROWEndRow,
-                                         sensorName )
+    # yChangeList <- newMaxOnsetPeakDistFn(tsData=tsData,
+    #                                      xOnset=xOnset,
+    #                                      xPeak=xPeak,
+    #                                      onsetRow=onsetRow,
+    #                                      ROWEndRow=ROWEndRow,
+    #                                      sensorName )
     
     yChangeOnset <-yChangeList[['yChangeOnset']]
     yChangeOnsetValue <- yChangeList[['yChangeOnsetValue']]
