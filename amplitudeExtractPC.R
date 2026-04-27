@@ -163,18 +163,20 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   # if(all(chartName == "03A", segmentName == "C7", sensorName == "AutoEDA")) {
   # if(all(examName=="D5HPNYP", seriesName=="X", chartName == "01A", segmentName == "C3", sensorName == "AutoEDA")) {
-  #     # stop for inspection
+  # if(all(seriesName=="2", chartName=="02A", segmentName=="C6", sensorName=="AutoEDA")) {
   #   assign("AutoExtractList", extractList, envir = .GlobalEnv)
   #   assign("extractList", extractList, envir = .GlobalEnv)
   #   assign("segmentDF", segmentDF, envir = .GlobalEnv)
   #   assign("tsData", tsData, envir = .GlobalEnv)
-  #   print(segmentName)
-  #   print(sensorName)
+  #   assign("ROWEndRow", ROWEndRow, envir=.GlobalEnv)
   #   assign("sensorName", sensorName, envir= .GlobalEnv)
   #   assign("segmentName", segmentName, envir= .GlobalEnv)
+  #   assign("segmentTitle", segmentTitle, envir=.GlobalEnv)
   #   assign("chartName", chartName, envir = .GlobalEnv)
-  #   # plot.ts(tsData)
-  #   stop()
+  #   print(segmentName)
+  #   print(sensorName)
+  #   plot.ts(tsData)
+  #   stop("stop for inspection") # stop for inspection
   # }
   
   # get the information from the input list
@@ -377,11 +379,16 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   # tsData_save <- tsData
   # tsData <- tsDataB
   
-  ####  keep response onset indices prior to the last peak index  ####
+  #### discard xPeak indices before the first xOnset ####
   
   {
-    # Feb 03, 2024
-    # xOnset <- xOnset[which(xOnset < xPeak[length(xPeak)])]
+    xPeak <- xPeak[which(xPeak > xOnset[1])]
+  }
+  
+  #### discard xOnset indices after the last xPeak ####
+  
+  {
+    xOnset <- xOnset[which(xOnset < xPeak[length(xPeak)])]
   }
   
   #### exclude peaks after the data descend below the min onset value in the ROW ####
@@ -451,20 +458,6 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
 
   } # end if(isTRUE(descentToOriginStop))
   
-  #### discard xOnset indices after the last xPeak ####
-  
-  {
-    # Feb 03, 2024
-    xOnset <- xOnset[which(xOnset < xPeak[length(xPeak)])]
-  }
-  
-  #### discard xPeak indices before the first xOnset ####
-  
-  {
-    # 2026Feb26
-    xPeak <- xPeak[which(xPeak > xOnset[1])]
-  }
-  
   #### check for no usable response at this point #####
   
   # Nov 19, 2022 fixed vectorized is.na()
@@ -473,31 +466,18 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     xPeak <- NA
   }
   
-  #### strict ROW option ####
-  
-  {
-    # August 2023
-    # now occurs in the getOnsets function that was abstracted from this function 
-  }
-  
-  ###########################################################################
-  
   #### get max distance for each xPeak to all preceding xOnset vals ####
   
   if( any(!is.na(xPeak)) && any(!is.na(xOnset)) ) {
     
-    # # for each xPeak value, calculate the max y distance
-    # # to all preceding xOnset value
-    
-    # Nov 1, 2023
-    # there may have been an error in the previous code here
-    # the max distance function appears to do a better job 
-    # when the onset is imputed via slope change
+    # for each xPeak value, calculate the max y distance
+    # to all preceding xOnset value
     
     # 2026Apr02
-    # if(all(chartName=="02A", segmentName=="C2", sensorName=="AutoEDA")) {
-    #   assign("segmentDF", segmentDF, pos=1)
-    #   # assign("extract.params", extract.params, pos=1)
+    # if(all(segmentTitle == "D25N073002_1_01A_3a", sensorName == "AutoEDA")) {
+    # if(all(segmentTitle == "D25N073002_2_02A_C6", sensorName == "AutoEDA")) {
+    #   assign("segmentDF", segmentDF, envir=.GlobalEnv)
+    #   assign("extract.params", extract.params, envir=.GlobalEnv)
     #   assign("extractList", extractList, envir=.GlobalEnv)
     #   assign("env.params", env.params, envir=.GlobalEnv)
     #   assign("tsData", tsData, envir=.GlobalEnv)
@@ -507,7 +487,11 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     #   assign("onsetRow", onsetRow, envir=.GlobalEnv)
     #   assign("ROWEndRow", ROWEndRow, envir=.GlobalEnv)
     #   assign("sensorName", sensorName, envir=.GlobalEnv)
-    #   stop()
+    #   assign("segmentName", segmentName, envir= .GlobalEnv)
+    #   assign("segmentTitle", segmentTitle, envir=.GlobalEnv)
+    #   plot.ts(tsData)
+    #   print(segmentTitle)
+    #   stop("stop for inspection - amplitudeExtractPC.R")
     # }
     
     # August 2023
