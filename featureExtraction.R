@@ -57,7 +57,7 @@
   source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
   source(paste0(RPath, "getResponseOnsets.R"), echo=FALSE)
   source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
-  source(paste0(RPath, "newMaxOnsetPeakDistance.R"), echo=FALSE)
+  source(paste0(RPath, 'descentRule.R'), echo=FALSE)
   source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
   source(paste0(RPath, "abstractScale.R"), echo=FALSE)
   
@@ -71,7 +71,7 @@
   
   # source(paste0(RPath, 'PLEMeasurement.R'), echo=FALSE)
   
-   source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
+  source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
   
   # source(paste0(RPath, 'amplitudeExtractOSS2.R'), echo=FALSE)
   
@@ -187,7 +187,7 @@ featureExtraction <- function(x=uniqueExams,
     }
     
     ##### iterate over each unique series #####
-
+    
     j=1
     for(j in 1:length(uniqueSeries)) {
       
@@ -290,10 +290,10 @@ featureExtraction <- function(x=uniqueExams,
           rateRatio <- NA
           
         }
-       
+        
         {
           
-        ####  reset the feature extraction columns for this chart  ####
+          ####  reset the feature extraction columns for this chart  ####
           
           chartDF$UPneumoExtract <- ""
           chartDF$LPneumoExtract <- ""
@@ -303,7 +303,7 @@ featureExtraction <- function(x=uniqueExams,
           if(sum(pmatch(names(chartDF), "c_PPG1", nomatch=0))!=0) {
             chartDF$PPG1Extract <- ""
           }
-            
+          
           # Aug 30, 2023
           chartDF$CardioExtract <- ""
           chartDF$CardioMeasure <- 0
@@ -345,7 +345,7 @@ featureExtraction <- function(x=uniqueExams,
         #### calculate the cardio rate and RBPF ####
         
         if(!isTRUE(PCATFormat) && chartDF$Cardio1[1] != -9.9) {
-        
+          
           # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
           cardioRate <- ratePerMin(MASmooth(x=chartDF$Cardio1, y=2, times=1),
                                    buffer=9,
@@ -358,12 +358,12 @@ featureExtraction <- function(x=uniqueExams,
           
           # print(paste("cardio rate:", cardioRate))
           # print(paste("rbpfMsg:", rbpfMsg))
-        
+          
           assign("cardioRate", cardioRate, envir=.GlobalEnv)
           assign("rbpfMsg", rbpfMsg, envir=.GlobalEnv)
-        
+          
         }
-
+        
         #### cardio rate using PLE ####
         
         # Jan 17, 2023 check for PLE sensor 
@@ -444,7 +444,7 @@ featureExtraction <- function(x=uniqueExams,
           uniqueRQs <- eventNames[grep("R", eventNames)]
           uniqueCQs <- eventNames[grep("C", eventNames)]
           
-
+          
           # slice the RQs and CQs only if more than 2 RQs and 2 CQs
           # if(length(uniqueRQs) >= 2 && length(uniqueCQs) >= 2) {
           #   theseRows <- grep("[R C]", chartDF$Label)
@@ -565,7 +565,7 @@ featureExtraction <- function(x=uniqueExams,
             # print(stimOffsetRow)
             # print(answerRow)
             # print(stimEndRow)
-
+            
             {
               # august 7, 2020
               # increment the loop if examiner marked artifact or other event during 5 prestim seconds
@@ -615,7 +615,7 @@ featureExtraction <- function(x=uniqueExams,
           if(isTRUE(as.logical(stopSeg[1]))) {
             if(all(i==as.numeric(stopSeg['case']), j==as.numeric(stopSeg['series']), k==as.numeric(stopSeg['chart']), segmentName==stopSeg['seg'])) {
               
-            # if(all(i==stopSeg[2], i==stopSeg['case'], seriesName==stopSeg['series'], segmentName==stopSeg['seg'])) {
+              # if(all(i==stopSeg[2], i==stopSeg['case'], seriesName==stopSeg['series'], segmentName==stopSeg['seg'])) {
               print("stopped for inspection")
               print(paste("exam:", examName, "series:", seriesName, "chart:", chartName, "segment:", segmentName))
               stop()
@@ -671,7 +671,7 @@ featureExtraction <- function(x=uniqueExams,
           }
           
           # View(segmentDF)
-        
+          
           ##### *experimental* pneumo pattern extraction #####
           
           # if(all(examName == "DX259I1", chartName == "01A", segmentName == "R5")) {
@@ -681,11 +681,11 @@ featureExtraction <- function(x=uniqueExams,
           # }
           
           if( all(isTRUE(extractPneumoPatterns), segmentDF$UPneumo[1] != -9.9, rateRatio >=.9) ) {
-
+            
             print("  pneumo pattern extraction")
-
+            
             # source(paste0(RPath, "pneumoPatterns.R"), echo=FALSE)
-
+            
             # respPatternsDF <- NULL # initialized earlier
             
             pnPatternDF <- pneumoPatternsFn(segmentDF=segmentDF,
@@ -695,12 +695,12 @@ featureExtraction <- function(x=uniqueExams,
                                             ampDiff=.1,
                                             baseDiff=.1,
                                             constrained=FALSE )
-
+            
             # append the pattern output for each stimulus event
-
+            
             # respPatternDF is initialized before the k loop over charts
             respPatternsDF <- rbind(respPatternsDF, pnPatternDF)
-
+            
           }
           
           # View(segmentDF)
@@ -719,7 +719,7 @@ featureExtraction <- function(x=uniqueExams,
           
           ############### cardio feature extraction ##############
           
-          # if(all(i == 2, seriesName == "X", chartName == "03A" && segmentName == "R7")) {
+          # if(all(i == 1, seriesName == "1", chartName == "01A" && segmentName == "2")) {
           #   assign("chartDF", chartDF, envir=.GlobalEnv)
           #   assign("segmentDF", segmentDF, pos=1)
           #   assign("extract.params", extract.params, pos=1)
@@ -762,8 +762,8 @@ featureExtraction <- function(x=uniqueExams,
           if( extractFC==TRUE && sum(pmatch(names(examDF), "c_FC", nomatch=0))!=0 ) {
             # check to see if finger cuff data exist
             # if( sum(pmatch(names(examDF), "c_FC", nomatch=0))!=0 ) {
-              print("  finger cuff feature extraction")
-              segmentDF <- newFCExtractFn(x=segmentDF, y=extract.params)
+            print("  finger cuff feature extraction")
+            segmentDF <- newFCExtractFn(x=segmentDF, y=extract.params)
             # } # end if FC data exist
           } 
           
@@ -835,10 +835,10 @@ featureExtraction <- function(x=uniqueExams,
         # pass back the RQs and CQs after feature extraction
         # chartDF[theseRows,] <- thisChartDF
         chartDF <- thisChartDF
-          
+        
         # pass the chartDF to the seriesDF
         seriesDF[chartOnsetRow:chartEndRow,] <- chartDF
-
+        
       } # end loop over k charts
       
       # pass the seriesDF to the examDF
@@ -849,8 +849,8 @@ featureExtraction <- function(x=uniqueExams,
         # respPatternsDF <- as.data.frame("")
         
         respPatternsDF <- as.data.frame(c(examName=examName, seriesName=seriesName, chartName=chartName, 
-          eventLabel=NA, rRateUP=NA, rRateLP=NA, ampChangeUP=NA, ampChangeLP=NA, 
-          baseChangeUP=NA, baseChangeLP=NA, RLEUp=NA, RLELp=NA ) )
+                                          eventLabel=NA, rRateUP=NA, rRateLP=NA, ampChangeUP=NA, ampChangeLP=NA, 
+                                          baseChangeUP=NA, baseChangeLP=NA, RLEUp=NA, RLELp=NA ) )
         
       }
       
@@ -862,9 +862,9 @@ featureExtraction <- function(x=uniqueExams,
       
     } # end loop over j series
     
-      # save the examDF to the global environment 
-      assign(paste0(examName, "_Data"), examDF, pos=1)
-
+    # save the examDF to the global environment 
+    assign(paste0(examName, "_Data"), examDF, pos=1)
+    
   } # end loop over i exams 
   
   if(showNames==TRUE) print(paste(i, "exams processed"))
