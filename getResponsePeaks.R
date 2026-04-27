@@ -38,10 +38,10 @@ getResponsePeaksFn <- function(tsData,
   
   #### make a vector of slope values ####
   
-  {
-    theSlope <- getTheSlopeFn(tsData)
-    # theSlope inclues 0 1 and -1 values
-  }
+  # {
+  #   theSlope <- getTheSlopeFn(tsData)
+  #   # theSlope inclues 0 1 and -1 values
+  # }
   
   ####   locate the response peak indices   ####
   
@@ -91,7 +91,7 @@ getResponsePeaksFn <- function(tsData,
     # there will always be at least 1 xPeak at this point
   }
   
-  #### strict Window option to keep the first latePeak after endRow ####
+  #### strict Window option to keep the first late Peak after endRow ####
   
   {
     # for the strictWOE==FALSE option 

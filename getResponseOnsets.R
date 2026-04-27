@@ -28,6 +28,12 @@ getResponseOnsetsFn <- function(tsData,
   ####
   # tsData is the time series vector for EDA or cardio data
   # xPeak is a vector of response peaks from the getResponsePeaksFn() in the getResponsePeaks.R script
+  # onsetRow is the sample index (in tsData) where the question/event begins
+  # latRow is the sample index of the end of the MRL minimum response latency
+  # ROWEndRow is the sample index for the end of the ROW response onset window for this segment
+  # endRow is the sample index for the offset of the question/Event
+  # inflectionRule is a switch, initialized in NCCAASCII_init.R used to control the use of the inflection rule 
+  # addLat is a numeric value (seconds) added to the MRL when using the inflection rule
   ####
   
   options(warn = 2)
@@ -188,21 +194,24 @@ getResponseOnsetsFn <- function(tsData,
     xOnset <- xOnset[xOnset <= ROWEndRow]
   }
   
-  # #### exclude peaks after the data descend below the onset value ####
+  # #### exclude onsets after the data descend below the min onset value in the ROW####
   # 
+  # commented out when this is handled in the apmplitudeExtractFnPC(),
+  # after extraction of candidate onset indices and candidate peak indices,
+  # and after selection of the indices with the max onset to peak distance
   # {
   #   # initialize this to NA to avoid problems
   #   postROWXOnset <- NULL
   #   # use the xPosSlope vector from earlier
-  #   
+  # 
   #   # get the pos slope onset indices after ROWEndRow
   #   postROWXOnset <- which(xPosSlope[ROWEndRow:endRow] == 1) + ROWEndRow - 1
-  #   
+  # 
   #   if(length(postROWXOnset) > 0) {
   #     # get the data values for post ROW onset indices
   #     postROWXOnsetVals <- tsData[postROWXOnset]
   #     minPostROWVal <- min(tsData[postROWXOnset])
-  #     
+  # 
   #     # get min xOnset
   #     thisMinOnset <- xOnset[which.min(tsData[xOnset])]
   #     minOnsetVal <- tsData[thisMinOnset]
