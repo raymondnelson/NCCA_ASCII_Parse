@@ -19,8 +19,9 @@ maxOnsetPeakDistFn <- function(tsData,
   # R function to select the EDA and cardio response onset and peak with the max distance
   # August 18, 2023
   # Raymond Nelson
-  # abstracted from the amplitudeExtractPCFn()
+  # modified April 27, 2026 to include the descent rule
   # located in the getMaxOnsetPeakDistance.R script
+  # abstracted from the amplitudeExtractPCFn() August 18, 2023
   # was previously included in the amplitudeExtractFn() in the AmplitudeExtract.R script
   # called by the amplitudeExtractFnPC() function in the amplitudeExtractPD.R script
   ####

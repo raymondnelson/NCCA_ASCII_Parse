@@ -568,12 +568,14 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   
   #### something vs nothing is something rule ####
   
-  if(isTRUE(nothingIsSomething) && yChangeValue < 20) {
+  if(isTRUE(nothingIsSomething) && yChangeValue < 10) {
     
     # Sep 27, 2021 
     # use an environment parameter to set NA response value to 0
     
     # nothingIsSomething is initialized in the NCCAASCII_init.R script
+    # it is used here,
+    # and also used int he RCScore.R script
     
     yChangeOnset <- NA
     yChangeOnsetValue <- NA
@@ -582,7 +584,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     
     yChangeValue <- 0
     # 2026Mar21 what happens when a min value is used
-    yChangeValue <- 20 # 20 is 1% of the y-axis range
+    yChangeValue <- 10 # 10 is 0.5% of the y-axis range
     # yChangeValue will be NA if no response and nothingIsSomething=FALSE
     
   }

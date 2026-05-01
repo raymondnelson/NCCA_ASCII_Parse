@@ -17,7 +17,7 @@ descentRuleFn <- function(xOnsetLoop=xOnsetLoop,
                           sensorName=sensorName,
                           segmentName=segmentName,
                           segmentTitle=segmentTitle ) {
-  # newR function to execute the "descent rule" which prevents selection of a response peak,
+  # R function to execute the "descent rule" which prevents selection of a response peak,
   # after the data have descended more than a proportion (1/2 way),
   # from a preceeding response peak to the min value in the ROW
   # April 26, 2026 

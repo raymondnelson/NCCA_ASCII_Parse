@@ -560,13 +560,29 @@ RCScoresFn <- function(seriesMeasurementDF=RqCqDFSeries,
           next() # next k sensor
         }
         
+        #### something vs nothing is something rule ####
+        
+        # May 1, 2026
+        if(isTRUE(nothingIsSomething)) {
+          # something vs nothing rules says that
+          # something vs nothing is something 
+          # so we score with the RQ or CQ if the other is missing 
+          
+          # nothingIsSomething is boolean value intitialized in the NCCAASCII_init.R script
+          # it is used here and also in the amplitudeExctractFnFC.R script
+          
+          if(is.na(RQValue) || RQValue == "") {
+            RQValue <- 10
+          }
+          if(is.na(CQValue) || CQValue == "") {
+            CQValue <- 10
+            CQName <- "svn"
+          }
+        }
+        
         #### replace small values ####
         
-        # something vs nothing rules says that
-        # something vs nothing is something 
-        # so we score with the RQ or CQ if the other is missing 
-        
-        # also replace small values < 1% of the y axis
+        # replace small values < 0.5% of the y axis
         # to avoid divide by zero errors and Inf values 
         
         # for EDA and cardio
