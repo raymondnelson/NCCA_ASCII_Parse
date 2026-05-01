@@ -172,7 +172,10 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # the data are scaled to but are not constrained to these aesthetics
   # UPneumo LPneumo EDA, Cardio, PLE, seat FC eCardio PTTPPG PTTECG PTTPTT
   # May 9, 2024 added PTT channels
-  scaleVals <- c(225, 225, 300, 300, 100, 50, 300, 225, 200, 200, 200)
+  # scaleVals <- c(225, 225, 300, 300, 100, 50, 300, 225, 200, 200, 200)
+  # 2026Apr16
+  scaleVals <- c(100, 100, 100, 100, 45, 30, 150, 125, 100, 100, 100)
+  
   # scaleVals <- c(225, 225, 200, 300, 200, 50, 300, 225)
   # scaleVals <- c(225, 225, 100, 300, 300, 50, 300, 225)
   
@@ -194,9 +197,11 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # Nov 17, 2023
   # range values for feature extraction
   # these are best if they are identical to the scaleVals
-  # because when gainVals==100 the output will be the same as the un-gained va
+  # because when gainVals==100 the output will be the same as the un-gained values
   # May 9, 2024 added PTT channels
-  rangeVals <- c(225, 225, 300, 300, 100, 50, 300, 225, 200, 200, 200)
+  # rangeVals <- c(225, 225, 300, 300, 100, 50, 300, 225, 200, 200, 200)
+  # 2026Apr16
+  rangeVals <- c(100, 100, 100, 100, 45, 30, 150, 125, 100, 100, 100)
   # 
   # rangeVals <- c(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000)
   # these initialize the range of integer unit within which response features are measured
@@ -373,7 +378,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # Dec 8, 2023
   # number of prestim seconds for Cardio artifact extraction
   # these are actually pre-response seconds not pre-stim
-  cardioPrestim <- 4
+  cardioPrestim <- 5
   # was 2
   # was 4 2026Feb28
   
@@ -482,6 +487,9 @@ print("init parameters for parsing and processing NCCA ASCII data")
   ROWEnd <- 5
   # ROWEnd <- 14.9
   
+  # ROWAnchor can be "verbalAnswer" "stimulusEnd" or "stimulusOnset"
+  ROWAnchor <- "verbalAnswer"
+  
   # the number of seconds afer ROWStop
   
   # measuredSeg is the number of seconds in the scoring window following stimulus onset
@@ -505,6 +513,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # recoveryProp is the proportion of return to onset value
   # used when evaluating response duration or 1/2 recovery time 
   # .632 = 1 time constant
+  # 2026Apr19 not sure if this parameter is in use because response duration is not extracted
   recoveryProp <- .368
   # .632 == 1 time constant == the time needed to return .632 * distance to origin
   # after 5 * Tc the data will return 99% of the distance to the origin
@@ -514,18 +523,18 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # strict means that upward segments beginning after ROWEndRow are always ignored
   # FALSE will include positive slope segments that begin after ROW
   # but only if the data have not descended below the onset Y value
-  # or below 50% of the max Y value if the descentRule is not 0
-  # the allowed descent proportion is set by the descProp parameter
+  # or below 50% of the max Y value if the "descentRule" parameter is not FALSE
+  # the allowed descent proportion is set by the "descProp" parameter in this script
   # FALSE will also make use of the descentRule parameter
-  # strictROW <- TRUE
+  EDAStrictROW <- TRUE
   EDAStrictROW <- FALSE
+  cardioStrictROW <- TRUE
   cardioStrictROW <- FALSE
   
   # strictWindow = TRUE will force a strict EDA and cardio evaluation window
   # strict means that measured responses end at the end of the EW 
   # even if the response continues to a peak ofter the end of the EW
   # FALSE will score to the end of reaction even if outside the EW
-  # strictWindow <- TRUE
   EDAStrictWindow <- TRUE
   EDAStrictWindow <- FALSE
   cardioStrictWindow <- TRUE
@@ -534,26 +543,30 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # number of seconds to shorten the window when strictWindow == FALSE
   shortenEW <- 1.5
   
-  # descentRule is a switch 
   # descentRule will exclude positive slope segments 
   # after the data have descended a proportion from the previous max peak
-  # descentRule is used when strictROW==FALSE
-  # descentRule = 0 will disable the use of the descentRule
-  # and will use all upward segments that begin during the EW befor or after the ROW  
-  # if the data have not descended below the onset Y value
-  # descentRule = 1 will exclude positive slope segments during the EW
-  # if the data have descended a proportion from the previous max peak value
-  # descentRule = 2 will allow all ascending segments during ROW,
-  # and exclude ascending segments during EW after ROW,
-  # if the data descend more than a proportion descProp from the previous peak
+  # if the data descend more than a proportion (descProp) from the previous peak
+  # to the origin or response onset within the ROW
   # descentRule = 1 or 2 uses the descProp parameter 
-  descentRule <- 2
+  descentRule <- TRUE
+  # "descProp" is a parameter in this script
+  # descentRule and desProp are both used by the descentPropFn() function,
+  # in the descentRule.R script
   
-  # descProp is the proportion to use for the descentRule
-  # when strictROW=FALSE
-  # used by the descentRule
-  # .632 = 1 time constant
-  descProp <- .632
+  # descProp <- .632 
+  # .632 = 1 time constant, so that 5 time constants (1-descProp)^5 will ensure that,
+  # data will return 99% of the distance to origin
+  descProp <- .5
+  # polygraph field practitioners have traditianally discussed,
+  # whether data have returned half-way to the origin
+  # descProp is used by the descentPropFn() function,
+  # that is called by the getMaxOnsetPeakDistanceFn() that is called by the amplitudeExtractFnPC()
+  #  descentPropFn() function is controlled by the "descentRule" parameter in this script
+  
+  # ignore response peaks after data (EDA and cardio) descend to lowest point in the ROW
+  descentToOriginStop <- TRUE
+  # used in the amplitudeExtractFnPC() in the amplitudeExtractPC.R script,
+  # and also in the descentRuleFn() in the descentrule.R script
   
   # ignore is a parameter to ignore slope changes of small duration
   # when locating EDA and cardio response onset and response end x row indices
@@ -563,6 +576,8 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # changed to 6 during 2018 to improve robust performance with bad data
   ignore <- 7
   # changed to 7 2020-02-17 to ignore slope changes of less than 1/4 second
+  # 2026Mar21 find out where this is used 
+  # used in the smoothSlope() function in the amplitudeExtractHelperFunctions.R script
   
   # inflection method
   # 0 = no inflection detection
@@ -573,9 +588,9 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # slopechangeRule is a switch to control the use of a response onset location
   # as a function of a significant change (increase) in positive slope
   # when the slope is positive at stimulus onset 
-  # slopeChangeRule = 0 will disable the use of significant changes in positive slope as a response onset
-  # slopeChangeRule = 1 will enable the use of significant changes in positive slope as a response onset
-  # slopeChangeRule = 2 will enable the use of significant changes in positive slope 
+  # inflectionRule = 0 will disable the use of significant changes in positive slope as a response onset
+  # inflectionRule = 1 will enable the use of significant changes in positive slope as a response onset
+  # inflectionRule = 2 will enable the use of significant changes in positive slope 
   # but only when there is no normal onset of a positive slope segment during the ROW
   inflectionRule <- 1
   cardioInflectionRule <- 0
@@ -617,6 +632,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # to ignore small slope changes when evaluating upward slope
   # before inferring a response onset in EDA and cardio
   ignoreTonicChange = .125
+  # 2026Mar21 where is this used
   
   # inflectionLat is the number of seconds of added latency 
   # after the MRL
@@ -661,7 +677,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # FPA = finger pulse amplitude (distance between max and min peaks)
   # SDL = systolic - diastolic line method (using interpolated sys and dyst lines)
   
-  # July 27, 2023S
+  # July 27, 2023
   # set this parameter to FALSE to prevent evaluation of the strength of RQ and CQ response
   PLESomethingVsSomethingIsNothing <- FALSE
   # PLESomethingVsSomethingIsNothing <- TRUE
@@ -836,15 +852,13 @@ print("init parameters for parsing and processing NCCA ASCII data")
   pneumoConstraintHigh <- log(1.6) # 0.4700036
   # pneumoConstraintHigh <- log(2) # 0.6931472
   
-  # Sep 27, 2021
-  # nothingIsSomething
+  # nothingIsSomething is for the "something vs nothing is something" rule 
   # for EDA and cardio
-  # TRUE returns 0 for no response onset 
-  # FALSE returns NA for no response onset
+  # returns a minimum value of 20 (1% of the y-axis range) when no value is extracted from the data
   nothingIsSomething <- FALSE
   # nothingIsSomething <- TRUE
-  # used in the amplitudeExtractPCFn() for EDA and Cardio feature extractio
-  
+  # used in the amplitudeExtractPCFn() for EDA and Cardio feature extraction
+
 }
 
 
