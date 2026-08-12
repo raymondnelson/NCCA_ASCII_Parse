@@ -302,8 +302,17 @@ extractMeasurementsFn<- function(x=uniqueExams,
             if(answerRow > (offsetRow + 5*cps)) answerRow <- offsetRow + 1
             # Aug 5 2023 treat this as a missing answer instead
             
+            # August 4, 2006
+            # get the ROWAnchorROW
+            # ROWAnchor is initialized in the NCCAASCII_init.R script
+            ROWAnchorRow <- switch(ROWAnchor,
+                                   "verbalAnswer"=answerRow,
+                                   "stimulusBegin"=stimOnsetRow,
+                                   "stimulusEnd"=offsetRow )
+            
             # end of the ROW
-            ROWEndRow <- answerRow + ((5*cps)-1)
+            # August 4, 2006 using ROWAnchorRow instead of answerRow
+            ROWEndRow <- ROWAnchorRow + ((ROWEnd*cps)-1)
             if(ROWEndRow > (nrow(segmentDF)-2)) ROWEndRow <- nrow(segmentDF) - 2
           
             # end of the WOE
@@ -920,28 +929,30 @@ extractMeasurementsFn<- function(x=uniqueExams,
               latencyEndIndices[which(latencyEndIndices >= nrow(chartDF))] <- nrow(chartDF) - 1
             }
             
-            ROWEndIndices <- c(P2Idx=round(ROWEnd*cps) + answerRow + segOnsetRow - 1,
-                               P1Idx=round(ROWEnd*cps) + answerRow + segOnsetRow - 1,
+            
+            # August 4, 2026 using ROWAnchorROW instead of answerRow
+            ROWEndIndices <- c(P2Idx=round(ROWEnd*cps) + ROWAnchorRow + segOnsetRow - 1,
+                               P1Idx=round(ROWEnd*cps) + ROWAnchorRow + segOnsetRow - 1,
                                PneumoIdx="",
-                               AutoEDAIdx=round(ROWEnd*cps) + answerRow + segOnsetRow - 1,
+                               AutoEDAIdx=round(ROWEnd*cps) + ROWAnchorRow + segOnsetRow - 1,
                                AutoEDADurIdx="",
                                AutoEDACmplxIdx="",
-                               ManualEDAIdx=round(ROWEnd*cps) + answerRow + segOnsetRow - 1,
+                               ManualEDAIdx=round(ROWEnd*cps) + ROWAnchorRow + segOnsetRow - 1,
                                XManualEDADurIdx="",
                                ManualEDACmplxIdx="",
-                               CardioIdx=round(ROWEnd*cps) + answerRow + segOnsetRow - 1,
+                               CardioIdx=round(ROWEnd*cps) + ROWAnchorRow + segOnsetRow - 1,
                                CardioDurIdx="",
                                CardioCmplxIdx="",
                                CardioRateIdx="",
                                if(sum(pmatch(names(segmentDF), "FCMeasure", nomatch=0))!=0) {
-                                 c(FCIdx=round(ROWEnd*cps) + answerRow + segOnsetRow - 1, 
+                                 c(FCIdx=round(ROWEnd*cps) + ROWAnchorRow + segOnsetRow - 1, 
                                    FCDurIdx="", 
                                    FCCmplxIdx="",
                                    FCRateIdx="")
                                },
                                # eCardio
                                if(sum(pmatch(names(segmentDF), "PPG1Measure", nomatch=0))!=0) {
-                                 PLEIdx=round(ROWEnd*cps) + answerRow + segOnsetRow - 1
+                                 PLEIdx=round(ROWEnd*cps) + ROWAnchorRow + segOnsetRow - 1
                                }
             ) 
             
