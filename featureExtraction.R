@@ -422,8 +422,8 @@ featureExtraction <- function(x=uniqueExams,
           
         } else {
           
-          LPRate <- NA
           UPRate <- NA
+          LPRate <- NA
           rateRatio <- NA
           
         }
