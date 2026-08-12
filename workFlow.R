@@ -554,13 +554,13 @@ if(fixSensorNames==TRUE) {
   if(!is.null(searchPattern1)) {
     
     # PLE sensor name should be PPG1
-    # fixSensorNameFn(x="D&+", oldSensorName = "PLE1", newSensorName = "PPG1")
+    fixSensorNameFn(x="D&+", oldSensorName = "PLE1", newSensorName = "PPG1")
     # fixSensorNameFn(x="D&+", oldSensorName = "  PL", newSensorName = "PPG1")
     
     # fixSensorNameFn(x="D&+", oldSensorName = "Move1", newSensorName = "MoveX")
     
-    fixSensorNameFn(x="D&+", oldSensorName = "Aux01", newSensorName = "Move1")
-    fixSensorNameFn(x="D&+", oldSensorName = "Aux02", newSensorName = " PPG1")
+    # fixSensorNameFn(x="D&+", oldSensorName = "Aux01", newSensorName = "Move1")
+    # fixSensorNameFn(x="D&+", oldSensorName = "Aux02", newSensorName = " PPG1")
     
     # the NCCA ASCI spec uses "UPneumo" and LPnuemo"
     # while the NCCA pReview application seems to use "Upneumo" and "Lpneumo"
@@ -938,6 +938,9 @@ if(preProcessData == TRUE) {
   # source this for the fixTagsFn()
   source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
   
+  # # list of events to exclude from analysis
+  source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+
   print("pre-processing")
   source(paste0(RPath, 'preProc.R'), echo=FALSE)
   # preProc(x=uniqueExams, makeDF=makeDF, output=output) 
@@ -2151,7 +2154,7 @@ if(isTRUE(printCharts)) {
  
 
 
-if(!exists("printSegments")) printSegments <- FALSE
+   if(!exists("printSegments")) printSegments <- FALSE
  # printSegments <- TRUE
 
 
