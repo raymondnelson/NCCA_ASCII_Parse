@@ -33,6 +33,9 @@
 
 {
   
+  # import a vector of question labels that are not included in feature extraction
+  source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+  
   # source the scripts for algorithm functions
   
   # output functions for score and measurement tables
@@ -512,7 +515,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
           
           # we still have the series rows for the RQ and CQ charts
           
-          if(isTRUE(writeCSV)) {
+          if(isTRUE(saveCSV)) {
             rqcqfilename <- paste0(str_sub(searchString, 2, -15), "_RQCQDFSeries_", seriesName, ".csv")
             write.csv(RqCqDFSeries, file=rqcqfilename, row.names=FALSE)
           }
