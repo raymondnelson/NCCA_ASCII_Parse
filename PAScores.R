@@ -594,7 +594,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
   }
  
-  #### calculate the categorical result using the probability cutpoints ####
+  #### decision rules to compute the categorical result using the probability cutpoints ####
   
   {
     
@@ -609,6 +609,12 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                        flip=FALSE )
     # using only the postTruthful value 
     # because it is the compliment of postDeceptive
+    
+    # <> subtotal score rule here
+    
+    # <>
+    
+    
     
     PACategoricalResult <- GTRResult$testResult
     
