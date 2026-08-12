@@ -68,7 +68,7 @@
   
   # to control the print output
   showNames <- TRUE
-  # output <- FALSE
+  output <- FALSE
   
   outputChartFileName <- "_chartPlot.pdf"
   
@@ -115,17 +115,17 @@
     showActivityData <- TRUE
     # showActivityData <- FALSE
     
-    showPTTPTT <- TRUE
-    # showPTTPTT <- FALSE
-    
     showEDAData <- TRUE
     # showEDAData <- FALSE
     
     showAutoEDA <- TRUE
     # showAutoEDA <- FALSE
     
+    showPTTPTT <- TRUE
+    showPTTPTT <- FALSE
+    
     showManualEDA <- TRUE
-    showManualEDA <- FALSE
+    # showManualEDA <- FALSE
     
     # Jan 17, 2023
     # second EDA sensor
@@ -221,13 +221,14 @@
   {
     
     
+    inclChartName <- TRUE
+    # inclChartName <- FALSE
+    
     showWarnings <- TRUE
     # showWarnings <- FALSE
     
     if(!showScores) showWarnings <- FALSE
-    
-    inclChartName <- TRUE
-    # inclChartName <- FALSE
+    if(!showScores) inclChartName <- FALSE
     
   }
   
@@ -461,6 +462,8 @@ for(i in 1:length(uniqueExams)) {
         
         # get the data frame with the time series data for each chart
         chartDF <- seriesDF[seriesDF$chartName==chartName,]
+        
+        # View(chartDF)
         
         chartOnsetRow <- which(seriesDF$chartName==uniqueCharts[k])[1]
         chartEndRow <- chartOnsetRow + nrow(chartDF) - 1
@@ -862,6 +865,13 @@ for(i in 1:length(uniqueExams)) {
           stimOffset <- which(chartDF$Events=="offsetRow")
           answerRow <- which(chartDF$Events=="answerRow")
           
+          if(length(stimOnset) != length(stimOffset)) {
+            print(paste(examName, "series", seriesName, "chart", chartName))
+            print("unequal parameter lengths for shaded areas")
+            print("line 859")
+            # stop()
+          }
+          
           # <> Aug 4, 2020
           RQStimOnset <- which(chartDF$eventLabel %in% eventNames[grep("R", eventNames)])
           # exclude sacrifice "SR" and "RS" events
@@ -1230,7 +1240,7 @@ for(i in 1:length(uniqueExams)) {
           uPnQ2 <- quantile(chartDF$c_UPneumoSm, .50)
           uPnQ3 <- quantile(chartDF$c_UPneumoSm, .75)
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ2), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           # tukey fences
           uPnIQR <- uPnQ3 - uPnQ1
@@ -1259,7 +1269,7 @@ for(i in 1:length(uniqueExams)) {
           lPnQ2 <- quantile(chartDF$c_LPneumoSm, .50)
           lPnQ3 <- quantile(chartDF$c_LPneumoSm, .75)
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ2), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           # tukey fences
           lPnIQR <- lPnQ3 - lPnQ1
@@ -1298,6 +1308,14 @@ for(i in 1:length(uniqueExams)) {
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioDiastolic), color="grey60", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioSystolic), color="grey60", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           
+          # cardio quartile lines
+          cdoQ1 <- quantile(chartDF$c_Cardio1, .25)
+          cdoQ2 <- quantile(chartDF$c_Cardio1, .5)
+          cdoQ3 <- quantile(chartDF$c_Cardio1, .75)
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ1), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ3), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          
           # signal processing Stern Ray & Quigley 19
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioSRQ1+125), color="red3", linewidth=.15, alpha=.7) # + coord_cartesian(ylim=c(yMin, yMax))
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioSRQ2+250), color="red2", linewidth=.15, alpha=.7) # + coord_cartesian(ylim=c(yMin, yMax))
@@ -1322,7 +1340,7 @@ for(i in 1:length(uniqueExams)) {
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_FCSystolic), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_FCMid+500), color="black", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             if(showScores) {
-              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_FCMA+500), color="blue3", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_FCMA+500), color="blue4", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             }
           } # end if for FC
         } # end if showCardioData
@@ -1336,6 +1354,15 @@ for(i in 1:length(uniqueExams)) {
             # wire frame lines
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDAPeak), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDABase), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+            
+            # EDA quartile lines
+            edaQ1 <- quantile(chartDF$c_AutoEDA, .25)
+            edaQ2 <- quantile(chartDF$c_AutoEDA, .5)
+            edaQ3 <- quantile(chartDF$c_AutoEDA, .75)
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ1), color="green2", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ2), color="yellow", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ3), color="green2", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            
           }
           
           if(isTRUE(showManualEDA)) {
@@ -1370,6 +1397,15 @@ for(i in 1:length(uniqueExams)) {
             # systolic diastolic peak lines
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1Max), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1Min), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+            
+            # PPG1 quantiles
+            ppgQ1 <- quantile(chartDF$c_PPG1, .25)
+            ppgQ2 <- quantile(chartDF$c_PPG1, .5)
+            ppgQ3 <- quantile(chartDF$c_PPG1, .75)
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ1), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ3), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            
           } # end if for PLE
         }
         
@@ -1387,10 +1423,13 @@ for(i in 1:length(uniqueExams)) {
           # upper and lower peak lines
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Min), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Max), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
-          # quantiles
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=quantile(c_Move1Proc, .50)), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=quantile(c_Move1Proc, .25)), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=quantile(c_Move1Proc, .75)), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          # Move1 quantiles
+          actQ1 <- quantile(chartDF$c_Move1Proc, .25)
+          actQ2 <- quantile(chartDF$c_Move1Proc, .5)
+          actQ3 <- quantile(chartDF$c_Move1Proc, .75)
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           # IQR
           activityQ1 <- quantile(chartDF$c_Move1Proc, .25)
           activityQ2 <- quantile(chartDF$c_Move1Proc, .50)
@@ -2396,6 +2435,9 @@ for(i in 1:length(uniqueExams)) {
           scoredEvents <- chartDF$Label[scoredEventRows]
           
           checkThese <- which(allEventRows %in% scoredEventRows)
+          # exclude the first question if it is present in the vector
+          checkThese <- checkThese[which(checkThese != 1)]
+          
           againstThese <- checkThese - 1
           
           # question onset pacing in seconds
