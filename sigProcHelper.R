@@ -6,8 +6,8 @@
 # #####
 
 # 2026Apr14 moved 2 functions to separate scripts
-source(paste0(RPath, "scaleData.R"), echo = TRUE)
-source(paste0(RPath, "offsetData.R"), echo = TRUE)
+# source(paste0(RPath, "scaleData.R"), echo = TRUE)
+# source(paste0(RPath, "offsetData.R"), echo = TRUE)
 
 
 # sampleSpace() function to calculate the sample space for a pulse rate
@@ -283,6 +283,37 @@ interpolatePeaks <- function(x=na.omit(maxOut), y=na.omit(maxVal)) {
 
 # diastolicInterp <- c(interpolatePeaks(x=minOut, y=minVal),0 )
 # plot.ts(diastolicInterp, ylim=c(-3,10))
+
+
+####
+
+
+# myData <- chartDF$c_Cardio1
+
+peakLinesFn <- function(x=myData, line="upper", sensorName="cardio") {
+  # function to compute the systolic or diastolic line for cardio data
+  # can also be used with vasomotor, respiration, eda, or activity data
+  # x input is a time series vector
+  # line is "upper" or "lower"
+  # sensorName is "cardio" and can also be "eda" "vasomotor", "pneumo" or "activity"
+  # output is the interpolated line
+  ###
+  if(sensorName=="cardio") {
+    # cps is a value in the global envir, typically = 30
+    y = round(.25 * cps, 0)
+    # cardio
+    # eda 
+    # pneumo
+    # activity
+  }
+  if(line=="upper") {
+    peakIdcs <- maxPeak(x=x, y=y)
+  } else {
+    peakIdcs <- minPeak(x=x, y=y)
+  }
+  peakVals <- x[peakIdcs]
+  interpolatePeaks(x=peakIdcs, y=peakVals) 
+} # end peakLinesFn()
 
 
 ####
@@ -882,7 +913,7 @@ centerColumn <- function(x) {
 ####
 
 
-setColRange <- function(DAT, y=30000, firstRow=firstEvent, lastRow=lastEventEnd) {
+setColRange <- function(DAT, y=50000, firstRow=firstEvent, lastRow=lastEventEnd) {
   # function to set each column range
   # called by the sigProc function
   # in the sigProcHelper.R script
@@ -898,6 +929,7 @@ setColRange <- function(DAT, y=30000, firstRow=firstEvent, lastRow=lastEventEnd)
   #        )
   # )
   # deadRows <- which(x == -.9.9)
+  DAT <- DAT - min(DAT)
   rangeVal <- max(DAT[firstRow:lastRow], na.rm=TRUE) - min(DAT[firstRow:lastRow], na.rm=TRUE)
   rangeCoef <- y / rangeVal
   # in case there is a dead sensor with no activity
