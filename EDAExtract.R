@@ -98,13 +98,14 @@ EDAExtractFn <- function(x=segmentDF, y=extract.params) {
   #### make  a list of environment parameters ####
   
   {
+    
     # could get all these from the global env but this is an opportunity to change them 
     # the advantage of using a list is that they can be changed here
     env.params <- list(dataRate=cps, 
                        Lat=EDALat, 
                        useROW=useROW,
                        ROWStart=ROWStart,
-                       ROWStop=ROWStop,
+                       ROWStop=ROWAnchor,
                        ROWEnd=ROWEnd, 
                        ignore=ignore, 
                        strictWindow=EDAStrictWindow, 
@@ -113,7 +114,7 @@ EDAExtractFn <- function(x=segmentDF, y=extract.params) {
                        descProp=descProp, 
                        inflectionRule=inflectionRule,
                        inflectionMethod=inflectionMethod, 
-                       nothingIsSomething=nothingIsSomething,
+                       nothingIsSomething=EDANothingIsSomething,
                        prestim=EDAPrestim ) # prestim added Aug 8, 2023
     
     assign("env.params", env.params, pos=1)
