@@ -225,27 +225,28 @@ artifactProcFn<- function(x=uniqueExams) {
         
         if(isTRUE(pneumoArtifacts)) {
           
-          # if(showNames==TRUE)  print("  pneumo artifacts")
-          # 
-          # # check for unresponsive pneumo data
-          # # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-          # # source(paste0(RPath, 'tukeyFences.R'), echo=FALSE)
-          # # source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
-          # 
-          # # 2020-06-03 seems to be a problems with adding NUL
-          # pneumoCheckMsg <- pneumoCheckFn(x1=chartDF$c_UPneumoSm, x2=chartDF$c_LPneumoSm, sec=5, times=30, omit=10, firstRow=NULL, lastRow=NULL)
-          # 
+          if(showNames==TRUE)  print("  pneumo artifacts")
+
+          # check for unresponsive pneumo data
+          # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+          # source(paste0(RPath, 'tukeyFences.R'), echo=FALSE)
+          # source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
+
+          # check for unresponsive pneumo sensors
+          # 2020-06-03 seems to be a problems with adding NUL
+          pneumoCheckMsg <- pneumoCheckFn(x1=chartDF$c_UPneumoSm, x2=chartDF$c_LPneumoSm, sec=5, times=30, omit=10, firstRow=NULL, lastRow=NULL)
+
           # chartDF$LPneumoUnresponse_a <- pneumoCheckMsg
           # chartDF$UPneumoUnresponse_a <- pneumoCheckMsg
-          # 
-          # # check for respiration artifacts
-          # # source(paste0(RPath, 'pneumoArtifact.R'), echo=FALSE)
-          # chartDF <- pneumoArtifactFn(x=chartDF)
-          # # stop()
-          # 
-          # # which(chartDF$Pneumo_a == "Artifact")
-          # # which(chartDF$UPneumo_a == "Artifact")
-          # # which(chartDF$LPneumo_a == "Artifact")
+
+          # check for respiration artifacts
+          # source(paste0(RPath, 'pneumoArtifact.R'), echo=FALSE)
+          chartDF <- pneumoArtifactFn(x=chartDF)
+          # stop()
+
+          # which(chartDF$Pneumo_a == "Artifact")
+          # which(chartDF$UPneumo_a == "Artifact")
+          # which(chartDF$LPneumo_a == "Artifact")
           
         } 
         
