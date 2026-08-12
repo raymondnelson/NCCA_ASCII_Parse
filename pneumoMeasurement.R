@@ -6,8 +6,10 @@
 ####
 
 
+
 # dataVector <- segmentDF$c_UPneumo[responseOnsetRow:responseEndRow]
 # verbalAnswer <- which(segmentDF$Event=="answerRow") - (which(segmentDF$Event=="onsetRow")+1) + 1
+
 
 
 pneumoMeasurementFn <- function(dataVector, verbalAnswer=NULL, pnBufferLen=pneumoMeasurementBuffer, output="mean") {
@@ -106,12 +108,7 @@ pneumoMeasurementFn <- function(dataVector, verbalAnswer=NULL, pnBufferLen=pneum
     pneumoMeasurementBufferLen <- length(REVector2)
   }
                                
-  # if(output=="mean") {
-  #   REVector2 <- REVector2[c(1:(length(REVector2) - pneumoMeasurementBufferLen))]
-  #   REVector2 <- REVector2[c(1:length(REVector2))]
-  # }
-  
-  # compute the sum of absolute differences for the moving window
+ # compute the sum of absolute differences for the moving window
   # i=pneumoMeasurementBufferLen
   for (i in pneumoMeasurementBufferLen:length(REVector2)) {
     REVector2[(i-pneumoMeasurementBufferLen+1)] <-  sum( REVector1[(i-pneumoMeasurementBufferLen+1):i] )
@@ -126,7 +123,7 @@ pneumoMeasurementFn <- function(dataVector, verbalAnswer=NULL, pnBufferLen=pneum
   # head(REVector2, 300)
   # tail(REVector2, 300)
   
-  # fix NA values when the out
+  # fix NA values when the output is a vector
   if(output=="vector") {
     for(i in 2:length(REVector2)) {
       if(is.na(REVector2[i])) {
@@ -143,10 +140,14 @@ pneumoMeasurementFn <- function(dataVector, verbalAnswer=NULL, pnBufferLen=pneum
     return(REVector2)
   }
   
+  return( mean(REVector2, na.rm=TRUE) )
+  
 } # end pneumoMeasurementFn() function
 
 
+
 # pneumoMeasurementFn(dataVector, verbalAnswer)
+
 
 
 
