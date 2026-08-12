@@ -1,3 +1,9 @@
+# R function to select the EDA and cardio response onset and peak with the max distance
+# April 1, 2026
+# replaces the maxOnsetPeakDistFn() in the getMaxOnstDistance.R script,
+# to include helper functions to exclude peaks based on the degree of descent from a previous peak
+# Raymond Nelson
+####
 
 
 
@@ -9,15 +15,15 @@ newMaxOnsetPeakDistFn <- function(tsData,
                                   ROWEndRow,
                                   sensorName ) {
   # R function to select the EDA and cardio response onset and peak with the max distance
-  # located in the newMaxOnsetPeakDistance.R script
-  # was previously included in the amplitudeExtractFn() in the AmplitudeExtract.R script
   # April 1, 2026
-  # Raymond Nelson
   # replaces the maxOnsetPeakDistFn() in the getMaxOnstDistance.R script,
-  # to include the descentRule parameter that is initialized in the NCCASCII_init.R script
-  # called by the amplitudeExtractPCFn()
+  # to include helper functions to exclude peaks based on the degree of descent from a previous peak
+  # Raymond Nelson
+  # located in the newMaxOnsetPeakDistance.R script
+  # called by the amplitudeExtractFnPC() function in the amplitudeExtractPD.R script
   ####
   # tsData input is the time series data for a stimulus segment, with prestim and poststim segments
+  # time series data can be Manual or Auto EDA, and can be cardio diastolic, systolic, or mid-line
   # xOnset input is a vector of indices at which + slope segments begin
   # XPeak input is a vector of indices at which - slope segments begin
   # sensorName is passed to another funtion to normalize the scale of the measured response
@@ -29,9 +35,9 @@ newMaxOnsetPeakDistFn <- function(tsData,
   # yChangePeakValue 
   # yChangeValue 
   ####
-
-  # xPeak rows may be excluded depending on how the data descend prior to a peak after a previous peak
   
+  ### initialized some vectors for the onset and peak values ####
+
   {
     
     # check and fix if xOnset == xPeak 
@@ -44,14 +50,28 @@ newMaxOnsetPeakDistFn <- function(tsData,
     onsetIdx <- rep(NA, length=length(xPeak))
     onsetVals <- rep(NA, length=length(xPeak))
     
-    # peakIdx <- rep(NA, length=length(xPeak))
-    # peakVals <- rep(NA, length=length(xPeak))
+    # these may not be necessary
+    peakIdx <- rep(NA, length=length(xPeak))
+    peakVals <- rep(NA, length=length(xPeak))
     
     # initialize a vector for the max y distance for xOnset to xPeak
     yDistance <- rep(NA, length=length(xPeak))
     
     # first make an empty vector for the loop output
     # yChange <- rep("", times=length(xOnset)) 
+    
+  }
+  
+  #### exit if no xPeak or XOnset indices ####
+  
+  if( (length(xPeak) == 0 || all(is.na(xPeak))) || (length(xOnset) == 0 || all(is.na(xOnset))) ) {
+      
+    return(list(yChangeOnset=NA, 
+                yChangeOnsetValue=NA, 
+                yChangePeak=NA, 
+                yChangePeakValue=NA, 
+                yChangeValue=NA,
+                sensorName=sensorName ))
     
   }
   
@@ -70,23 +90,33 @@ newMaxOnsetPeakDistFn <- function(tsData,
       # plot.ts(tsData[(xOnset[n]):length(tsData)])
       # plot.ts(tsData)
       
+      # next n if there are no xOnset indices before this [n] xPeak
       if(length(which(xOnset < xPeak[n])) == 0) next()
       
       # set the stopRow to stop including xPeak values if the data descend below the xOnset[n] value
       # stopRow <- which( tsData[ c( (xOnset[n]+1):length(tsData) ) ] <= xOnsetVals[n] )[1] + xOnset[n] - 1
+      # this way will include all xPeak indices befor ROWEndROW
       stopRow <- which( tsData[ c( ROWEndRow:length(tsData) ) ] <= min(xOnsetVals ))[1] + ROWEndRow - 1
+      
+      if(!isTRUE(descentToOriginStop)) {
+        # set the stopRow to the end of the segment to disable this rule,
+        # using a parameter that was initialized in the NCCAASCII_init.R script
+        stopRow <- length(tsData)
+        # this will force the feature extraction function to use all xPeaks in the WOE,
+        # regardless of whether the data descend below the origin or low point in the ROW
+      } 
       
       # there is no stop row when the data do not descend below onset, so use the last row instead
       if(is.na(stopRow)) stopRow <- length(tsData)
       
+      # next n if there are no xOnset indices before the stopRow
       if(length(which(xOnset < stopRow)) == 0) next()
       
       # descentRule=0 will disable the descent rule, 
-      # all peaks in the EW are used until the data descend below the y-axis value at xOnset[n]
       # descentRule=1 will enable the rule for all negative slope segments after a response peak
-      # descentRule=2 will enable the rule only after ROWEndRow during the EW,
-      # keeping all ascending segments during the ROW
-      
+      # descentRule=2 will keep all ascending segments and all xPeaks in the ROW, 
+      # and will enable the rule only after ROWEndRow during the WOE
+
       # plot.ts(tsData)
       
       # # initialize the xOnsetStart to compute the descent distance/proportion
@@ -244,7 +274,11 @@ newMaxOnsetPeakDistFn <- function(tsData,
       # }
       # # loop output is a vector 'yDistance' to index the peak row in the tsData for the max response for each xOnset index
       
-    } # end of evil n loop to select the max change for each xOnset row
+    } # end of n loop 
+    
+    
+    
+    
     
     #### select the onset and peak with the max distance ####
     
@@ -269,25 +303,7 @@ newMaxOnsetPeakDistFn <- function(tsData,
       
     }
     
-  } else {
-    # if there are no xPeaks or xOnset indices
-    return(list(yChangeOnset=NA, 
-                yChangeOnsetValue=NA, 
-                yChangePeak=NA, 
-                yChangePeakValue=NA, 
-                yChangeValue=NA,
-                sensorName=sensorName ))
-  }
-  
-  #### Nov 17, 2023 abstract the measured value from the display gain ####
-  
-  if(all(useGainCorrection, !is.na(yChangeValue), !is.null(yChangeValue), !is.na(yChangeValue), yChangeValue!=0, yChangeValue!="")) {
-    
-    # source("~/Dropbox/R/NCCA_ASCII_Parse/abstractScale.R", echo=TRUE)
-    
-    yChangeValue <- abstractScaleFn(x=yChangeValue, sensorName=sensorName)
-    
-  }
+  } # end if for extant xPeak and xOnset indices
   
   #### output ####
   
@@ -299,6 +315,6 @@ newMaxOnsetPeakDistFn <- function(tsData,
               yChangeValue=yChangeValue,
               sensorName=sensorName ))
   
-}
+} # end newMaxOnsetPeakDistFn()
 
 
