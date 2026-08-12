@@ -115,7 +115,7 @@ CardioExtractFn <- function(x=segmentDF,
                      Lat=CardioLat, 
                      useROW=useROW,
                      ROWStart=ROWStart,
-                     ROWStop=ROWStop,
+                     ROWStop=ROWAnchor,
                      ROWEnd=ROWEnd, 
                      ignore=ignore, 
                      strictWindow=cardioStrictWindow, 
@@ -462,7 +462,7 @@ CardioExtractFn <- function(x=segmentDF,
       }
     } # end if else for cardio slow moving average
     
-  } # end iteration over 4 cardio lines: diastolic, systolic, mid, ma
+  } # end iteration i over 4 cardio lines: diastolic, systolic, mid, ma
   
   #### select the cardio line that was set in the NCCAASCI_init.R script ####
   
