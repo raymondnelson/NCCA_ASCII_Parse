@@ -145,8 +145,32 @@ fixTagsFn <- function(x=chartDF$Label) {
   # AXCITON SERIES ANNOTATIONS
   x <- gsub("MIXEDSER", "EI", x)
   x <- gsub("SERIES1", "EI", x)
+  x <- gsub("SERIES2", "EI", x)
+  x <- gsub("MGQT1-1", "EI", x)
+  x <- gsub("MGQT2-2", "EI", x)
+  x <- gsub("MGQT3-3", "EI", x)
+  x <- gsub("MGQT2-1", "EI", x)
+  x <- gsub("MGQT2-2", "EI", x)
+  x <- gsub("MGQT2-3", "EI", x)
+  x <- gsub("MGQT1", "EI", x)
+  x <- gsub("MGQT2", "EI", x)
+  x <- gsub("MGQT3", "EI", x)
   x <- gsub("MGQT", "EI", x)
+  x <- gsub("ZCT1-1", "EI", x)
+  x <- gsub("ZCT1-2", "EI", x)
+  x <- gsub("ZCT1-3", "EI", x)
+  x <- gsub("ZCT2-1", "EI", x)
+  x <- gsub("ZCT2-2", "EI", x)
+  x <- gsub("ZCT2-3", "EI", x)
+  x <- gsub("ZCT1", "EI", x)
+  x <- gsub("ZCT2", "EI", x)
+  x <- gsub("ZCT3", "EI", x)
   x <- gsub("ZCT", "EI", x)
+  
+  x <- gsub("EI1", "EI", x)
+  x <- gsub("EI2", "EI", x)
+  x <- gsub("EI3", "EI", x)
+  
   
   # SOME UNUSUAL QUESTION TAGS
   x <- gsub("3(C)", "C3", x)
