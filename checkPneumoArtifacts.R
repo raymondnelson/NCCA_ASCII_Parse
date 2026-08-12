@@ -104,7 +104,7 @@ respInstabilityFn2 <- function(med, q25, q75, Inh, Exh) {
 
 
 
-respDesyncFn <- function(diffVc=diffVc,inF=1.5, outF=3, fences="inner", side="both") {
+respDesyncFn <- function(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="both") {
   # R function to identify badly desynchronized thoracic and abdominal respiration
   # using a Tukey fence
   ###
@@ -114,10 +114,13 @@ respDesyncFn <- function(diffVc=diffVc,inF=1.5, outF=3, fences="inner", side="bo
   # fences can be "inner" "outer" or "both"
   # side can be "upper" "lower" or "both"
   # output is a vector of row number where the thoracic - abdominal distance exceeded the Tukey fence
+  # artifacts are marked when the difference exceeds the Tukey fences for the diff (upper - lower)
   ###
   # plot.ts(diffVc)
   # plot.ts(tsUP)
   # plot.ts(tsLP)  
+  
+  # artifa
   
   # adjust the data vector by removing the 1st and last sample rows
   diffVc <- diffVc[2:(length(diffVc)-1)]
@@ -236,6 +239,7 @@ respActivityArtifactFn2 <- function(tsData=tsDataUp, tsMid=tsMid, offset=0) {
   # offset is an adjustment value to be added or subtracted to a peak
   # to increase or decrease sensitivity
   # output is a vector of indices at which artifacts are found
+  # artifacts are marked where upper or lower peaks are on an unexpected side of the mid line
   ###
   # plot.ts(tsData)
   ### call two functions to obtain the inhalation and exhalation peaks
@@ -306,6 +310,7 @@ respApneaFn <- function(x=segmentDF$c_UPneumoSm, w=3.75, y=20, seg=4) {
   # y is the threshold value
   # an artifact is marked if the abs sum y distance is less than y for each w segment
   # seg is the number of measurements to check for each 3.75 sec segment
+  # artifacts are indicated when the segmented excursion length is less than y
   ##
   # initialize an output vector
   outVc <- rep(0, length(x))
@@ -316,7 +321,7 @@ respApneaFn <- function(x=segmentDF$c_UPneumoSm, w=3.75, y=20, seg=4) {
   # iterate over the time series data with a moving window
   i=1
   for(i in 1:(length(outVc)-length(winLen)+1)) {
-    # mark an artifact if the y axis chance is small for the w period
+    # mark an artifact if the y axis change is small for the w period
     if(sum(abs(diff(x[i+winPoints-1]))) < y) {
     # if(sum(diff(x[winPoints+i-1])) < y) {
       # outVc[winLen+i-1] <- "artifact"
@@ -759,6 +764,8 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
   #
   # output is a vector of 0s the same length as the segmentDF
   # artifacted indices are are indicated with the "Artifact" message
+  # 
+  # this function is called by the pneumoExtractFn() in the PneumoExtract.R script
   #
   ####
   
@@ -925,6 +932,7 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
   
   {
     
+    
     # plot.ts(tsMidU)
     # plot.ts(tsMidL)
 
@@ -932,7 +940,9 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
     # diffVc <- (tsDataUp - tsDataLp)
     # plot.ts(diffVc)
     
-    # diffVc is the difference between the thoracic and abdominal mid-lines
+    # diffVc is the difference between the thoracic and abdominal respiration lines
+    
+    # artifacts are marked when the difference exceeds the Tukey fences
 
     artifactRowsDesync <- respDesyncFn(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="both")
 
@@ -953,6 +963,9 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
   #### evaluate the tonic stability of the respiration data using the mid line ####
   
   {
+    
+    # using the midline, 25th percenttile and 75th percentiule, computed during signal procesing
+    # artifacts are marked where the midline exceeds the 25th or 75th percentile 
     
     tonicInstabilityRowsUP <- respTonicInstabilityFn(q25=q25U, q75=q75U, mid=tsMidU)
     tonicInstabilityRowsLP <- respTonicInstabilityFn(q25=q25L, q75=q75L, mid=tsMidL)
@@ -1028,6 +1041,8 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
   
   {
     ## biting, swallowing, tussis, other distortions ##
+    
+    # artifacts are marked where upper or lower peaks are on an unexpected side of the mid line
 
     # Call a function to separately compare the upper and lower peaks to a mid line
     artifactRowsUp <- respActivityArtifactFn2(tsData=tsDataUp, tsMid=tsMidU)
@@ -1107,6 +1122,10 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
   {
     UPApn <- respApneaFn(x=tsDataUp)
     LPApn <- respApneaFn(x=tsDataLp)
+    
+    # artifacts are indicated when the segmented excursion length for a 3.75 second moving window, 
+    # equal to one respiration cycle at the median rate of 16 cpm, is less than 
+    # a threashold value of 1% of the y-axis range
     
     # exclude artifacts surrounding the verbal answer
     # UPApn <- UPApn[!(UPApn %in% ansBuffRows)]
