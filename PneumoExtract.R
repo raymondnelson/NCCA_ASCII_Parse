@@ -284,6 +284,9 @@ pneumoExtractFn <- function(segmentDF=segmentDF,
   
   if( all(!is.na(c(UPMeasurement, LPMeasurement)), artifactPneumo, processArtifacts) ) {
     
+    # processArtifacts is initialized in the NCCAASCII_init.R script
+    # artifactPneumo is initialized in the NCCAASCII_init.R script
+    
     # source("~/Dropbox/R/NCCA_ASCII_Parse/checkPneumoArtifacts.R", echo=FALSE)
     
     # call a function to check for artifacts  
