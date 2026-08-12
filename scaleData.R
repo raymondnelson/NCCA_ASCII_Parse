@@ -16,7 +16,8 @@ scaleDataFn <- function(x=chartDF$c_UPneumoSm,
                         maxY=(yMax-.05*yRange), 
                         minY=(yMin+.05*yRange),  
                         firstRow=firstEvent, 
-                        lastRow=(lastEventEnd-450)) {
+                        lastRow=(lastEventEnd-450),
+                        sensorName="eda") {
   # R function to scale the time series data in NCCA ASCII charts
   # Raymond Nelson
   # first version 4-17-2016
