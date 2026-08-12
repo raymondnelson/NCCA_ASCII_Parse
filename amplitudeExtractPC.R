@@ -161,9 +161,9 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   }
   
   
-  # if(all(chartName == "03A", segmentName == "C7", sensorName == "AutoEDA")) {
   # if(all(examName=="D5HPNYP", seriesName=="X", chartName == "01A", segmentName == "C3", sensorName == "AutoEDA")) {
   # if(all(seriesName=="2", chartName=="02A", segmentName=="C6", sensorName=="AutoEDA")) {
+  # if(all(chartName == "01A", segmentName == "R6", sensorName == "CardioMA")) {
   #   assign("AutoExtractList", extractList, envir = .GlobalEnv)
   #   assign("extractList", extractList, envir = .GlobalEnv)
   #   assign("segmentDF", segmentDF, envir = .GlobalEnv)
@@ -331,9 +331,9 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # can be "answer" "onset" "offset" "latency" or "EWEnd"
     # set the ROWStopRef to select the reference point for ROW End
     ROWStopRef <- switch(ROWStop,
-                         "answer"=answerRow,
-                         "onset"=onsetRow,
-                         "offset"=offsetRow,
+                         "verbalAnswer"=answerRow,
+                         "stimulusBegin"=onsetRow,
+                         "stimulusEnd"=offsetRow,
                          "latency"=latRow,
                          "EWEnd"=endRow )
     ROWEndRow <- ROWStopRef + (cps*ROWEnd)
@@ -684,6 +684,12 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     # artifactRows <- NULL
     
     responseRows <- c(c(yChangeOnset - (cardioPrestim*cps)):c(yChangePeak + 1))
+    # 2026May31 to work effectively with something vs nothing
+    # if(is.na(yChangeOnset)) {
+    #   responseRows <- 301
+    # } else {
+    #   responseRows <- c(c(yChangeOnset - (cardioPrestim*cps)):c(yChangePeak + 1))
+    # }
     
     # integration of artifacts from other sensors
     if(all(integrateArtifacts)) {
