@@ -174,7 +174,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # May 9, 2024 added PTT channels
   # scaleVals <- c(225, 225, 300, 300, 100, 50, 300, 225, 200, 200, 200)
   # 2026Apr16
-  scaleVals <- c(100, 100, 100, 100, 45, 30, 150, 125, 100, 100, 100)
+  scaleVals <- c(120, 120, 250, 110, 60, 40, 200, 200, 100, 100, 100)
   
   # scaleVals <- c(225, 225, 200, 300, 200, 50, 300, 225)
   # scaleVals <- c(225, 225, 100, 300, 300, 50, 300, 225)
@@ -201,7 +201,8 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # May 9, 2024 added PTT channels
   # rangeVals <- c(225, 225, 300, 300, 100, 50, 300, 225, 200, 200, 200)
   # 2026Apr16
-  rangeVals <- c(100, 100, 100, 100, 45, 30, 150, 125, 100, 100, 100)
+  rangeVals <- scaleVals
+  # rangeVals <- c(125, 125, 250, 125, 40, 30, 150, 125, 100, 100, 100)
   # 
   # rangeVals <- c(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000)
   # these initialize the range of integer unit within which response features are measured
@@ -214,12 +215,12 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # gain values used to dynamically increase or decrease the tracing size
   # not actually used in the R envir, but planning for LXEdge
   # May 9, 2024 added PTT channels
-  gainVals <- c(100, 100, 100, 100, 100, 100, 100, 100, 200, 200, 200)
+  gainVals <- c(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100)
   # called from the global envir by the abstractScaleFn in the abstractScale.R script
   # default of 100 permits the computation of integer unit changes as percentage values
   names(gainVals) <- c("uPneumo", "lPneumo", "eda", "cardio", "ple", "activity", "FC", "eCardio", "PTTPPG", "PTTECG", "PTTPTT")
   
-  # Nov 17, 1023
+  # Nov 17, 2023
   # gain correction switch, 
   # to output consistent feature extraction measurements regardless of the gain or scale size
   useGainCorrection <- TRUE
@@ -240,14 +241,14 @@ print("init parameters for parsing and processing NCCA ASCII data")
   
   # yMaxVals <- c(1000, 700, 625, 950, 0, 950, 950, 950)
   # May 9, 2024 added PTT channels
-  yMaxVals <- c(950, 950, 950, 950, 0, 0, 950, 950, 950, 950, 950, 950)
+  yMaxVals <- c(950, 950, 950, 950, 950, 950, 950, 950, 950, 950, 950, 950)
   # yMaxVals <- c(1000, 600, 900, 950, 0, 950, 950, 950)
   
   names(yMaxVals) <- c("uPneumo", "lPneumo", "eda", "cardio", "ple", "activity", "FC", "eCardio", "PTTPPG", "PTTECG", "PTTPTT")
   
   # yMinVals <- c(500, 200, -375, -950, -950, -950, -950, -950)
   # May 9, 2024 added PTT channels
-  yMinVals <- c(0, 0, -950, -950, -950, -950, -950, -950, -950, -950, -950)
+  yMinVals <- c(-950, -950, -950, -950, -950, -950, -950, -950, -950, -950, -950)
   # yMinVals <- c(400, 000, -400, -950, -950, -950, -950, -950)
   names(yMinVals) <- c("uPneumo", "lPneumo", "eda", "cardio", "ple", "activity", "FC", "eCardio", "PTTPPG", "PTTECG", "PTTPTT")
   
@@ -280,7 +281,8 @@ print("init parameters for parsing and processing NCCA ASCII data")
     processArtifacts <- TRUE
     # processArtifacts <- FALSE
     
-    # used by the feature extraction functions 
+    ## these are used by the feature extraction functions 
+    
     artifactPneumo <- TRUE
     # artifactPneumo <- FALSE
     
@@ -298,8 +300,8 @@ print("init parameters for parsing and processing NCCA ASCII data")
     
     artifactFC <- FALSE
     
-    # these parameters (below) are used by the artifactProc function 
-    # in the artifactProc.R script
+    ## these parameters (below) are used by the artifactProc function 
+    ## in the artifactProc.R script
     
     pneumoArtifacts <- FALSE
     
@@ -479,18 +481,22 @@ print("init parameters for parsing and processing NCCA ASCII data")
   
   # ROWStop sets the reference point for the ROW End
   # can be "answer" "onset" "offset" "latency" or "EWEnd"
-  ROWStop <- "answer"
+  # ROWStop <- "answer"
   # ROWStop <- "onset"
   
   # ROWEnd is the end offset for the Response Onset Window (ROW) 
   # set as number of seconds after the ROWStop
   ROWEnd <- 5
+  # 2026Aug04 cannot separate these yet because of the extractMeasurement.R script
+  # EDAROWEnd <- 5 # canno
+  # cardioROWEnd <- 5
   # ROWEnd <- 14.9
   
-  # ROWAnchor can be "verbalAnswer" "stimulusEnd" or "stimulusOnset"
+  # ROWAnchor can be "verbalAnswer" "stimulusEnd" "stimulusBegin" "latency" or "EWEnd"
   ROWAnchor <- "verbalAnswer"
-  
-  # the number of seconds afer ROWStop
+  # 2026Aug04 cannot separate these yet because of the extractMeasurement.R script
+  # EDAROWAnchor <- "verbalAnswer"
+  # cardioROWAnchor <- "verbalAnswer"
   
   # measuredSeg is the number of seconds in the scoring window following stimulus onset
   # to include in the feature extraction
@@ -548,7 +554,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # if the data descend more than a proportion (descProp) from the previous peak
   # to the origin or response onset within the ROW
   # descentRule = 1 or 2 uses the descProp parameter 
-  descentRule <- TRUE
+  descentRule <- FALSE
   # "descProp" is a parameter in this script
   # descentRule and desProp are both used by the descentPropFn() function,
   # in the descentRule.R script
@@ -854,9 +860,12 @@ print("init parameters for parsing and processing NCCA ASCII data")
   
   # nothingIsSomething is for the "something vs nothing is something" rule 
   # for EDA and cardio
-  # returns a minimum value of 20 (1% of the y-axis range) when no value is extracted from the data
+  # returns a minimum value of 10 (0.5% of the y-axis range) when no value is extracted from the data
   nothingIsSomething <- FALSE
   # nothingIsSomething <- TRUE
+  EDANothingIsSomething <- FALSE
+  cardioNothingIsSomething <- FALSE
+  
   # used in the amplitudeExtractPCFn() for EDA and Cardio feature extraction
 
 }
