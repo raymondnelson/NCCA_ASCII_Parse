@@ -130,21 +130,23 @@ print("init parameters for parsing and processing NCCA ASCII data")
   strongEDAFilt <- FALSE
   
   # PneumoLowPass for smoothing to improve the diagnostic coefficient and visual appearance
-  PneumoLowPass=TRUE # a low pass .886 filter
-  morePnSmooth=TRUE # a 1 x .25sec moving average
-  evenMorePnSmooth=FALSE # a 2 x .25sec moving average
+  PneumoLowPass <- TRUE # a low pass .886 filter
+  morePnSmooth <- TRUE # a 1 x .25sec moving average
+  evenMorePnSmooth <- FALSE # a 2 x .25sec moving average
   
   # PLE baseline 
-  PLEBaseline = TRUE
+  PLEBaseline <- FALSE
+  PLEBaseline <- TRUE
   # used to call a filter to correct PLE baseline
   # not used for imported NCCA ASCII data
   
   # useFilters will turn all filters off conveniently
-  useFilters=TRUE
+  useFilters <- TRUE
   
   # PLEBaseline controls a filter to constraint the tracing to a stable baseline
+  # do not use with imported charts
   PLEBaseline <- FALSE
-  PLEBaseline <- TRUE
+  # PLEBaseline <- TRUE
   
   includePLEData <- TRUE
   # includePLEData <- FALSE
