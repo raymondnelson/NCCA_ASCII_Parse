@@ -351,6 +351,9 @@ print("init parameters for the NCCA ASCII work flow")
     processArtifacts <- TRUE
     # processArtifacts <- FALSE
     
+    PLEBaseline <- FALSE
+    # PLEBaseline <- TRUE
+    
     EDAFilt="laf18"
     # EDAFilt="none"
     
@@ -717,7 +720,7 @@ if(!exists("uniqueExams")) uniqueExams <- getUniqueExams()
 
   # output the algorithm reports to a pdf file
   saveResultsToPDF <- FALSE
-  saveResultsToPDF <- TRUE
+  # saveResultsToPDF <- TRUE
 
 }
 
