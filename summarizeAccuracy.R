@@ -19,6 +19,8 @@
   
   # 2026Jun25 work with the Federal YouPhase N22 sample from 2011
   
+  # 2026Aug14 work with the Utah3 N40 Ohio sample from 2014/15
+  
 }
 
 
@@ -503,9 +505,9 @@ subtotalMeanFn <- function(x=c(criterionState, c(R1score, R2score, R3score, R4sc
   # return(RQMean)
   
   x=c(criterionState=-1, c(R1score=1, R2score=0, R3score=3, R4score=-5))
-  subtotalMeanFn(x=x)
-  subtotalMeanFn(x=c(criterionState=-1, c(R1score=1, R2score=0, R3score=3, R4score=-5)))
-  subtotalMeanFn(x=c(criterionState=-1, c(R1score=-3, R2score=0, R3score=0)))
+  # subtotalMeanFn(x=x)
+  # subtotalMeanFn(x=c(criterionState=-1, c(R1score=1, R2score=0, R3score=3, R4score=-5)))
+  # subtotalMeanFn(x=c(criterionState=-1, c(R1score=-3, R2score=0, R3score=0)))
   
 } # end subtotalMeanFn()
 
@@ -757,7 +759,7 @@ if(isTRUE(summarizeResults)) {
     examName <- str_sub(analysisLists[i], 1, -10)
     
     # ohio
-    examName <- str_sub(examName, 1, -2)
+    # examName <- str_sub(examName, 1, -2)
     
     # thisCaseNumber <- str_sub(scoreSheetFiles[i], 2, 4)
     # 
@@ -992,7 +994,7 @@ if(isTRUE(summarizeResults)) {
     examName <- str_sub(analysisLists[i], 1, -10)
     
     # ohio
-    examName <- str_sub(examName, 1, -2)
+    # examName <- str_sub(examName, 1, -2)
     
     
     # thisCaseNumber <- str_sub(scoreSheetFiles[i], 2, 4)
@@ -1231,7 +1233,7 @@ if(isTRUE(summarizeSensorInfo)) {
     examName <- str_sub(analysisLists[i], 1, -10)
     
     # ohio
-    examName <- str_sub(examName, 1, -2)
+    # examName <- str_sub(examName, 1, -2)
     
     # thisCaseNumber <- str_sub(scoreSheetFiles[i], 2, 4)
     # 
@@ -1464,7 +1466,7 @@ if(isTRUE(summarizeOSS3)) {
       examName <- str_sub(analysisLists[i], 1, -10)
       
       # ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # FZCT N60
       # examName <- str_sub(analysisLists[i], 2, -10)
@@ -1621,7 +1623,7 @@ if(isTRUE(summarizeOSS3Sensors)) {
     # thisExamName <- examNames[i]
     
     # ohio
-    examName <- str_sub(examName, 1, -2)
+    # examName <- str_sub(examName, 1, -2)
     
     # thisExamName <- str_sub(thisExamName, 1, -2)
     
@@ -1789,7 +1791,7 @@ if(isTRUE(summarizePA)) {
       # examName <- str_sub(analysisLists[i], 2, 8)
       
       # ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
       
@@ -1955,7 +1957,7 @@ if(isTRUE(summarizeOSS2)) {
       # examName <- str_sub(analysisLists[i], 2, 8)
       
       # ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
     }
@@ -2119,7 +2121,7 @@ if(isTRUE(summarizeROSS)) {
       # examName <- str_sub(analysisLists[i], 2, 8)
       
       # ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
       
@@ -2284,7 +2286,7 @@ if(isTRUE(summarizePermutation)) {
       # examName <- str_sub(analysisLists[i], 2, 8)
       
       # ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
     }
@@ -2444,7 +2446,7 @@ if(isTRUE(summarizeBootstrap)) {
       # examName <- str_sub(analysisLists[i], 2, 8)
       
       # ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
     }
@@ -2875,7 +2877,7 @@ if(isTRUE(summarizeIpZ)) {
       # examName <- str_sub(analysisLists[i], 2, 8)
       
       # ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
     }
@@ -3029,7 +3031,7 @@ if(isTRUE(summarizeRCRatios)) {
       # examName <- str_sub(analysisLists[i], 2, 8)
       
       # Ohio
-      examName <- str_sub(examName, 1, -2)
+      # examName <- str_sub(examName, 1, -2)
       
       # examName <- str_sub(examName, 1, 3)
     }
@@ -3962,7 +3964,7 @@ if(aggregateOutputSummaries) {
   # View(criterionStateDF)
   
   # ohio
-  examNames <- str_sub(examNames, 1, -2)
+  # examNames <- str_sub(examNames, 1, -2)
   
   # slice exams from the criterion state data frame if they match examNames
   theseCaseRows <- which(criterionStateDF$examName %in% examNames)
