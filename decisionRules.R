@@ -129,6 +129,9 @@ SSRFn <- function(subtotalScores=c(-2,2,3),
     totalScore <- 1 - totalScore
     cutScores <- 1 - cutScores
   }
+  if(is.null(names(cutScores))) {
+    names(cutScores) <- c("STDI", "STNDI")
+  }
   # fix cutscore issue, coerce use of the uncorrected subtotal cutscore
   if(!("STNDIc" %in% names(cutScores))) cutScores['STNDIc'] <- cutScores['STNDI']
   # check the names of the input cutscores
@@ -224,6 +227,8 @@ eTSRFn <- function(totalScore=6,
   if(is.null(names(cutScores))) {
     names(cutScores) <- c("GTDI", "GTNDI", "STDIc")
   }
+  # fix cutscore issue, coerce use of the uncorrected subtotal cutscore
+  if(!("STDIc" %in% names(cutScores))) cutScores['STDIc'] <- cutScores['STDI']
   nRQ <- length(subtotalScores)
   if(is.integer(totalScore) && totalScore != sum(subtotalScores)) { 
     return("TSR input error: inconsistent grand total and subtotal scores") 

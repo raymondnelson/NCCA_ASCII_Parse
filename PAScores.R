@@ -696,7 +696,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # call the private function to use the grand total rule
     GTRResult <- GTRFn(totalScore=postTruthful, 
                        RQNames=uniqueRQs,
-                       cutScores=cutScores, 
+                       cutScores=c(GTDI=PACutProbD, GTNDI=PACutProbT), 
                        flip=FALSE )
     # using only the postTruthful value 
     # because it is the compliment of postDeceptive
@@ -704,14 +704,14 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # <> subtotal score rule (SSR) here
     
     SSRResult <- SSRFn(subtotalScores=postTruthfulRQs,
-                       cutScores=cutScores,
+                       cutScores=c(STDI=PACutProbD, STNDI=PACutProbT),
                        flip=FALSE )
     
     # <> two-stage rule (TSR) here
     
     TSRResult <- eTSRFn(totalScore=postTruthful,
                         subtotalScores=postTruthfulRQs,
-                        cutScores=cutScores,
+                        cutScores=c(GTDI=PACutProbD, GTNDI=PACutProbT, STDI=PACutProbD),
                         flip=FALSE )
     
   }
@@ -733,8 +733,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                              "TSR"=TSRResult$testResult,
                              "eTSR"=TSRResult$testResult,
                              "SSR"=SSRResult$testResult,
-                             "GTR"=GTRResult$testResult,
-                             "FZR"=)
+                             "GTR"=GTRResult$testResult)
 
     PAQuestionResults <- switch(PADecisionRule,
                                   "TSR"=TSRResult$subtotalResults,
@@ -747,6 +746,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                           "eTSR"=TSRResult$resultUsing,
                           "SSR"=SSRResult$resultUsing,
                           "GTR"=GTRResult$resultUsing)
+    
     names(resultUsing) <- NULL
     
   }
