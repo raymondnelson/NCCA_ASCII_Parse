@@ -27,11 +27,11 @@
 
 
 # requires the grand total decision rule
-# source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+# source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
 
 
 # requires the PA reference model
-source(paste0(RPath, 'PAModel.R'), echo=FALSE)
+source(file.path(RPath, 'PAModel.R'), echo=FALSE)
 
 
 
@@ -103,7 +103,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
     print("calculate the Probability Analysis scores")
     
-    # source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+    # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
     
     # View(RqCqDFSeries)
     
@@ -187,11 +187,12 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   ##################   PA reference model   ###################
   
-  # already sourced by the workFlow.R script
+  # already sourced by a line near the top of this script
+  # source(file.path(RPath, 'PAModel.R'), echo=FALSE)
   
   # {
   #   
-  #   # source(paste0(RPath, 'PAModel.R'), echo=FALSE)
+  #   # source(file.path(RPath, 'PAModel.R'), echo=FALSE)
   #   
   #   # from Nelson (2008) replication of the PA algorotihm
   #   # discriminate scores were calculated using SPSS
@@ -230,7 +231,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
   }
   
-  #### standardize all measurements to the between chart sensor parameters ####
+  #### standardize all sensor measurements to the between chart sensor parameters ####
   
   {
     
@@ -251,10 +252,10 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # assign("PAZScoresDF", PAZScoresDF, pos=1)
     
     # iterate over the data frame rows and calculate the z scores
-    i=4
+    i=1
     for(i in 1:nrow(PAZScoresDF)) {
       thisSensor <- PAZScoresDF[i,'sensorName']
-      # iterate over the columns (questions)
+      # iterate over the columns (questions) for each sensor
       j=5
       for(j in 5:ncol(PAZScoresDF)) {
         thisMeasurement <- PAMeasurementsDF[i,j]
@@ -268,21 +269,21 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
         }
         PAZScoresDF[i,j] <- round(thisZScore, 2)
         # PAZScoresDF[i,]
-      }
-    }
+      } # end j loop
+    } # end i loop
     # View(PAZScoresDF)
     
     ###### extreme values ##########
     
     # mark extreme values
-    for(j in 1:nrow(PAZScoresDF)) { 
-      theseZVals <- PAZScoresDF[j,5:ncol(PAZScoresDF)]
+    for(i in 1:nrow(PAZScoresDF)) { 
+      theseZVals <- PAZScoresDF[i, c(5:ncol(PAZScoresDF))]
       theseZVals <- which(theseZVals >= 4 | theseZVals <= -4)
-      PAMeasurementsDF[j,5:ncol(PAZScoresDF)][theseZVals] <- NA
-    }
+      PAMeasurementsDF[i, 5:ncol(PAZScoresDF)][theseZVals] <- NA
+    } # end i loop
     
     # then recalculate the Z Scores without the extreme values
-    i=4
+    i=1
     for(i in 1:nrow(PAZScoresDF)) {
       thisSensor <- PAZScoresDF[i,'sensorName']
       # iterate over the columns (questions)
@@ -299,14 +300,14 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
         }
         PAZScoresDF[i,j] <- round(thisZScore, 2)
         # PAZScoresDF[i,]
-      }
-    }
+      } # end j loop
+    } # end i loop
     
     # View(PAZScoresDF)
   
   }
   
-  ######## combine the upper and lower respiration by averaging ########
+  #### combine the upper and lower respiration by averaging ####
   
   {
     
@@ -322,7 +323,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
         )
         # rename the added sensor row
         PAZScoresDF$sensorName[(LPneumoRows[i]+1)] <- "Pneumo"
-      }
+      } # end i loop 
     }
     # View(PAZScoresDF)
     
@@ -354,12 +355,14 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                                  PAZScoresDF$sensorName=="Pneumo")
         PAZScoresDF[thisPneumoRow,i] <- round(PneumoMeanZ, 2)
         # PAZScoresDF[LPneumoRow,i] <- NA
-      }
-    }
+      } # end j loop
+    } # end i loop
+    
     # View(PAZScoresDF)
     
+    # mean(rowMeans(PAZScoresDF[3:ncol(PAZScoresDF)], na.rm=TRUE))
+    
   }
-  # mean(rowMeans(PAZScoresDF[3:ncol(PAZScoresDF)], na.rm=TRUE))
   
   #### submit the PA z scores to the RqCqSeries data frame ####
   
@@ -381,8 +384,8 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                            RqCqDFSeries$eventLabel==thisQuestion)
         if(length(thisOne) == 0 ) next()
         RqCqDFSeries$PAScore[thisOne] <- PAZScoresDF[i,j]
-      }
-    }
+      } # end j loop
+    } # end i loop
     
     # View(RqCqDFSeries)
     
@@ -404,75 +407,82 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   {
     
-    {
-      # initialize a data frame for the RQs
-      RQCols <- which(names(PAZScoresDF) %in% uniqueRQs)
-      RQZScoreDF <- PAZScoresDF[,c(1:4, RQCols)]
-      # View(RQZScoreDF)
+    # initialize a data frame for the RQs
+    RQCols <- which(names(PAZScoresDF) %in% uniqueRQs)
+    
+    # initialize a data frame with only the RQ columns (omitting CQ cols)
+    RQZScoreDF <- PAZScoresDF[,c(1:4, RQCols)]
+    # View(RQZScoreDF)
+    
+    # initialize a data frame to hold the sensor means for each RQ
+    RQMeanSensorZScores <- data.frame(matrix(ncol=(length(uniqueRQs)), 
+                                             nrow=length(PASensors2)))
+    names(RQMeanSensorZScores) <- uniqueRQs
+    row.names(RQMeanSensorZScores) <- PASensors2
+    
+    # View(RQMeanSensorZScores)
+    
+    # initialize a vector to hold the sensor means
+    meanSensorZ <-  rep(NA, length=length(PASensors2))
+    names(meanSensorZ) <- PASensors2
+    
+    # iterate over the RQs to average the sensor means beween charts
+    i=5
+    for(i in 5:ncol(RQZScoreDF)) {
+      meanSensorZ[1] <- 
+        mean(RQZScoreDF[RQZScoreDF$sensorName==PASensors2[1],i], na.rm=TRUE)
+      meanSensorZ[2] <- 
+        mean(RQZScoreDF[RQZScoreDF$sensorName==PASensors2[2],i], na.rm=TRUE)
+      meanSensorZ[3] <- 
+        mean(RQZScoreDF[RQZScoreDF$sensorName==PASensors2[3],i], na.rm=TRUE)
       
-      # initialize a vector to hold the RQ sensor means
-      RQMeanSensorZScores <- data.frame(matrix(ncol=(length(uniqueRQs)), 
-                                               nrow=length(PASensors2)))
-      names(RQMeanSensorZScores) <- uniqueRQs
-      row.names(RQMeanSensorZScores) <- PASensors2
-      
-      # initialize a vector to hold the sensor means
-      meanSensorZ <-  rep(NA, length=length(PASensors2))
-      names(meanSensorZ) <- PASensors2
-      # iterate over the RQs to average the sensor means beween charts
-      i=3
-      for(i in 5:ncol(RQZScoreDF)) {
-        meanSensorZ[1] <- 
-          mean(RQZScoreDF[RQZScoreDF$sensorName==PASensors2[1],i], na.rm=TRUE)
-        meanSensorZ[2] <- 
-          mean(RQZScoreDF[RQZScoreDF$sensorName==PASensors2[2],i], na.rm=TRUE)
-        meanSensorZ[3] <- 
-          mean(RQZScoreDF[RQZScoreDF$sensorName==PASensors2[3],i], na.rm=TRUE)
-        
-        # submit the RQ values to the data frame
-        RQMeanSensorZScores[,names(RQMeanSensorZScores)==names(RQZScoreDF)[i]] <- 
-          meanSensorZ
-      }
-      # View(RQMeanSensorZScores)
-    }
+      # submit the sensor values to the data frame for each RQ
+      RQMeanSensorZScores[c(1:nrow(RQMeanSensorZScores)),names(RQMeanSensorZScores)==names(RQZScoreDF)[i]] <- 
+        meanSensorZ
+    } # end i loop over RQs
+    
+    # View(RQMeanSensorZScores)
+    
+    # RQMeanSensorZScores can be used to evalutate RQ subtotal scores 
     
   }
   
   #### get the between chart mean CQ z-scores for each sensor ####
   
-  {
+  {  
+    # initialize a data frame for the CQs
+    CQCols <- which(names(PAZScoresDF) %in% uniqueCQs)
+    CQZScoreDF <- PAZScoresDF[,c(1:4, CQCols)]
+    # View(CQZScoreDF)
     
-    {  
-      # initialize a data frame for the CQs
-      CQCols <- which(names(PAZScoresDF) %in% uniqueCQs)
-      CQZScoreDF <- PAZScoresDF[,c(1:4, CQCols)]
-      # View(CQZScoreDF)
+    # initialize a vector to hold the CQ sensor means
+    CQMeanSensorZScores <- data.frame(matrix(ncol=(length(uniqueCQs)), 
+                                             nrow=length(PASensors2)))
+    names(CQMeanSensorZScores) <- uniqueCQs
+    row.names(CQMeanSensorZScores) <- PASensors2
+    
+    # initialize a vector to hold the sensor means
+    meanSensorZ <-  rep(NA, length=3)
+    
+    # iterate over the CQs to average the sensor means beween charts
+    i=4
+    for(i in 5:ncol(CQZScoreDF)) {
+      meanSensorZ[1] <- 
+        mean(CQZScoreDF[CQZScoreDF$sensorName==PASensors2[1],i], na.rm=TRUE)
+      meanSensorZ[2] <- 
+        mean(CQZScoreDF[CQZScoreDF$sensorName==PASensors2[2],i], na.rm=TRUE)
+      meanSensorZ[3] <- 
+        mean(CQZScoreDF[CQZScoreDF$sensorName==PASensors2[3],i], na.rm=TRUE)
       
-      # initialize a vector to hold the CQ sensor means
-      CQMeanSensorZScores <- data.frame(matrix(ncol=(length(uniqueCQs)), 
-                                               nrow=length(PASensors2)))
-      names(CQMeanSensorZScores) <- uniqueCQs
-      row.names(CQMeanSensorZScores) <- PASensors2
-      
-      # initialize a vector to hold the sensor means
-      meanSensorZ <-  rep(NA, length=3)
-      
-      # iterate over the CQs to average the sensor means beween charts
-      i=4
-      for(i in 5:ncol(CQZScoreDF)) {
-        meanSensorZ[1] <- 
-          mean(CQZScoreDF[CQZScoreDF$sensorName==PASensors2[1],i], na.rm=TRUE)
-        meanSensorZ[2] <- 
-          mean(CQZScoreDF[CQZScoreDF$sensorName==PASensors2[2],i], na.rm=TRUE)
-        meanSensorZ[3] <- 
-          mean(CQZScoreDF[CQZScoreDF$sensorName==PASensors2[3],i], na.rm=TRUE)
-        
-        # submit the CQ values to the data frame
-        CQMeanSensorZScores[,names(CQMeanSensorZScores)==names(CQZScoreDF)[i]] <- 
-          meanSensorZ
-      }
-      # View(CQMeanSensorZScores)
-    }
+      # submit the CQ values to the data frame
+      CQMeanSensorZScores[,names(CQMeanSensorZScores)==names(CQZScoreDF)[i]] <- 
+        meanSensorZ
+    } # end i loop
+    
+    # View(CQMeanSensorZScores)
+    
+    # PA uses aggregated CQ values within each chart
+    # ZScores are aggregated betwen RQs and within each sensor 
     
   }
   
@@ -490,31 +500,14 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
         
   }
   
-  #### calclate the CQmeanZ - RQmeanZ difference for each sensor ####
+  #### calculate the PA discriminate score for the test as a whole ####
   
   {
     
     meanZDiffSensors <- CQMeanZSensors - RQMeanZSensors
     
-    # also get the difference CQ-RQ difference for each sensor within each RQ
-    i=1
-    RQMeanZDiffSensors <- RQMeanSensorZScores
-    for(i in 1:ncol(RQMeanZDiffSensors)) {
-      RQMeanZDiffSensors[,i] <- CQMeanZSensors - RQMeanSensorZScores[,i]
-    }
-    
-    # round it for output
-    CQMeanZSensors <- round(CQMeanZSensors, 3)
-    RQMeanZSensors <- round(RQMeanZSensors, 3)
-    
-  }
-  
-  ######## calculate the PA discriminate score ########
-  
-  {
-    
     # first multiply the mean Z sensor score by the discriminate function
-    # PACoefs are from the 1988 Secret Service field study
+    # PACoefs are from the the discriminate analysis by Nelson et al 2008 publication on OSS-3
     # and are sourced in the PAModel.R script
     weightedSensorScores <- meanZDiffSensors * PACoefs
     
@@ -523,47 +516,101 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
       round(sum(weightedSensorScores, na.rm=TRUE), 3)
     # this is the likelihood function for Bayesian analysis
     
+    # round the mean ZDiff sensor scores for output
+    CQMeanZSensors <- round(CQMeanZSensors, 3)
+    RQMeanZSensors <- round(RQMeanZSensors, 3)
+    
   }
+  
+  #### also calculate the the weighted discrimiate scores for the individual RQs ####
   
   {
     
-    # also get the weighted RQ scores
+    # initialize a data frame
+    RQMeanZDiffSensors <- RQMeanSensorZScores
     
-    weightedRQSensorScores <- RQMeanZDiffSensors
+    # iterate over the RQs
     i=1
     for(i in 1:ncol(RQMeanZDiffSensors)) {
+      # use CQMeanZSensors to use the aggregated CQ means for each sensor
+      RQMeanZDiffSensors[,i] <- CQMeanZSensors - RQMeanSensorZScores[,i]
+    }
+    
+    # initialize a data frame for the weighted sensor scores for each RQ
+    weightedRQSensorScores <- RQMeanZDiffSensors
+    
+    # iterate over the RQs
+    i=1
+    for(i in 1:ncol(weightedRQSensorScores)) {
+      # PACoefs are from the the discriminate analysis by Nelson et al 2008 publication on OSS-3
+      # and are sourced in the PAModel.R script
       weightedRQSensorScores[,i] <- RQMeanZDiffSensors[,i] * PACoefs
     }
     
     # this will be equal to the discriminate score
     mean(colSums(weightedRQSensorScores, na.rm=TRUE))
     
+    # compute the weighted score for each RQ
+    discriminateScoreRQs <- colSums(weightedRQSensorScores, na.rm=TRUE)
+    # this will be used to compute the subtotal classifications
+    
   }
   
-  #### calculate the maximum likelihood score for deception and truth ####
+  #### calculate the maximum likelihood score for deception and truth using the aggregate score for all RQs ####
   
   {
     
+    # PACoefs and PANorms were initialized by a line near the top of this script
+    # source(file.path(RPath, 'PAModel.R'), echo=FALSE)
+    
+    # source(file.path(RPath, 'PAModel.R'), echo=FALSE)
+    
     # MLE Truthful
     # EXP(-0.5 * ( (DS-TMean) / TStDeve )^2) / ( SQRT(2*pi) * TStDev )
-    pTruthful <- exp(-0.5 * ( (discriminateScore-PANorms['TMean']) / 
+    pTruthful <- exp(-0.5 * ( (discriminateScore - PANorms['TMean']) / 
                                 PANorms['TStDev'] )^2) / 
       ( sqrt(2*pi) * PANorms['TStDev'] )
     
     # MLE Deceptive
     # EXP(-0.5 * ( (DS-DMean) / DStDeve )^2) / ( SQRT(2*pi) * DStDev )
-    pDeceptive <- exp(-0.5 * ( (discriminateScore-PANorms['DMean']) / 
+    pDeceptive <- exp(-0.5 * ( (discriminateScore - PANorms['DMean']) / 
                                  PANorms['DStDev'] )^2) / 
       ( sqrt(2*pi) * PANorms['DStDev'] )
-    
-    # 
     
     # pTruthful <- round(pTruthful, 3)
     # pDeceptive <- round(pDeceptive, 3)
     
   }
   
-  #### calculate the Bayesian posterior likelihood ####
+  #### also calculate the maximum likelihood score for the individual RQs ####
+  
+  {
+    
+    # MLE Truthful
+    pTruthfulRQs <- rep(NA, times=ncol(weightedRQSensorScores))
+    i=1
+    for(i in 1:length(pTruthfulRQs)) {
+      pTruthfulRQs[i] <- exp(-0.5 * ( (discriminateScoreRQs[i] - PANorms['TMean']) / 
+                                        PANorms['TStDev'] )^2) / 
+        ( sqrt(2*pi) * PANorms['TStDev'] )
+    }
+    
+    
+    # MLE Deceptive
+    pDeceptiveRQs <- rep(NA, times=ncol(weightedRQSensorScores))
+    i=1
+    for(i in 1:length(pDeceptiveRQs)) {
+      pDeceptiveRQs[i] <- exp(-0.5 * ( (discriminateScoreRQs[i] - PANorms['DMean']) / 
+                                         PANorms['DStDev'] )^2) / 
+        ( sqrt(2*pi) * PANorms['DStDev'] )
+    }
+    
+    # pTruthfulRQs <- round(pTruthfulRQs, 3)
+    # pDeceptiveRQs <- round(pDeceptiveRQs, 3)
+    
+  }
+  
+  #### calculate the Bayesian posterior likelihood for the grand total ####
   
   {
     
@@ -577,6 +624,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     postDeceptive <- ((1-PAPrior)*pDeceptive) /
       ((1-PAPrior)*pDeceptive+PAPrior*pTruthful)
     
+    # set the ceiling and floor values
     postTruthful <- ifelse(postTruthful > .999,
                            .999,
                            ifelse(postTruthful < .001,
@@ -594,13 +642,56 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
   }
  
+  #### also calculate the Bayesian posterior likelihood for the RQ subtotal scores ####
+  
+  {
+    
+    postTruthfulRQs <- rep(NA, time=length(pTruthfulRQs))
+    postDeceptiveRQs  <- rep(NA, time=length(pDeceptiveRQs))
+    
+    # PA prior is initialized in the init script
+    # priorP <- .5
+    
+    # P(X|T)
+    i=1
+    for(i in 1:length(postTruthfulRQs)) {
+      postTruthfulRQs[i] <- ((1-PAPrior)*pTruthfulRQs[i]) / 
+        ((1-PAPrior)*pTruthfulRQs[i]+PAPrior*pDeceptiveRQs[i])
+    }
+    
+    # P(X|D)
+    i=1
+    for(i in 1:length(postDeceptiveRQs)) {
+      postDeceptiveRQs[i] <- ((1-PAPrior)*pDeceptiveRQs[i]) /
+        ((1-PAPrior)*pDeceptiveRQs[i]+PAPrior*pTruthfulRQs[i])
+    }
+    
+    # set the ceiling and floor values for the RQs
+    postTruthfulRQs <- ifelse(postTruthfulRQs > .999,
+                           .999,
+                           ifelse(postTruthfulRQs < .001,
+                                  .001,
+                                  round(postTruthfulRQs, 3) ) )
+    
+    postDeceptiveRQs <- ifelse(postDeceptiveRQs > .999,
+                            .999,
+                            ifelse(postDeceptiveRQs < .001,
+                                   .001,
+                                   round(postDeceptiveRQs, 3) ) )
+    
+    # these two values are complimentary for each RQ
+    # and only 1 value is used to classify the test result
+    # based on the lowest RQ probability score
+    
+  }
+  
   #### decision rules to compute the categorical result using the probability cutpoints ####
   
   {
     
-    cutScores <- c(GTDI=PACutProbD, GTNDI=PACutProbT)
+    cutScores <- c(GTDI=PACutProbD, GTNDI=PACutProbT, STDI=PACutProbD, STNDI=PACutProbT)
     
-    # source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+    # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
     
     # call the private function to use the grand total rule
     GTRResult <- GTRFn(totalScore=postTruthful, 
@@ -610,17 +701,53 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # using only the postTruthful value 
     # because it is the compliment of postDeceptive
     
-    # <> subtotal score rule here
+    # <> subtotal score rule (SSR) here
     
-    # <>
+    SSRResult <- SSRFn(subtotalScores=postTruthfulRQs,
+                       cutScores=cutScores,
+                       flip=FALSE )
+    
+    # <> two-stage rule (TSR) here
+    
+    TSRResult <- eTSRFn(totalScore=postTruthful,
+                        subtotalScores=postTruthfulRQs,
+                        cutScores=cutScores,
+                        flip=FALSE )
+    
+  }
+  
+  #### select the decision rule ####
+  
+  {
+    
+    # PACategoricalResult <- GTRResult$testResult
+    # 
+    # PAQuestionResults <- GTRResult$subtotalResults
+    # 
+    # resultUsing <- GTRResult$resultUsing
     
     
-    
-    PACategoricalResult <- GTRResult$testResult
-    
-    PAQuestionResults <- GTRResult$subtotalResults
-    
-    resultUsing <- GTRResult$resultUsing
+    if(!exists("PADecisionRule")) PADecisionRule <- "GTR"
+
+    PACategoricalResult <- switch(PADecisionRule,
+                             "TSR"=TSRResult$testResult,
+                             "eTSR"=TSRResult$testResult,
+                             "SSR"=SSRResult$testResult,
+                             "GTR"=GTRResult$testResult,
+                             "FZR"=)
+
+    PAQuestionResults <- switch(PADecisionRule,
+                                  "TSR"=TSRResult$subtotalResults,
+                                  "eTSR"=TSRResult$subtotalResults,
+                                  "SSR"=SSRResult$subtotalResults,
+                                  "GTR"=GTRResult$subtotalResults)
+
+    resultUsing <- switch(PADecisionRule,
+                          "TSR"=TSRResult$resultUsing,
+                          "eTSR"=TSRResult$resultUsing,
+                          "SSR"=SSRResult$resultUsing,
+                          "GTR"=GTRResult$resultUsing)
+    names(resultUsing) <- NULL
     
   }
 
