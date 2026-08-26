@@ -28,23 +28,23 @@
 
 {
   # source a script to load the helper functions
-  source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-  source(paste0(RPath, 'sigProc_filters.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc_filters.R'), echo=FALSE)
   
-  source(paste0(RPath, 'sigProc_extra.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc_extra.R'), echo=FALSE)
   
   # source the scripts with signal processing functions for the sensors
-  source(paste0(RPath, 'pneumoSigProc.R'), echo=FALSE)
-  source(paste0(RPath, 'EDASigProc.R'), echo=FALSE)
-  source(paste0(RPath, 'cardioSigProc.R'), echo=FALSE)
-  source(paste0(RPath, 'FCSigProc.R'), echo=FALSE)
-  source(paste0(RPath, 'eCardioSigProc.R'), echo=FALSE)
-  source(paste0(RPath, 'PLESigProc.R'), echo=FALSE)
-  source(paste0(RPath, 'activitySigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'pneumoSigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'EDASigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'cardioSigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'FCSigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'eCardioSigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'PLESigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'activitySigProc.R'), echo=FALSE)
   
-  source(paste0(RPath, "PTTSigProc.R"), echo=FALSE)
+  source(file.path(RPath, "PTTSigProc.R"), echo=FALSE)
   
-  source(paste0(RPath, 'DetrendedEDAFilter.R'), echo=FALSE)
+  source(file.path(RPath, 'DetrendedEDAFilter.R'), echo=FALSE)
 }
 
 
@@ -403,7 +403,7 @@ sigProc <- function(uniqueExams=uniqueExams,
         
         ####### Scale and offset the data ######
         
-        # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+        # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
         
         {
           

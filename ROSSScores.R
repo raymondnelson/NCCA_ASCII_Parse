@@ -3,7 +3,7 @@
 
 
 
-source(paste0(RPath, 'ROSSModel.R'), echo=FALSE)
+source(file.path(RPath, 'ROSSModel.R'), echo=FALSE)
 
 
 
@@ -326,7 +326,7 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   ###### ROSS reference model (Honts & Driscoll, 1987; 1988) ######
   
-  # source(paste0(RPath, 'ROSSModel.R'), echo=FALSE)
+  # source(file.path(RPath, 'ROSSModel.R'), echo=FALSE)
   
   # ROSSCutScores <- c(GTDI=-14, GTNDI=14, STDI=-3, STNDI=3)
   
@@ -336,7 +336,7 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
   {
   
-    # source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+    # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
     
     GTRResult <- GTRFn(totalScore=CRDiffScore, 
                        RQNames=uniqueRQs,

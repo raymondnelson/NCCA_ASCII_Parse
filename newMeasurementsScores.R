@@ -12,7 +12,7 @@
 # source('~/Dropbox/R/NCCA_ASCII_Parse/outputScores.R', echo=FALSE)
 
 
-source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+source(file.path(RPath, 'outputScores.R'), echo=FALSE)
 
 
 

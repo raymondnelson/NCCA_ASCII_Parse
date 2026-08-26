@@ -25,8 +25,10 @@ print("init parameters for the NCCA ASCII work flow")
   # RPath <- "~/Dropbox/"
   
   if(!exists("RPath")) {
+    RPath <- rstudioapi::getActiveProject()
+    
     # mac
-    RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+    # RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
     # windows
     # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
   }
@@ -36,13 +38,15 @@ print("init parameters for the NCCA ASCII work flow")
   library(readr)
   
   # init parameters for processing and analyzing NCCA ASCII data
-  source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  source(file.path(RPath, "NCCAASCII_init.R"), echo=FALSE)
   
   # # list of events to exclude from analysis
   # source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
   
   # define the getCharts and uniqueNames functions
-  source(paste0(RPath, 'getExamNames.R'), echo=FALSE)
+  # source(paste0(RPath, 'getExamNames.R'), echo=FALSE)
+  source(file.path(RPath, "getExamNames.R"), echo=FALSE)
   
   if(!exists("uniqueExams")) {
     # uniqueExams <- getUniqueExams(x="*_Data$")

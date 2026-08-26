@@ -41,13 +41,15 @@ if(getOption("warn") !=2) {
 
 if(!exists("RPath")) {
   # this path is prepended to the file path before sourcing a script
+  RPath <- rstudioapi::getActiveProject()
+  
   # mac
-  RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+  # RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
   # windows
   # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
   
   # use this
-  # source(paste0(RPath, <filePath>), echo=FALSE)
+  # source(file.path(RPath, <filePath>), echo=FALSE)
 }
 
 
@@ -77,10 +79,12 @@ if(!exists("NCCADataPath")) {
 
 
 {
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
+  source(file.path(RPath, "workFlow_init.R"), echo=FALSE)
   
   # this is sourced by the workFlow_init.R script
-  source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  source(file.path(RPath, "NCCAASCII_init.R"), echo=FALSE)
 }
 
 
@@ -161,10 +165,10 @@ if(!exists("NCCADataPath")) {
 {
   
   # source the getExamNames.R script to load the getCharts() and uniqueNames() functions
-  # source(paste0(RPath, 'getExamNames.R'), echo=FALSE)
+  # source(file.path(RPath, 'getExamNames.R'), echo=FALSE)
   # this is sourced by the workFlow_init.R script
   
-  # source(paste0(RPath, "workFlow_init.R"), echo=FALSE)
+  # source(file.path(RPath, "workFlow_init.R"), echo=FALSE)
   
   # getCharts() will locate NCCA ASCII charts in the cwd
   # uniqueNames() is used to make a list of uniques exams in a directory
@@ -368,7 +372,8 @@ if(fixNonASCIICharacters==TRUE) {
   
   print("fix non-ASCII characters in NCCA ASCII output")
   
-  source(paste0(RPath, 'fixNonASCIICharacters.R'), echo=FALSE)
+  source(file.path(RPath, 'fixNonASCIICharacters.R'), echo=FALSE)
+  
   
   if(length(uniqueExamNames1) > 0) {
     fixNonASCIICharactersFn(searchPattern=searchPattern1)
@@ -425,7 +430,7 @@ if(fixFileNames==TRUE) {
   # first fix all problem characters in file and directory names
   print("fix problem characters in NCCA ASCII files")
   
-  source(paste0(RPath, 'fixFileNames.R'), echo=FALSE)
+  source(file.path(RPath, 'fixFileNames.R'), echo=FALSE)
   
   # run the loop twice for search pattern 1
   if(length(uniqueExamNames1) > 0) {
@@ -490,7 +495,7 @@ if(isTRUE(fixStrings)) {
   
   # fixStrings is set in the workFlow_init.R script
   
-  source(paste0(RPath, 'fixStrings.R'), echo=FALSE)
+  source(file.path(RPath, 'fixStrings.R'), echo=FALSE)
   
   # no output from this 
   # fixStringsFn(x="D&+", oldString=" 4KeyR", newString="  4Key")
@@ -549,7 +554,7 @@ if(fixSensorNames==TRUE) {
   
   print("fix the sensor names if necessary")
   
-  source(paste0(RPath, 'fixActivitySensorName.R'), echo=FALSE)
+  source(file.path(RPath, 'fixActivitySensorName.R'), echo=FALSE)
   
   if(!is.null(searchPattern1)) {
     
@@ -662,7 +667,7 @@ if(fixSensorNames==TRUE) {
 {
   
   # source the getExamNames.R script to load the getCharts() and uniqueNames() functions
-  # source(paste0(RPath, 'getExamNames.R'), echo=FALSE)
+  # source(file.path(RPath, 'getExamNames.R'), echo=FALSE)
   # this is sourced by the workFlow_init.R script
   
   print("locate NCCA ASCCI text files and make a vector of exams in the cwd")
@@ -705,11 +710,11 @@ if(NCCAASCIIParse == TRUE) {
   # NCCAASCIIParse is inititialized in the workFlow_init.R script
   
   print("source the NCCAASCIIParse.R script to parse the data")
-  source(paste0(RPath, 'NCCAASCII_Parse.R'), echo=FALSE)
+  source(file.path(RPath, 'NCCAASCII_Parse.R'), echo=FALSE)
   
-  source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
+  source(file.path(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
   
-  source(paste0(RPath, "NCCAASCII_dataParse.R"), echo = FALSE)
+  source(file.path(RPath, "NCCAASCII_dataParse.R"), echo = FALSE)
   
   # stop()
   
@@ -747,12 +752,12 @@ if(resetDataColumns == TRUE) {
   
   
   
-  source(paste0(RPath, "NCCAASCII_dataParse.R"), echo = FALSE)
+  source(file.path(RPath, "NCCAASCII_dataParse.R"), echo = FALSE)
   
-  source(paste0(RPath, 'addColumns.R'), echo=FALSE)
+  source(file.path(RPath, 'addColumns.R'), echo=FALSE)
   
   
-  source(paste0(RPath, 'NCCAASCII_resetDataCols.R'), echo=FALSE)
+  source(file.path(RPath, 'NCCAASCII_resetDataCols.R'), echo=FALSE)
   
   
   
@@ -782,7 +787,7 @@ if(stimulusParse == TRUE) {
   
   # first source the NCCAASCIIParseHelperFunctions.R script
   if(!exists("eventParse")) {
-    source(paste0(RPath, 'NCCAASCII)_ParseHelperFunctions.R'), echo=FALSE)
+    source(file.path(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
   }
   
   # print("source the NCCAASCIIParseHelperFunctions.R script")
@@ -867,7 +872,7 @@ if(cleanUp == TRUE) {
 
 {
   
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
   # make a function to make a list of unique exams in the global environment
   getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
@@ -933,16 +938,16 @@ if(preProcessData == TRUE) {
   # preProc will also correct the stimulus event data frame
   
   # source the sigProcHelper.R script to load the getFirstLastEventFn()
-  # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   
   # source this for the fixTagsFn()
-  source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
+  source(file.path(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
   
   # # list of events to exclude from analysis
-  source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+  source(file.path(RPath, 'excludedEvents.R'), echo=FALSE)
 
   print("pre-processing")
-  source(paste0(RPath, 'preProc.R'), echo=FALSE)
+  source(file.path(RPath, 'preProc.R'), echo=FALSE)
   # preProc(x=uniqueExams, makeDF=makeDF, output=output) 
   
   dataNames <- preProc(x=uniqueExams, makeDF=makeDF, output=output)
@@ -970,12 +975,12 @@ if(fixDuplicateTags == TRUE) {
   # for each chart in the exam data frame
   
   # first source the NCCAASCII_ParseHelperFunctions.R script to load the fixDupFn() function
-  source(paste0(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
+  source(file.path(RPath, 'NCCAASCII_ParseHelperFunctions.R'), echo=FALSE)
   
   
   # then source the fixDup.R script 
   # to call the fixDupFn() 
-  source(paste0(RPath, 'fixDup.R'), echo=FALSE)
+  source(file.path(RPath, 'fixDup.R'), echo=FALSE)
   print("fix duplicated or repeated stmulus event names")
   
   ### this is done somewhere else in the sigProc.R script
@@ -1028,7 +1033,7 @@ if(processData == TRUE) {
   # source('sigProcHelper.R', echo=FALSE)
   # source('sigProc_extra.R', echo=FALSE)
   
-  source(paste0(RPath, 'sigProc.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc.R'), echo=FALSE)
   
   # lowPass <- lowPass8th2hz_resp
   # highPass <- highPass8th1hz_resp
@@ -1075,11 +1080,11 @@ if(isTRUE(removeAnnotations)) {
   
   # source("~/Dropbox/R/NCCA_ASCII_Parse/removeAnnotations.R", echo=FALSE)
   
-  source(paste0(RPath, 'removeAnnotations.R'), echo=FALSE)
+  source(file.path(RPath, 'removeAnnotations.R'), echo=FALSE)
   
   # load the getFirstLastEventsFn()
   if(!exists("getFirstLastEventFn")) {
-    source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+    source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   }
   
   removeAnnotationsFn(uniqueExams=uniqueExams)
@@ -1108,7 +1113,7 @@ if(isTRUE(fixDLSTLabels)) {
   # C1, R1, R1, C2, R1, R2, C1, R1, R2, C2, R1, R2, C1
   
   
-  source(paste0(RPath, 'fixDLSTLabels.R'), echo=FALSE)
+  source(file.path(RPath, 'fixDLSTLabels.R'), echo=FALSE)
   
   
   fixDLSTLabelsFn(x="*_Data$", y="_Stimuli$")
@@ -1135,8 +1140,8 @@ if(isTRUE(trimExcessTime)) {
   # must be after signal processing to avoid problems
   # Aug 24, 2020
   
-  # source(paste0(RPath, 'toMinSec.R'), echo=FALSE)
-  source(paste0(RPath, 'dataTrim.R'), echo=FALSE)
+  # source(file.path(RPath, 'toMinSec.R'), echo=FALSE)
+  source(file.path(RPath, 'dataTrim.R'), echo=FALSE)
   
   dataTrimFn(x="*_Data$", y="_Stimuli$", pre=8, post=20)
   
@@ -1232,16 +1237,18 @@ if(loadRDA1==TRUE) {
   
   # this path is prepended to the file path before sourcing a script
   if(!exists("RPath")) {
+    RPath <- rstudioapi::getActiveProject()
+    
     # mac
-    RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+    # RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
     # windows
     # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
     
     # use this
-    # source(paste0(RPath, <filePath>), echo=FALSE)
+    # source(file.path(RPath, <filePath>), echo=FALSE)
   }
   
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
   myRdaNames <- list.files(pattern="*_1.Rda$")
   if(selectExams != "ALL") {
@@ -1279,8 +1286,8 @@ if(loadRDA1==TRUE) {
   
   # processData <- TRUE
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
   {
     
@@ -1295,8 +1302,8 @@ if(loadRDA1==TRUE) {
     
   }
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
   loadRDA1 <- FALSE
   
@@ -1316,12 +1323,12 @@ if(loadRDA1==TRUE) {
   # load a library of string functions (str_sub) used by the getUniqueExams()
   library(stringr)
   
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   # this is sourced by the workFlow_init.R script
   
-  source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+  source(file.path(RPath, 'excludedEvents.R'), echo=FALSE)
   
   # make a function to make a list of unique exams in the global environment
   if(!exists("getUniqueExams")) {
@@ -1380,12 +1387,12 @@ if(scaleOffsetData) {
   # ideally there will be no differences
   # but differences may occur at extreme (near zero) scaling values 
   
-  # RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+  # RPath <- rstudioapi::getActiveProject()
+  
+  source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
 
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
-
-  source(paste0(RPath, 'scaleOffsetData.R'), echo=FALSE)
+  source(file.path(RPath, 'scaleOffsetData.R'), echo=FALSE)
 
   ScaleOffsetDataFn(x=uniqueExams, makeDF=TRUE, output=FALSE, saveChartDF=FALSE)
 
@@ -1476,7 +1483,7 @@ if(isTRUE(writeNCCAASCII_LAF)) {
   
   # sourcing this file will export the data to Lafayette NCCA ASCII format
   # without calling a function
-  source(paste0(RPath, 'NCCAASCII_OUTPUT.R'), echo=FALSE)
+  source(file.path(RPath, 'NCCAASCII_OUTPUT.R'), echo=FALSE)
   
   writeNCCAASCII_LAF <- FALSE
 
@@ -1500,19 +1507,19 @@ if(processArtifacts == TRUE) {
   
   # print("artifact extraction")
 
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
   # source('~/Dropbox/NCCAASCII_init.R', echo=FALSE)
 
-  # source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+  # source(file.path(RPath, 'excludedEvents.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   
   # digital filters
-  # source(paste0(RPath, 'sigProc_extra.R'), echo=FALSE)
+  # source(file.path(RPath, 'sigProc_extra.R'), echo=FALSE)
 
   # a function to iterate over exams and sensors
-  source(paste0(RPath, 'artifactProc.R'), echo=FALSE)
+  source(file.path(RPath, 'artifactProc.R'), echo=FALSE)
 
   # call a function to iterate over the exams in the global environment
   artifactProcFn(x=uniqueExams)
@@ -1521,7 +1528,7 @@ if(processArtifacts == TRUE) {
 
   # which(chartDF$Artifacts_a != 0)
 
-  # source(paste0(RPath, 'chartPlot_gg.R'), echo=FALSE)
+  # source(file.path(RPath, 'chartPlot_gg.R'), echo=FALSE)
 
   # which(examDF$Pneumo_a == "Artifact")
   # which(examDF$UPneumo_a == "Artifact")
@@ -1545,14 +1552,14 @@ if(processArtifacts == TRUE) {
 
 if(processArtifacts == TRUE && activityArtifacts == TRUE) {
 
-  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-  # source(paste0(RPath, 'activityCheck.R'), echo=FALSE)
+  # source(file.path(RPath, 'getSegment.R'), echo=FALSE)
+  # source(file.path(RPath, 'activityCheck.R'), echo=FALSE)
   #
   # print("check for activity sensor artifacts")
   # chartFUN <- activityCheck
   # getExamFn(x=uniqueExams)
   #
-  # # source(paste0(RPath, 'chartPlot.R'), echo=FALSE)
+  # # source(file.path(RPath, 'chartPlot.R'), echo=FALSE)
 
 }
 
@@ -1564,9 +1571,9 @@ if(processArtifacts == TRUE && activityArtifacts == TRUE) {
 
 if(processArtifacts == TRUE && edaArtifacts == TRUE) {
 
-  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # source(file.path(RPath, 'getSegment.R'), echo=FALSE)
   # 
-  # source(paste0(RPath, 'dataCheck.R'), echo=FALSE)
+  # source(file.path(RPath, 'dataCheck.R'), echo=FALSE)
   # 
   # print("check for unresponsive EDA data")
   # chartFUN <- dataCheckFn
@@ -1575,13 +1582,13 @@ if(processArtifacts == TRUE && edaArtifacts == TRUE) {
   # # reset the warnings
   # # assign("last.warning", NULL, envir = baseenv())
   # 
-  # source(paste0(RPath, 'nonstimArtifacts.R'), echo=FALSE)
+  # source(file.path(RPath, 'nonstimArtifacts.R'), echo=FALSE)
   # 
   # print("check for non-specific EDA responses")
   # chartFUN=nonStimArtifactFn
   # getExamFn(x=uniqueExams)
   # 
-  # source(paste0(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
+  # source(file.path(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
   # 
   # print("check for finger movement artifacts in the EDA data")
   # chartFUN=EDAMvtArtifactFn
@@ -1607,17 +1614,17 @@ if(processArtifacts == TRUE && pneumoArtifacts == TRUE) {
   # sec2 <- 3
   # cutProp2 <- .01
   # 
-  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # source(file.path(RPath, 'getSegment.R'), echo=FALSE)
   # 
-  # source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
-  # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-  # source(paste0(RPath, 'tukeyFences.R'), echo=FALSE)
+  # source(file.path(RPath, 'pneumoCheck.R'), echo=FALSE)
+  # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+  # source(file.path(RPath, 'tukeyFences.R'), echo=FALSE)
   # 
   # print("check for unresponsive respiration data")
   # chartFUN <- pneumoCheckFn
   # getExamFn(x=uniqueExams)
   # 
-  # source(paste0(RPath, 'pneumoArtifact.R'), echo=FALSE)
+  # source(file.path(RPath, 'pneumoArtifact.R'), echo=FALSE)
   # 
   # print("respiration artifacts")
   # chartFUN=pneumoArtifactFn
@@ -1633,8 +1640,8 @@ if(processArtifacts == TRUE && pneumoArtifacts == TRUE) {
 
 if(processArtifacts == TRUE && cardioArtifacts == TRUE) {
   # 
-  #   source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-  #   source(paste0(RPath, 'cardioArtifact.R'), echo=FALSE)
+  #   source(file.path(RPath, 'getSegment.R'), echo=FALSE)
+  #   source(file.path(RPath, 'cardioArtifact.R'), echo=FALSE)
   # 
   #   # print("check for artifacts in the cardio data")
   #   # chartFUN=cardioArtifactFn
@@ -1650,8 +1657,8 @@ if(processArtifacts == TRUE && cardioArtifacts == TRUE) {
 
 if(processArtifacts == TRUE && pleArtifacts == TRUE) {
   # 
-  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
-  # source(paste0(RPath, 'pleArtifact.R'), echo=FALSE)
+  # source(file.path(RPath, 'getSegment.R'), echo=FALSE)
+  # source(file.path(RPath, 'pleArtifact.R'), echo=FALSE)
   # 
   # # print("PLE artifacts")
   # # chartFUN=pleArtifactFn
@@ -1675,7 +1682,7 @@ if(extractFeatures == TRUE) {
   # extractFeatures is initialized in the workFlow_init.R script
   
   # source the feature extraction function
-  source(paste0(RPath, 'featureExtraction.R'), echo=FALSE)
+  source(file.path(RPath, 'featureExtraction.R'), echo=FALSE)
 
   print("feature extraction")
   
@@ -1731,7 +1738,7 @@ if(integrateArtifacts == TRUE) {
   # # remove response onset and response end 
   # # if artifacts have occurred from 3 sec prestim seconds to .5 sec after response end
   # 
-  # source(paste0(RPath, 'integrateArtifacts.R'), echo=FALSE)
+  # source(file.path(RPath, 'integrateArtifacts.R'), echo=FALSE)
   # 
   # 
   # 
@@ -1758,14 +1765,14 @@ if(getScores == TRUE) {
   
   # _Measurements data frame is needed by the scoring algorithms
   
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   
   print("make a data frame of _Measurments for each exam")
   
   # source the extractMeasurements.R script to get the Kircher measurements
   
-  source(paste0(RPath, 'extractMeasurements.R'), echo=FALSE)
+  source(file.path(RPath, 'extractMeasurements.R'), echo=FALSE)
   
   extractMeasurementsFn(x=uniqueExams)
   # writeCSV=true will save the _Measurements.CSV data frame
@@ -1792,9 +1799,9 @@ if(getScores == TRUE) {
   
   print("score the data")
   
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
-  source(paste0(RPath, 'newScores.R'), echo=TRUE)
+  source(file.path(RPath, 'newScores.R'), echo=TRUE)
   
   # uniqueExams <- getUniqueExams(x="*_Data$")
   
@@ -1805,10 +1812,10 @@ if(getScores == TRUE) {
               output=FALSE )
   
   # source the script to load the getScoresFn() to calculate all numerical scores
-  # source(paste0(RPath, 'scores.R'), echo=FALSE)
+  # source(file.path(RPath, 'scores.R'), echo=FALSE)
   
   # load the getExamFn
-  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # source(file.path(RPath, 'getSegment.R'), echo=FALSE)
 
   # declare this after sourciong the getSegment.R script  
   # seriesFUN <- getScoresFn
@@ -1824,7 +1831,7 @@ if(getScores == TRUE) {
 
   #### PCASS Scores
   
-  # source(paste0(RPath, 'PCASS_feature_extraction.R'))
+  # source(file.path(RPath, 'PCASS_feature_extraction.R'))
   # 
   # if(isTRUE(PCASSFormat)) {
   #   PCASSAlgorithmFn(x=uniqueExams)
@@ -1863,16 +1870,16 @@ if(getScores == TRUE && saveMeasurements == TRUE) {
   
   ### save the _Measurements data frame to a .csv for each chart for each exam
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   
   library(stringr)
   
   print("save the _Measurments to a .CSV file")
   
   # source the outputScores.R script for the measurementTableFn
-  source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+  source(file.path(RPath, 'outputScores.R'), echo=FALSE)
   
-  source(paste0(RPath, 'newMeasurementsScores.R'), echo=FALSE)
+  source(file.path(RPath, 'newMeasurementsScores.R'), echo=FALSE)
   
   newMeasurementsScoresFn(uniqueExams=uniqueExams,
                           makeDF=FALSE,
@@ -1884,7 +1891,7 @@ if(getScores == TRUE && saveMeasurements == TRUE) {
   # *_measurementTable.csv is now in the cwd with feature extraction values
   
   # source the measurementsScores.R script to get the Kircher measurements
-  # source(paste0(RPath, 'measurementsScores.R'))
+  # source(file.path(RPath, 'measurementsScores.R'))
   
   # examFUN <- measurementsScoresFn
   
@@ -2005,17 +2012,19 @@ if(saveRDA2==TRUE) {
 {
   
   if(!exists("RPath")) {
+    RPath <- rstudioapi::getActiveProject()
+    
     # mac
-    RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+    # RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
     # windows
     # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
   }
   
   library(stringr)
   
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FAL SE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FAL SE)
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   
   # make a function to make a list of unique exams in the global environment
   if(!exists("getUniqueExams")) {
@@ -2042,7 +2051,7 @@ if(loadRDA2==TRUE) {
   #   getUniqueExams <- function(x="*_Data$") { unique(str_sub(ls(pattern=x, pos=1),1, -6)) }
   # }
   
-  # if(!exists("RPath")) RPath <- "~/Dropbox/"
+  # if(!exists("RPath")) RPath <- rstudioapi::getActiveProject()
   # RPath <- "~/Dropbox/"
   
   if(!exists("selectExams")) { selectExams <- "ALL" }
@@ -2076,11 +2085,11 @@ if(loadRDA2==TRUE) {
   
   #### re-select the exams in the working directory  
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
-  # source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
-  # source(paste0(RPath, 'getSegment.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'excludedEvents.R'), echo=FALSE)
+  # source(file.path(RPath, 'getSegment.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   
   ### get exam names from the _Data data frames
   
@@ -2106,7 +2115,7 @@ if(loadRDA2==TRUE) {
     }
   }
   
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
   print(paste(length(uniqueExams), "exams selected"))
   print(uniqueExams)
@@ -2149,20 +2158,20 @@ if(!exists("printCharts")) printCharts <- TRUE
 
 if(isTRUE(printCharts)) {
   # source the chartPlot.R script to print the plots
-  source(paste0(RPath, 'chartPlot_gg.R'), echo=FALSE)
+  source(file.path(RPath, 'chartPlot_gg.R'), echo=FALSE)
 }
  
 
 
-   if(!exists("printSegments")) printSegments <- FALSE
- # printSegments <- TRUE
+if(!exists("printSegments")) printSegments <- FALSE
+# printSegments <- TRUE
 
 
 
 # plot the segments
-# source(paste0(RPath, 'segmentPlot_init.R'))
+# source(file.path(RPath, 'segmentPlot_init.R'))
 if(isTRUE(printSegments)) {
-  source(paste0(RPath, 'segmentPlot_gg.R'), echo=FALSE)
+  source(file.path(RPath, 'segmentPlot_gg.R'), echo=FALSE)
 }
 
 
@@ -2179,7 +2188,7 @@ if(!exists("saveAlgorithmTXT")) saveAlgorithmTXT<- FALSE
 
 if(isTRUE(saveAlgorithmTXT)) {
   
-  source(paste0(RPath, 'saveAnalysisToTXT.R'), echo=FALSE)
+  source(file.path(RPath, 'saveAnalysisToTXT.R'), echo=FALSE)
   # saveAlgorithmTXT <- FALSE
   
   # call the function
@@ -2203,6 +2212,8 @@ if(!exists("saveResultsToPDF")) saveResultsToPDF <- FALSE
 # install.packages("rmarkdown")
 # library(rmarkdown)
 
+install.packages("tinytex")
+tinytex::install_tinytex()
 
 
 if(isTRUE(saveResultsToPDF)) {
@@ -2213,7 +2224,7 @@ if(isTRUE(saveResultsToPDF)) {
   # library(rmarkdown)
   
   # define the txtToPDF() function
-  source(paste0(RPath, 'saveAnalysisToPDF.R'), echo=FALSE)
+  source(file.path(RPath, 'saveAnalysisToPDF.R'), echo=FALSE)
   
   analysisOutputFiles <- list.files(pattern="Output")
   # exclude file that are not .txt
@@ -2355,7 +2366,7 @@ if(isTRUE(copyProblems)) {
 
 
 
-# source(paste0(RPath, 'summarizeAccuracy.R'), echo=FALSE)
+# source(file.path(RPath, 'summarizeAccuracy.R'), echo=FALSE)
 
 
 

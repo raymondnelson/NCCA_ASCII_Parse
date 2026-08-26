@@ -21,61 +21,61 @@
 
 {
   
-  # source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   
   # import a vector of question labels that are not included in feature extraction
-  source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+  source(file.path(RPath, 'excludedEvents.R'), echo=FALSE)
   
   # source this also 
   # for the ratePerMin() function
-  source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   # for the lowPass.2hz.2nd() function to remove dichrotic notch while estimating cardio rate
-  source(paste0(RPath, 'sigProc_extra.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc_extra.R'), echo=FALSE)
   
   # source the scripts for each sensor
-  source(paste0(RPath, 'PneumoExtract.R'), echo=FALSE)
-  source(paste0(RPath, 'EDAExtract.R'), echo=FALSE)
-  source(paste0(RPath, 'CardioExtract.R'), echo=FALSE)
-  source(paste0(RPath, 'newFCExtract.R'), echo=FALSE)
-  source(paste0(RPath, 'PLEExtract.R'), echo=FALSE)
+  source(file.path(RPath, 'PneumoExtract.R'), echo=FALSE)
+  source(file.path(RPath, 'EDAExtract.R'), echo=FALSE)
+  source(file.path(RPath, 'CardioExtract.R'), echo=FALSE)
+  source(file.path(RPath, 'newFCExtract.R'), echo=FALSE)
+  source(file.path(RPath, 'PLEExtract.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'FCExtract.R'), echo=FALSE)
+  # source(file.path(RPath, 'FCExtract.R'), echo=FALSE)
   
   # source the scripts with the helper functions
-  source(paste0(RPath, 'pneumoMeasurement.R'), echo=FALSE)
+  source(file.path(RPath, 'pneumoMeasurement.R'), echo=FALSE)
   
   # experimental functions for extracting respiration patterns 
-  source(paste0(RPath, "pneumoPatterns.R"), echo=FALSE)
+  source(file.path(RPath, "pneumoPatterns.R"), echo=FALSE)
   
   # amplitude extraction for EDA and cardio
-  source(paste0(RPath, 'amplitudeExtractPC.R'), echo=FALSE)
-  source(paste0(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
-  source(paste0(RPath, 'inflectionRule.R'), echo=FALSE)
+  source(file.path(RPath, 'amplitudeExtractPC.R'), echo=FALSE)
+  source(file.path(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
+  source(file.path(RPath, 'inflectionRule.R'), echo=FALSE)
   
   # August 2023 functions were abstracted from amplitudeExtractPC.R
-  source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
-  source(paste0(RPath, "getResponseOnsets.R"), echo=FALSE)
-  source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
-  source(paste0(RPath, 'descentRule.R'), echo=FALSE)
-  source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
-  source(paste0(RPath, "abstractScale.R"), echo=FALSE)
+  source(file.path(RPath, "getResponsePeaks.R"), echo=FALSE)
+  source(file.path(RPath, "getResponseOnsets.R"), echo=FALSE)
+  source(file.path(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
+  source(file.path(RPath, 'descentRule.R'), echo=FALSE)
+  source(file.path(RPath, "getSlopeDirection.R"), echo=FALSE)
+  source(file.path(RPath, "abstractScale.R"), echo=FALSE)
   
-  source(paste0(RPath, "checkEDATonicity.R"), echo=FALSE)
+  source(file.path(RPath, "checkEDATonicity.R"), echo=FALSE)
   
-  source(paste0(RPath, "checkCardioArtifacts.R"), echo=FALSE)
+  source(file.path(RPath, "checkCardioArtifacts.R"), echo=FALSE)
   
-  source(paste0(RPath, "checkPneumoArtifacts.R"), echo=FALSE)
+  source(file.path(RPath, "checkPneumoArtifacts.R"), echo=FALSE)
   
-  # source(paste0(RPath, "checkRespirationArtifacts.R"), echo=FALSE)
+  # source(file.path(RPath, "checkRespirationArtifacts.R"), echo=FALSE)
   
-  # source(paste0(RPath, 'PLEMeasurement.R'), echo=FALSE)
+  # source(file.path(RPath, 'PLEMeasurement.R'), echo=FALSE)
   
-  source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
+  source(file.path(RPath, 'rbpfProb.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'amplitudeExtractOSS2.R'), echo=FALSE)
+  # source(file.path(RPath, 'amplitudeExtractOSS2.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   
   ## these are set the init script ##
   # cps <- 30
@@ -346,14 +346,14 @@ featureExtraction <- function(x=uniqueExams,
         
         if(!isTRUE(PCATFormat) && chartDF$Cardio1[1] != -9.9) {
           
-          # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+          # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
           cardioRate <- ratePerMin(MASmooth(x=chartDF$Cardio1, y=2, times=1),
                                    buffer=9,
                                    peaks="upper",
                                    lowPass=TRUE)
           # used by the cardio extract function
           
-          # source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
+          # source(file.path(RPath, 'rbpfProb.R'), echo=FALSE)
           rbpfMsg <- rbpfProbFn(x=chartDF, y=NULL)
           
           # print(paste("cardio rate:", cardioRate))
@@ -389,7 +389,7 @@ featureExtraction <- function(x=uniqueExams,
           # used the by the pneumo extract function
           
           # for the ratePerMin() function
-          # source(paste0(RPath, "sigProcHelper.R'), echo=FALSE)
+          # source(file.path(RPath, "sigProcHelper.R'), echo=FALSE)
           
           # determine the respiration rate
           UPRate <- ratePerMin(x=chartDF$c_UPneumoSm, buffer=40, peaks="upper", lowPass=TRUE)
@@ -684,7 +684,7 @@ featureExtraction <- function(x=uniqueExams,
             
             print("  pneumo pattern extraction")
             
-            # source(paste0(RPath, "pneumoPatterns.R"), echo=FALSE)
+            # source(file.path(RPath, "pneumoPatterns.R"), echo=FALSE)
             
             # respPatternsDF <- NULL # initialized earlier
             

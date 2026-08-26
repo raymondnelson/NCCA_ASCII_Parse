@@ -16,13 +16,13 @@
 
 
 # requires the OSS-2 reference model
-source(paste0(RPath, 'OSS2Model.R'), echo=FALSE)
+source(file.path(RPath, 'OSS2Model.R'), echo=FALSE)
 
 # requires the grand total decision rule
-# source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+# source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
 
 # requires some other functions to make the score sheet and measurement tables
-# source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+# source(file.path(RPath, 'outputScores.R'), echo=FALSE)
 
 
 
@@ -42,7 +42,7 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   ###
   #
   # requires 6 tables for the OSS-2 reference tables
-  # source(paste0(RPath, 'OSS2Model.R'))
+  # source(file.path(RPath, 'OSS2Model.R'))
   # 
   # x input is a data frame of measurements for the RQs and CQs 
   # for a test series, including all test charts
@@ -183,7 +183,7 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   ################# OSS-2 reference model #####################
   
-  # source(paste0(RPath, 'OSS2Model.R'), echo=FALSE)
+  # source(file.path(RPath, 'OSS2Model.R'), echo=FALSE)
   
   ###################  OSS-2 numerical cut-scores ##################
   
@@ -615,7 +615,7 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
     cutScores <- c(GTNDI=cutScoreT, GTDI=cutScoreD)
     
-    # source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+    # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
     
     # call the private function to use the grand total rule
     OSS2Result <- GTRFn(totalScore=OSS2GrandTotal, 
@@ -654,7 +654,7 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   #####################  OSS-2 output  ######################
   
-  # source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+  # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
   
   ### OSS-2 measurements data frame 
   

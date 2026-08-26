@@ -9,21 +9,21 @@
 
 {
   
-  # source(paste0(RPath, "amplitudeExtractHelperFunctions.R'))
+  # source(file.path(RPath, "amplitudeExtractHelperFunctions.R'))
   
   # source the maxSlopeChangeFn
-  # source(paste0(RPath, 'slopeChange.R'), echo=FALSE)
+  # source(file.path(RPath, 'slopeChange.R'), echo=FALSE)
   
-  # source(paste0(RPath, "checkEDATonicity.R", echo=FALSE)
+  # source(file.path(RPath, "checkEDATonicity.R", echo=FALSE)
   
-  # source(paste0(RPath, "checkCardioArtifacts.R", echo=FALSE)
+  # source(file.path(RPath, "checkCardioArtifacts.R", echo=FALSE)
   
   # # August 2023 functions were abstracted from amplitudeExtractPC.R
-  # source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
-  # source(paste0(RPath, "getResponseOnsets.R"), echo=FALSE)
-  # source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
-  # source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
-  # source(paste0(RPath, "abstractScale.R"), echo=TRUE)
+  # source(file.path(RPath, "getResponsePeaks.R"), echo=FALSE)
+  # source(file.path(RPath, "getResponseOnsets.R"), echo=FALSE)
+  # source(file.path(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
+  # source(file.path(RPath, "getSlopeDirection.R"), echo=FALSE)
+  # source(file.path(RPath, "abstractScale.R"), echo=TRUE)
   
 }
 
@@ -93,13 +93,13 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
   #   
   #   # these are sourced earlier 
   #
-  #   source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
+  #   source(file.path(RPath, "getResponsePeaks.R"), echo=FALSE)
   #   
-  #   source(paste0(RPath, "getResponseOnsets.R"), echo=FALSE)
+  #   source(file.path(RPath, "getResponseOnsets.R"), echo=FALSE)
   #   
-  #   source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
+  #   source(file.path(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
   #   
-  #   source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
+  #   source(file.path(RPath, "getSlopeDirection.R"), echo=FALSE)
   #   
   # }
   
@@ -496,7 +496,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
     
     # August 2023
     # now abstracted to a separate function
-	  # source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
+	  # source(file.path(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
 	  # 2026Apr01 commented out
     yChangeList <- maxOnsetPeakDistFn(tsData=tsData,
                                       xOnset=xOnset,
@@ -510,7 +510,7 @@ amplitudeExtractFnPC <- function(extractList=AutoExtractList, env.params=env.par
 	  # preparing to include the descent rule
     # this new function works identical to the old one,
     # when descentRule == 0 in the NCCAASCII_init.R script
-	  # source(paste0(RPath, "newMaxOnsetPeakDistance.R"), echo=FALSE)
+	  # source(file.path(RPath, "newMaxOnsetPeakDistance.R"), echo=FALSE)
     # yChangeList <- newMaxOnsetPeakDistFn(tsData=tsData,
     #                                      xOnset=xOnset,
     #                                      xPeak=xPeak,

@@ -9,17 +9,17 @@
 {
 
   # already sourced by the decisionRules.R script
-  # source(paste0(RPath, 'KWANOVA.R'), echo=FALSE)
+  # source(file.path(RPath, 'KWANOVA.R'), echo=FALSE)
   
-  source(paste0(RPath, 'OSS3Model.R'), echo=FALSE)
+  source(file.path(RPath, 'OSS3Model.R'), echo=FALSE)
   
-  source(paste0(RPath, 'OSS3ChannelContributions.R'), echo=FALSE)
+  source(file.path(RPath, 'OSS3ChannelContributions.R'), echo=FALSE)
   
   # requires the grand total decision rule
-  # source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+  # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
 
   # for the table output
-  # source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+  # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
   
   # RqCqDFSeries$examName[1]
   

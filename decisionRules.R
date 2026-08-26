@@ -15,11 +15,11 @@
 ####
 
 # used by the ESS-M algorithm
-# source(paste0(RPath, 'autoSelectGTRTSR.R', echo=FALSE)
-source(paste0(RPath, 'autoSelectTSRSSR.R'), echo=FALSE)
+# source(file.path(RPath, 'autoSelectGTRTSR.R', echo=FALSE)
+source(file.path(RPath, 'autoSelectTSRSSR.R'), echo=FALSE)
 
 # used by the SCN decision rule for OSS-3
-source(paste0(RPath, 'KWANOVA.R'), echo=FALSE)
+source(file.path(RPath, 'KWANOVA.R'), echo=FALSE)
 
 ##########  Grand total Rule ##########
 
@@ -241,12 +241,16 @@ eTSRFn <- function(totalScore=6,
   # and may reduce FN errors
   ifelse(totalScore <= cutScores['GTDI'],
          # parse the result within the ifelse()
-         # so that we can capture "using" info
+         # so that we can capture "using" info to indicate whether reuslt was obtained using the grand total or lowest subtotals
+         # first check for DI result using the grand total
          testResult <- c(result="DI/SR", using="grand total", cutScore=cutScores['GTDI']),
          ifelse(minSubtotalScore <= cutScores['STDIc'],
+                # check for DI result using the lowest subtotal
                 testResult <- c(result="DI/SR", using="lowest subtotal", cutScore=cutScores['STDIc']),
                 ifelse(totalScore >= cutScores['GTNDI'],
+                       # check for NDI result using the grand total
                        testResult <- c(result="NDI/NSR", using="grand total", cutScore=cutScores['GTNDI']),
+                       # INC if none of the previous conditions are satisfied
                        testResult <- c(result="INC/NO", using="grand total", cutScore=cutScores['GTNDI']) ) ) )
   names(testResult)[1] <- "TSR"
   # all subtotals get the same result as the test result
@@ -260,7 +264,7 @@ eTSRFn <- function(totalScore=6,
        totalScore=totalScore,
        lowestRQName=names(subtotalScores)[thisSubtotalScore],
        lowestSubtotalScore=minSubtotalScore )
-} # end TSRFn()
+} # end eTSRFn()
 
 
 TSRFn <- function(totalScore=6, 
@@ -583,7 +587,7 @@ SCNFn <- function(totalScore=inputPVal,
   }
   
   # get the KWANOVA result
-  # source(paste0(RPath, 'KWANOVA.R'), echo=FALSE)
+  # source(file.path(RPath, 'KWANOVA.R'), echo=FALSE)
   # already sourced by the OSS3Score.R script
   KWResult <- KWANOVAFn(withinChartRQMeans=withinChartRQMeans, a=.1)
   # KWResult <- "sig" # result will be the same as SSR unless KW is "ns"

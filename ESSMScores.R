@@ -9,33 +9,33 @@
 {
   
   # ESS-M requires the R/C ratios from the the function in this script
-  source(paste0(RPath, 'RCScores.R'), echo=FALSE)
+  source(file.path(RPath, 'RCScores.R'), echo=FALSE)
   
   # source the script for the R/C ratio constraints
   # requires the RCToESSFn()
-  # source(paste0(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
+  # source(file.path(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
   # sourced by the RCScores.R script
   
   # ESS-M also requires the function in this script to select the CQ
-  # source(paste0(RPath, 'selectCQ.R'), echo=FALSE)
+  # source(file.path(RPath, 'selectCQ.R'), echo=FALSE)
   # sourced by the RCScores.R script
   
   # function to autoselect the ESS-M decision rule via pairwise comparison
-  source(paste0(RPath, 'autoSelectTSRSSR.R'), echo=FALSE)
+  source(file.path(RPath, 'autoSelectTSRSSR.R'), echo=FALSE)
   
   # ESS Multinomial Likelihood Function
-  ESSM_simple_GT <- read.csv(paste0(RPath, 'ESSM_simple_GT.csv'), header=TRUE, stringsAsFactors=FALSE)
-  ESSM_simple_ST <- read.csv(paste0(RPath, 'ESSM_simple_ST.csv'), header=TRUE, stringsAsFactors=FALSE)
+  ESSM_simple_GT <- read.csv(file.path(RPath, 'ESSM_simple_GT.csv'), header=TRUE, stringsAsFactors=FALSE)
+  ESSM_simple_ST <- read.csv(file.path(RPath, 'ESSM_simple_ST.csv'), header=TRUE, stringsAsFactors=FALSE)
   
   # ESSM (simple) cutscore tables
-  ESSMs_SI_NDI <- read.csv(paste0(RPath, 'ESSMs_SI_NDI.csv'), stringsAsFactors=FALSE)
-  ESSMs_SI_DI <- read.csv(paste0(RPath, 'ESSMs_SI_DI.csv'), stringsAsFactors=FALSE)
-  ESSMs_SI_DI_St <- read.csv(paste0(RPath, 'ESSMs_SI_DI_St.csv'), stringsAsFactors=FALSE)
-  ESSMs_MI_NSR <- read.csv(paste0(RPath, 'ESSMs_MI_NSR.csv'), stringsAsFactors=FALSE)
-  ESSMs_MI_SR <- read.csv(paste0(RPath, 'ESSMs_MI_SR.csv'), stringsAsFactors=FALSE)
+  ESSMs_SI_NDI <- read.csv(file.path(RPath, 'ESSMs_SI_NDI.csv'), stringsAsFactors=FALSE)
+  ESSMs_SI_DI <- read.csv(file.path(RPath, 'ESSMs_SI_DI.csv'), stringsAsFactors=FALSE)
+  ESSMs_SI_DI_St <- read.csv(file.path(RPath, 'ESSMs_SI_DI_St.csv'), stringsAsFactors=FALSE)
+  ESSMs_MI_NSR <- read.csv(file.path(RPath, 'ESSMs_MI_NSR.csv'), stringsAsFactors=FALSE)
+  ESSMs_MI_SR <- read.csv(file.path(RPath, 'ESSMs_MI_SR.csv'), stringsAsFactors=FALSE)
   
   # function to get the lower limit of the Bayesiann credible interval
-  source(paste0(RPath, 'ClopperPearsonBinomialCI.R'), echo=FALSE)
+  source(file.path(RPath, 'ClopperPearsonBinomialCI.R'), echo=FALSE)
   
   ## these are set in the NCCAASCII_init.R script ##
   # RqCqDFSeries=RqCqDFSeries,
@@ -135,7 +135,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
 
   {
     # now included in 
-    # source(paste0(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
+    # source(file.path(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
   }
   
   #### initialize a data frame with the question sequence for each chart ####
@@ -297,7 +297,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
       thisChartRows <- which(RqCqDFSeries$chartName == thisChart)
       
       # ESS-M requires the R/C ratios from the the function in this script
-      # source(paste0(RPath, 'RCScores.R'), echo=FALSE)
+      # source(file.path(RPath, 'RCScores.R'), echo=FALSE)
       
       RqCqDFChart <- RqCqDFSeries[thisChartRows,]
       
@@ -464,7 +464,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
       
       #### then compute the ESS scores ####
       
-      # source(paste0(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
+      # source(file.path(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
       
       ESSScore <- RCToESSFn(thisScore=thisScore, 
                             thisSensor=thisSensor)
@@ -904,7 +904,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   {
   
-    # source(paste0(RPath, 'autoSelectTSRSSR.R'), echo=TRUE)
+    # source(file.path(RPath, 'autoSelectTSRSSR.R'), echo=TRUE)
     
     pairwiseResult <-  autoSelectTSRSSRFn(x=subtotalScores, 
                                     PLE=TRUE, 
@@ -953,7 +953,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
 
     # cutScores <- c(GTNDI=GTNDI, GTDI=GTDI, STDIc=STDIc, STDI=STDI, STNDIc=STNDIc)
     
-    # source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+    # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
     
     # the same cutscores will be submitted to all decision rules
     
@@ -1072,7 +1072,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   {
     
-    # source(paste0(RPath, 'ClopperPearsonBinomialCI.R'), echo=FALSE)
+    # source(file.path(RPath, 'ClopperPearsonBinomialCI.R'), echo=FALSE)
     
     testScore <- ifelse(resultUsing == "lowest subtotal",
                         minSubtotalScore,
@@ -1091,7 +1091,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                   1,
                   3 ) 
     
-    # source(paste0(RPath, 'ClopperPearsonBinomialCI.R'), echo=FALSE)
+    # source(file.path(RPath, 'ClopperPearsonBinomialCI.R'), echo=FALSE)
     CPLowerLimit <- clopperPearsonFn(p=postProb, 
                                      RQs=RQs,
                                      maxCharts=5,
@@ -1111,7 +1111,7 @@ ESSMScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   ########################### ESS-M output section ########################
   
   # output table functions
-  # source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+  # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
   
   ######## ESS-M measurements data frame 
   

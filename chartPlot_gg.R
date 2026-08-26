@@ -34,30 +34,30 @@
 {
   
   # source the list of excluded events so measurements are not plotted for these
-  source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+  source(file.path(RPath, 'excludedEvents.R'), echo=FALSE)
   excludeQuestions
   
   
-  source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   # source this after the NCCAASCII_init.R script
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
-  source(paste0(RPath, 'cardioCorrelation.R'), echo=FALSE)
+  source(file.path(RPath, 'cardioCorrelation.R'), echo=FALSE)
   
-  source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-  source(paste0(RPath, 'sigProc_extra.R'), echo=FALSE)
-  source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
-  source(paste0(RPath, 'EDADataCheck.R'), echo=FALSE)
-  source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc_extra.R'), echo=FALSE)
+  source(file.path(RPath, 'rbpfProb.R'), echo=FALSE)
+  source(file.path(RPath, 'EDADataCheck.R'), echo=FALSE)
+  source(file.path(RPath, 'pneumoCheck.R'), echo=FALSE)
   
-  source(paste0(RPath, 'cardioLeakDown.R'), echo=FALSE)
+  source(file.path(RPath, 'cardioLeakDown.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'EDACheck.R'), echo=FALSE)
+  # source(file.path(RPath, 'EDACheck.R'), echo=FALSE)
   
   
   # run the init script to set the plot parameters
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
-  # source(paste0(RPath, 'chartPlot_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'chartPlot_init.R'), echo=FALSE)
   
 }
 
@@ -282,7 +282,7 @@
   # selectScores <- "rank"
   
   # source the init script to reset the options above
-  # source(paste0(RPath, 'chartPlot_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'chartPlot_init.R'), echo=FALSE)
   
   #### PCASS/PCAT format ####
   
@@ -679,7 +679,7 @@ for(i in 1:length(uniqueExams)) {
           # first rese the RBPF warning
           rbpfMsg <- "none"
           
-          # source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
+          # source(file.path(RPath, 'rbpfProb.R'), echo=FALSE)
           
           # check for respiratory blood pressure fluctuation
           if(isTRUE(showScores) && !isTRUE(PCATFormat)) { 
@@ -4996,7 +4996,7 @@ for(i in 1:length(uniqueExams)) {
 if(showNames==TRUE) print(paste(length(uniqueExams), "exams processed"))
 
 # reset the NCCA ASCII init 
-# source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+# source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
 
 
 ######### tabulate the RQ States and exam criterion states ############

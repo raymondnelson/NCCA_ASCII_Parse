@@ -62,8 +62,10 @@
   # this path is prepended to the file path before sourcing a script
   # mac
   if(!exists("RPath")) {
+    RPath <- rstudioapi::getActiveProject()
+    
     # mac
-    RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
+    # RPath <- "~/Dropbox/R/NCCA_ASCII_Parse/"
     # windows
     # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
   }
@@ -71,7 +73,7 @@
   # RPath <- "C://Users/raymo/Dropbox/R/NCCA_ASCII_Parse/"
   
   # use this
-  # source(paste0(RPath, <filePath>), echo=FALSE)
+  # source(file.path(RPath, <filePath>), echo=FALSE)
   
 }
 
@@ -88,12 +90,12 @@
   # to reset default warning level
   # options(warn=0)
   
-  source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
+  source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   # this is sourced by the workFlow_init.R script
   
-  # source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+  # source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
   
 }
 

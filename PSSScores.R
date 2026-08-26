@@ -5,7 +5,7 @@
 
 {
   
-  source(paste0(RPath, 'PSSModel.R'), echo=FALSE)
+  source(file.path(RPath, 'PSSModel.R'), echo=FALSE)
   
   murphyFn <- function(pFD, pFT, prior) {
     # a private function for Murphy's (1978) formula
@@ -54,7 +54,7 @@ PermutationTestScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   # and all sensors (upper and lower respiration, electrodermal, cardio)
   #
   # requires the PSS reference model
-  # source(paste0(RPath, 'PSSModel.R'))
+  # source(file.path(RPath, 'PSSModel.R'))
   # 
   # PSS is for 3 RQs 3CQs and three charts
   # forced=TRUE will coerce the PSS to other exam formats
@@ -216,7 +216,7 @@ PermutationTestScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   ##############   PSS reference model   ###############
   
   {
-    # source(paste0(RPath, 'PSSModel.R'), echo=FALSE)
+    # source(file.path(RPath, 'PSSModel.R'), echo=FALSE)
   }
     
   ######## initialize three data frames for the scores ########
@@ -727,7 +727,7 @@ PermutationTestScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
       uniqueCQs <- unique(RqCqDFSeries[cqRows,'eventLabel'])
     }
     
-    # source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
+    # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
     
     # call the private function to use the grand total rule
     # use flip=TRUE to invert the probability score and probability cutscores
@@ -829,7 +829,7 @@ PermutationTestScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   {
     
-    # source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+    # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
     
     PSSMeasurementSensors <- c("UPneumo", 
                                "LPneumo", 

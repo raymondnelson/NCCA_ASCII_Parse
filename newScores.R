@@ -22,61 +22,61 @@
 # measuredSeg <- 15
 
 
-# source(paste0(RPath, 'workFlow_init.R'), echo=FALSE)
-# source(paste0(RPath, 'NCCAASCII_init.R'), echo=FALSE)
+# source(file.path(RPath, 'workFlow_init.R'), echo=FALSE)
+# source(file.path(RPath, 'NCCAASCII_init.R'), echo=FALSE)
 
 # source the amplitudeExtractHelperFunctions.R script to load the spd function
 # for the population st dev
-# source(paste0(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
+# source(file.path(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
 
 
 
 {
   
   # import a vector of question labels that are not included in feature extraction
-  source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+  source(file.path(RPath, 'excludedEvents.R'), echo=FALSE)
   
   # source the scripts for algorithm functions
   
   # output functions for score and measurement tables
-  source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+  source(file.path(RPath, 'outputScores.R'), echo=FALSE)
   
-  source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
+  source(file.path(RPath, 'rbpfProb.R'), echo=FALSE)
   
-  source(paste0(RPath, 'sigProc_filters.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc_filters.R'), echo=FALSE)
   
   
   # source the sigProcHelper.R script to load the getFirstLastEventFn()
-  source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   
   
   # source some scripts to calculate various types of rank scores
-  source(paste0(RPath, 'rankScores.R'), echo=FALSE)
-  source(paste0(RPath, 'RRMScores.R'), echo=FALSE)
-  source(paste0(RPath, 'miritelloRank.R'), echo=FALSE)
-  source(paste0(RPath, 'ipsativeZScore.R'), echo=FALSE)
+  source(file.path(RPath, 'rankScores.R'), echo=FALSE)
+  source(file.path(RPath, 'RRMScores.R'), echo=FALSE)
+  source(file.path(RPath, 'miritelloRank.R'), echo=FALSE)
+  source(file.path(RPath, 'ipsativeZScore.R'), echo=FALSE)
   
   # source a script to obtain the response onset and peak indices
-  # source(paste0(RPath, 'questionTimes.R'), echo=TRUE)
+  # source(file.path(RPath, 'questionTimes.R'), echo=TRUE)
   
   # source some scripts for the scoring algorithms
-  source(paste0(RPath, 'ESSMScores.R'), echo=FALSE)
-  source(paste0(RPath, 'OSS3Scores.R'), echo=FALSE)
-  source(paste0(RPath, 'OSS2Scores.R'), echo=FALSE)
-  source(paste0(RPath, 'PAScores.R'), echo=FALSE)
-  source(paste0(RPath, 'ROSSScores.R'), echo=FALSE)
-  source(paste0(RPath, 'PSSScores.R'), echo=FALSE)
-  source(paste0(RPath, 'bootstrapScores.R'), echo=FALSE)
+  source(file.path(RPath, 'ESSMScores.R'), echo=FALSE)
+  source(file.path(RPath, 'OSS3Scores.R'), echo=FALSE)
+  source(file.path(RPath, 'OSS2Scores.R'), echo=FALSE)
+  source(file.path(RPath, 'PAScores.R'), echo=FALSE)
+  source(file.path(RPath, 'ROSSScores.R'), echo=FALSE)
+  source(file.path(RPath, 'PSSScores.R'), echo=FALSE)
+  source(file.path(RPath, 'bootstrapScores.R'), echo=FALSE)
   
   
   # decision rules for scoring algorithms 
-  source(paste0(RPath, 'decisionRules.R'), echo=FALSE)
-  source(paste0(RPath, 'autoSelectTSRSSR.R'), echo=FALSE)
-  source(paste0(RPath, 'KWANOVA.R'), echo=FALSE)
+  source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
+  source(file.path(RPath, 'autoSelectTSRSSR.R'), echo=FALSE)
+  source(file.path(RPath, 'KWANOVA.R'), echo=FALSE)
   
   
   #### LXCAT algorithm
-  source(paste0(RPath, 'LXCATScores.R'), echo=FALSE)
+  source(file.path(RPath, 'LXCATScores.R'), echo=FALSE)
   
 }
 
@@ -351,7 +351,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       {
         
-        # source(paste0(RPath, 'outputScores.R'), echo=FALSE)
+        # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
         questionSequenceDF <- questionSequenceFn(measurementDF=seriesMeasurementDF,
                                                  outputName="questionSequenceDF",
                                                  makeDF=FALSE,
@@ -600,7 +600,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       if(isTRUE(getRankScores)) {
         
-        # source(paste0(RPath, 'rankScores.R'), echo=FALSE)
+        # source(file.path(RPath, 'rankScores.R'), echo=FALSE)
         
         # if(seriesName == "2" || seriesName == 2) stop()
         
@@ -613,7 +613,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         # stop()
         
         # use a function to get the rank scores for each chart in the series
-        # source(paste0(RPath, 'rankScores.R'), echo=TRUE)
+        # source(file.path(RPath, 'rankScores.R'), echo=TRUE)
         RqCqDFSeries <- rankScoreFn(RqCqDFSeries=RqCqDFSeries, 
                                     makeDF=FALSE,
                                     saveCSV=FALSE,
@@ -642,10 +642,10 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       if(isTRUE(getRRMScores)) {
         
-        # source(paste0(RPath, 'RRMScores.R'), echo=FALSE)
+        # source(file.path(RPath, 'RRMScores.R'), echo=FALSE)
         
         # use a function to get the RRM scores
-        # source(paste0(RPath, 'RRMScore.R', echo=TRUE)
+        # source(file.path(RPath, 'RRMScore.R', echo=TRUE)
         RqCqDFSeries <- RRMScoreFn(RqCqDFSeries=RqCqDFSeries, 
                                    makeDF=FALSE,
                                    saveCSV=saveCSV,
@@ -673,7 +673,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       if(isTRUE(getMiritelloRankScores)) {
         
         # use a function to get the Miritello rank scores
-        # source(paste0(RPath, 'miritelloRank.R'), echo=TRUE)
+        # source(file.path(RPath, 'miritelloRank.R'), echo=TRUE)
         RqCqDFSeries <- miritelloRankFn(RqCqDFSeries=RqCqDFSeries, 
                                         makeDF=FALSE,
                                         saveCSV=saveCSV,
@@ -702,7 +702,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         # if(seriesName == "3") stop()
 
         # use a function to get the Miritello rank scores
-        # source(paste0(RPath, 'ipsativeZScore.R'), echo=TRUE)
+        # source(file.path(RPath, 'ipsativeZScore.R'), echo=TRUE)
         
         RqCqDFSeries <- ipsativeZFn(RqCqDFSeries=RqCqDFSeries, 
                                     makeDF=FALSE,
@@ -786,9 +786,9 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       if(isTRUE(getRCScores)) {
         
         # use a function to get the R/C scores for the chart
-        # source(paste0(RPath, 'RCScores.R'), echo=TRUE)
+        # source(file.path(RPath, 'RCScores.R'), echo=TRUE)
         # will call the selectCQFn function from the selectCQ.R script
-        # source(paste0(RPath, 'selectCQ.R'), echo=FALSE)
+        # source(file.path(RPath, 'selectCQ.R'), echo=FALSE)
         
         # need the R/C scores for all charts
         # before calculating ESS for all charts
@@ -857,7 +857,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         
         # stop()
         
-        # source(paste0(RPath, 'ESSMScores.R'), echo=TRUE)
+        # source(file.path(RPath, 'ESSMScores.R'), echo=TRUE)
         
         # need the R/C scores for all charts
         # before calculating ESS for all charts
@@ -897,7 +897,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         
         # if(examName=="DXDB629GX") stop("stop OSS-3")
         
-        # source(paste0(RPath, 'OSS3Scores.R'), echo=TRUE)
+        # source(file.path(RPath, 'OSS3Scores.R'), echo=TRUE)
         
         if(!exists("OSS3DecisionRule")) OSS3DecisionRule <- "TSR"
         
@@ -938,7 +938,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       if(isTRUE(getPAScores)) {
         
-        # stop()
+        stop()
         
         RqCqDFSeries <- PAScoresFn(RqCqDFSeries=RqCqDFSeries,
                                    forced=TRUE,
@@ -946,6 +946,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
                                    PAPrior=.5,
                                    PACutProbT=.7,
                                    PACutProbD=.3,
+                                   EDA="auto",
                                    makeDF=FALSE,
                                    saveCSV=FALSE,
                                    analysisListName=analysisListName )

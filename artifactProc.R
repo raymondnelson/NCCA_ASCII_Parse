@@ -17,11 +17,11 @@
 {
 
   ## respiration ##
-  source(paste0(RPath, 'pneumoArtifact.R'), echo=FALSE)
+  source(file.path(RPath, 'pneumoArtifact.R'), echo=FALSE)
   # check for unresponsive respiration data
-  # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-  source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
-  source(paste0(RPath, 'tukeyFences.R'), echo=FALSE)
+  # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'pneumoCheck.R'), echo=FALSE)
+  source(file.path(RPath, 'tukeyFences.R'), echo=FALSE)
   
   sec <- .5
   cutProp <- .1
@@ -31,52 +31,52 @@
   sec2 <- 3
   cutProp2 <- .005
   
-  source(paste0(RPath, 'TukeyFences.R'), echo=FALSE)
+  source(file.path(RPath, 'TukeyFences.R'), echo=FALSE)
 
   ## EDA ##
   
-  # source(paste0(RPath, 'edaArtifact.R'), echo=FALSE)
+  # source(file.path(RPath, 'edaArtifact.R'), echo=FALSE)
   # # load a function to check for unresponsive EDA data
-  # source(paste0(RPath, 'dataCheck.R'), echo=FALSE)
+  # source(file.path(RPath, 'dataCheck.R'), echo=FALSE)
   # # define a function for finger movement artifacts
-  # source(paste0(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
+  # source(file.path(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
   # # define a function for non-stim activity that exceeds stim segments
-  # source(paste0(RPath, 'nonstimArtifacts.R'), echo=FALSE)
+  # source(file.path(RPath, 'nonstimArtifacts.R'), echo=FALSE)
   # # define a function to calculate finger movement artifacts
-  # source(paste0(RPath, 'TukeyFences.R'), echo=FALSE)
+  # source(file.path(RPath, 'TukeyFences.R'), echo=FALSE)
   
  # Sep 2, 2023
-  source(paste0(RPath, "checkEDATonicity.R"), echo=FALSE)
+  source(file.path(RPath, "checkEDATonicity.R"), echo=FALSE)
   
-  # source(paste0(RPath, "CardioArtifacts.R"), echo=FALSE)
+  # source(file.path(RPath, "CardioArtifacts.R"), echo=FALSE)
   
   # load the fillSlope function
-  source(paste0(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
+  source(file.path(RPath, 'amplitudeExtractHelperFunctions.R'), echo=FALSE)
   
   # digital filters
-  source(paste0(RPath, 'sigProc_extra.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc_extra.R'), echo=FALSE)
   
   
   ## cardio ##
   
-  source(paste0(RPath, 'cardioArtifact.R'), echo=FALSE)
-  source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
-  source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-  source(paste0(RPath, 'TukeyFences.R'), echo=FALSE)
-  source(paste0(RPath, 'cardioRate.R'), echo=FALSE)
-  # source(paste0(RPath, 'cardioArrythmia.R'), echo=FALSE)
-  source(paste0(RPath, 'artifactExtractHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'cardioArtifact.R'), echo=FALSE)
+  source(file.path(RPath, 'rbpfProb.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'TukeyFences.R'), echo=FALSE)
+  source(file.path(RPath, 'cardioRate.R'), echo=FALSE)
+  # source(file.path(RPath, 'cardioArrythmia.R'), echo=FALSE)
+  source(file.path(RPath, 'artifactExtractHelper.R'), echo=FALSE)
   # load a function to check for unresponsive data
-  # source(paste0(RPath, 'dataCheck.R'), echo=FALSE)
+  # source(file.path(RPath, 'dataCheck.R'), echo=FALSE)
   
   
   ## PLE ##
-  source(paste0(RPath, 'pleArtifact.R'), echo=FALSE)
+  source(file.path(RPath, 'pleArtifact.R'), echo=FALSE)
   
   ## activity ##
-  source(paste0(RPath, 'activityCheck.R'), echo=FALSE)
-  source(paste0(RPath, 'activityArtifact.R'), echo=FALSE)
-  source(paste0(RPath, "newActivityCheck.R"), echo=FALSE)
+  source(file.path(RPath, 'activityCheck.R'), echo=FALSE)
+  source(file.path(RPath, 'activityArtifact.R'), echo=FALSE)
+  source(file.path(RPath, "newActivityCheck.R"), echo=FALSE)
 
 }
 
@@ -228,9 +228,9 @@ artifactProcFn<- function(x=uniqueExams) {
           if(showNames==TRUE)  print("  pneumo artifacts")
 
           # check for unresponsive pneumo data
-          # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-          # source(paste0(RPath, 'tukeyFences.R'), echo=FALSE)
-          # source(paste0(RPath, 'pneumoCheck.R'), echo=FALSE)
+          # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+          # source(file.path(RPath, 'tukeyFences.R'), echo=FALSE)
+          # source(file.path(RPath, 'pneumoCheck.R'), echo=FALSE)
 
           # check for unresponsive pneumo sensors
           # 2020-06-03 seems to be a problems with adding NUL
@@ -240,7 +240,7 @@ artifactProcFn<- function(x=uniqueExams) {
           # chartDF$UPneumoUnresponse_a <- pneumoCheckMsg
 
           # check for respiration artifacts
-          # source(paste0(RPath, 'pneumoArtifact.R'), echo=FALSE)
+          # source(file.path(RPath, 'pneumoArtifact.R'), echo=FALSE)
           chartDF <- pneumoArtifactFn(x=chartDF)
           # stop()
 
@@ -258,11 +258,11 @@ artifactProcFn<- function(x=uniqueExams) {
           
           if(showNames==TRUE) print("  EDA artifacts")
           
-          # source(paste0(RPath, 'dataCheck.R'), echo=FALSE)
-          # source(paste0(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
-          # source(paste0(RPath, 'nonstimArtifacts.R'), echo=FALSE)
-          # source(paste0(RPath, 'TukeyFences.R'), echo=FALSE)
-          # source(paste0(RPath, "checkEDATonicity.R"), echo=FALSE)
+          # source(file.path(RPath, 'dataCheck.R'), echo=FALSE)
+          # source(file.path(RPath, 'EDAMvtArtifact.R'), echo=FALSE)
+          # source(file.path(RPath, 'nonstimArtifacts.R'), echo=FALSE)
+          # source(file.path(RPath, 'TukeyFences.R'), echo=FALSE)
+          # source(file.path(RPath, "checkEDATonicity.R"), echo=FALSE)
           
           # chartDF <- edaArtifactFn(x=chartDF)
           
@@ -287,12 +287,12 @@ artifactProcFn<- function(x=uniqueExams) {
 
           # if(showNames==TRUE) print("  cardio artifacts")
           # 
-          # # source(paste0(RPath, 'rbpfProb.R'), echo=FALSE)
-          # # source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
-          # # source(paste0(RPath, 'TukeyFences.R'), echo=FALSE)
-          # # source(paste0(RPath, 'cardioRate.R'), echo=FALSE)
-          # # source(paste0(RPath, 'cardioArrythmia.R'), echo=FALSE)
-          # # source(paste0(RPath, 'artifactExtractHelper.R'), echo=FALSE)
+          # # source(file.path(RPath, 'rbpfProb.R'), echo=FALSE)
+          # # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+          # # source(file.path(RPath, 'TukeyFences.R'), echo=FALSE)
+          # # source(file.path(RPath, 'cardioRate.R'), echo=FALSE)
+          # # source(file.path(RPath, 'cardioArrythmia.R'), echo=FALSE)
+          # # source(file.path(RPath, 'artifactExtractHelper.R'), echo=FALSE)
           # 
           # chartDF <- cardioArtifactFn(x=chartDF)
 
@@ -336,9 +336,9 @@ artifactProcFn<- function(x=uniqueExams) {
             # only if there is some activity in the activity sensor data
             if( max(chartDF$c_Move1) != min(chartDF$c_Move1) ) {
               
-              # source(paste0(RPath, 'activityCheck.R'), echo=FALSE)
+              # source(file.path(RPath, 'activityCheck.R'), echo=FALSE)
               
-              # source(paste0(RPath, "newActivityCheck.R", echo=FALSE)
+              # source(file.path(RPath, "newActivityCheck.R", echo=FALSE)
               
               inclActivity <- TRUE
               

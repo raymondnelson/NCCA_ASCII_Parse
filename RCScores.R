@@ -9,16 +9,16 @@
 {
   
   # source a function to select the CQ for each RQ
-  source(paste0(RPath, 'selectCQ.R'), echo=FALSE)
+  source(file.path(RPath, 'selectCQ.R'), echo=FALSE)
   
   # source a function for the PLE R/C Ratio
-  source(paste0(RPath, 'PLE_RC_Fn.R'), echo=FALSE)
+  source(file.path(RPath, 'PLE_RC_Fn.R'), echo=FALSE)
   
   # a separate function for pneumo R/C Ratios
-  source(paste0(RPath, 'pneumoRC_Fn.R'), echo=FALSE)
+  source(file.path(RPath, 'pneumoRC_Fn.R'), echo=FALSE)
   
   # source the script fo the RC ratio constraints
-  source(paste0(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
+  source(file.path(RPath, 'ESSScoreFromLogRC.R'), echo=FALSE)
   
 }
 
@@ -56,7 +56,7 @@ RCScoresFn <- function(seriesMeasurementDF=RqCqDFSeries,
   # with the "RCScore" column populated with the R/C ratios for all RQs
   # and the CQName column populated with the selected CQ for each RQ
   # 
-  # source(paste0(RPath, 'selectCQ.R'), echo=FALSE)
+  # source(file.path(RPath, 'selectCQ.R'), echo=FALSE)
   # to load the selectCQFn function
   # based on the heuristic in Nelson (2017) 
   # "Heuristic Principles to Select Comparison and 
@@ -422,7 +422,7 @@ RCScoresFn <- function(seriesMeasurementDF=RqCqDFSeries,
     #### iterate on the RQs ####
     
     # requires the selectCQ function
-    # source(paste0(RPath, 'selectCQ.R'), echo=FALSE)
+    # source(file.path(RPath, 'selectCQ.R'), echo=FALSE)
     
     j=1
     for (j in 1:length(uniqueRQs)) {
@@ -514,7 +514,7 @@ RCScoresFn <- function(seriesMeasurementDF=RqCqDFSeries,
           ###### call the selectCQFn function to select the CQ ######
           
           # source a function to select the CQ for each RQ
-          # source(paste0(RPath, 'selectCQ.R'), echo=FALSE)
+          # source(file.path(RPath, 'selectCQ.R'), echo=FALSE)
           
           CQSelectOutputList <- selectCQFn(CQSelectInputList=CQSelectInputList)
           
@@ -664,7 +664,7 @@ RCScoresFn <- function(seriesMeasurementDF=RqCqDFSeries,
           # This is the current value of the PLE constraint, and may change, 4/30/21
           # PLEConstraint <- log(1.1) # 0.09531018
           
-          # source(paste0(RPath, 'PLE_RC_Fn.R'), echo=FALSE)
+          # source(file.path(RPath, 'PLE_RC_Fn.R'), echo=FALSE)
           
           RCScore <- PLE_RC_Fn(RQValue, CQValue, PLEConstraint)
           
@@ -674,7 +674,7 @@ RCScoresFn <- function(seriesMeasurementDF=RqCqDFSeries,
         
         if( thisSensorName %in% c("UPneumo", "LPneumo") ) {
           
-          # source(paste0(RPath, 'pneumoRC_Fn.R"), echo=FALSE)
+          # source(file.path(RPath, 'pneumoRC_Fn.R"), echo=FALSE)
           
           RCScore <- pneumoRC_Fn(RQValue=RQValue, 
                                  CQValue=CQValue,

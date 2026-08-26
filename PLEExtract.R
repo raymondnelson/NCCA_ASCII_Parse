@@ -5,9 +5,9 @@
 
 
 # source('~/Dropbox/R/NCCA_ASCII_Parse/PLEMeasurement.R', echo=FALSE)
-source(paste0(RPath, 'PLEMeasurement.R'), echo=FALSE)
+source(file.path(RPath, 'PLEMeasurement.R'), echo=FALSE)
 
-source(paste0(RPath, 'checkPLEArtifacts.R'), echo=FALSE)
+source(file.path(RPath, 'checkPLEArtifacts.R'), echo=FALSE)
 
 
 # newPLEExtractFn <- function(x=segmentDF, onset, offset, answer) {

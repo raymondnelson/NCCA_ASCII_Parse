@@ -40,7 +40,7 @@
 
 
 # need the getFirstLastEventFn() 
-source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
 
 
 

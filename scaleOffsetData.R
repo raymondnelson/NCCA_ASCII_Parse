@@ -40,18 +40,18 @@
 
 {
   # load the scaleDataFn() and offsetDataFn()
-  source(paste0(RPath, "newScaleData.R"), echo = TRUE)
-  source(paste0(RPath, "newOffsetData.R"), echo = TRUE)
-  # source(paste0(RPath, "scaleData.R"), echo = TRUE)
-  # source(paste0(RPath, "offsetData.R"), echo = TRUE)
+  source(file.path(RPath, "newScaleData.R"), echo = TRUE)
+  source(file.path(RPath, "newOffsetData.R"), echo = TRUE)
+  # source(file.path(RPath, "scaleData.R"), echo = TRUE)
+  # source(file.path(RPath, "offsetData.R"), echo = TRUE)
   
   # load the getFirstLastEventFn()
-  source(paste0(RPath, 'sigProcHelper.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   
   # digital filters
-  source(paste0(RPath, 'sigProc_extra.R'), echo=FALSE)
+  source(file.path(RPath, 'sigProc_extra.R'), echo=FALSE)
   
-  source(paste0(RPath, "SBPFromPTT.R"), echo=FALSE)
+  source(file.path(RPath, "SBPFromPTT.R"), echo=FALSE)
   
 }
 

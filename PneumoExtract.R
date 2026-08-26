@@ -7,7 +7,7 @@
 {
   
   # source a script for the pneumoMeasurementFn function
-  source(paste0(RPath, 'pneumoMeasurement.R'), echo=FALSE)
+  source(file.path(RPath, 'pneumoMeasurement.R'), echo=FALSE)
   
   # source(paste0(RPath, "checkPneumoArtifacts.R"), echo=FALSE)
   

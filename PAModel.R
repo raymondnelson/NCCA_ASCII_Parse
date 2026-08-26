@@ -5,6 +5,7 @@
   PACoefs <- c(R=0.629, E=1.735, C=0.92)
   # normalized coefs
   # PACoefs <- c(R=0.192, E=0.528, C=0.280)
+  
   # 1988 USSS field study - normalized coefs
   # PACoefs <- c(R=.17, E=.53, C=.30)
   

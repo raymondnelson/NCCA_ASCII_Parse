@@ -42,13 +42,13 @@ library(stringr)
 
 {
   # source a script to load the addColumnsFn() function
-  source(paste0(RPath, 'addColumns.R'), echo=FALSE)
+  source(file.path(RPath, 'addColumns.R'), echo=FALSE)
   
   # source a script for the dataReduceFn()
-  source(paste0(RPath, 'dataReduce.R'), echo=FALSE)
+  source(file.path(RPath, 'dataReduce.R'), echo=FALSE)
   
   # dataReduceFn needs another function for the time scale
-  source(paste0(RPath, 'toMinSec.R'), echo=FALSE)
+  source(file.path(RPath, 'toMinSec.R'), echo=FALSE)
 }
 
 

@@ -5,13 +5,13 @@
 
 
 
-# source(paste0(RPath, "amplitudeExtractHelperFunctions.R"), echo=FALSE)
+# source(file.path(RPath, "amplitudeExtractHelperFunctions.R"), echo=FALSE)
 
-source(paste0(RPath, "getResponsePeaks.R"), echo=FALSE)
-source(paste0(RPath, "getResponseOnsets.R"), echo=FALSE)
-source(paste0(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
-source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
-source(paste0(RPath, "inflectionRule.R"), echo=FALSE)
+source(file.path(RPath, "getResponsePeaks.R"), echo=FALSE)
+source(file.path(RPath, "getResponseOnsets.R"), echo=FALSE)
+source(file.path(RPath, "getMaxOnsetPeakDistance.R"), echo=FALSE)
+source(file.path(RPath, "getSlopeDirection.R"), echo=FALSE)
+source(file.path(RPath, "inflectionRule.R"), echo=FALSE)
 
 
 
@@ -400,7 +400,7 @@ cardioAmplitudeCaliperFn <- function(x=chartDF$c_CardioMA,
   # start with the sample before caliperStart so that the difference can 
   DAT <- x[c((caliperStart-1):caliperStop)] 
   ## source a script for some helper functions
-  # source(paste0(RPath, "getSlopeDirection.R"), echo=FALSE)
+  # source(file.path(RPath, "getSlopeDirection.R"), echo=FALSE)
   ## call a function to get the slope of the time series data 
   diff1 <- c(diff(DAT))
   theSlope <- ifelse(diff1==0,

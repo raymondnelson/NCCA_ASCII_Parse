@@ -10,8 +10,8 @@
 
 
 # initialize the likelihood table
-probLookup20DF <- read.csv(paste0(RPath, "probLookup20DF.csv"), stringsAsFactors=FALSE)
-probLookup25DF <- read.csv(paste0(RPath, "probLookup25DF.csv"), stringsAsFactors=FALSE)
+probLookup20DF <- read.csv(file.path(RPath, "probLookup20DF.csv"), stringsAsFactors=FALSE)
+probLookup25DF <- read.csv(file.path(RPath, "probLookup25DF.csv"), stringsAsFactors=FALSE)
 
 
 
