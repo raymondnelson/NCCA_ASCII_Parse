@@ -938,7 +938,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       if(isTRUE(getPAScores)) {
         
-        stop()
+        # stop()
         
         RqCqDFSeries <- PAScoresFn(RqCqDFSeries=RqCqDFSeries,
                                    forced=TRUE,
