@@ -221,10 +221,12 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   OSS3DecisionRule <- ifelse(DRule=="TSR", "TSR", "SCR")
   # OSS3DecisionRule <- "SCR"
   
+  PADecisionRule <- ifelse(DRule=="TSR", "TSR", "GTR")
+  
+  # OSS2DecisionRule <- ifelse(DRule=="TSR", "GTR", "GTR")
+  
   ROSSDecisionRule <- ifelse(DRule=="TSR", "GTR", "SSR")
   # ROSSDecisionRule <- "SSR"
-  
-  PADecisionRule <- ifelse(DRule=="TSR", "GTR", "GTR")
   
   # ESSMDecisionRule <- "SSR"
   # ESSMDecisionRule <- "TSR"
