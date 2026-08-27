@@ -268,25 +268,25 @@ OSS3ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # this  was  not  part  of the Excel OSS-3 from 2008
     # May  14, 2020
 
-    # # iterate over the sensors and calculate the z scores
-    # j=10
-    # for(i in 1:length(uniqueSensors)) {
-    #   theseSensorRows <-
-    #     which(RqCqDFSeries2$sensorName == uniqueSensors[j])
-    # 
-    #   thisSensorMean <-
-    #     mean(RqCqDFSeries2$sensorMeasurement[theseSensorRows],na.rm=TRUE)
-    #   thisSensorSD <-
-    #     sd(RqCqDFSeries2$sensorMeasurement[theseSensorRows],na.rm=TRUE)
-    # 
-    #   sensorZScores <-
-    #     (RqCqDFSeries2$sensorMeasurement[theseSensorRows] -
-    #        thisSensorMean) / thisSensorSD
-    # 
-    #   NAThese <- which(sensorZScores >= 3.8906 | sensorZScores <= -3.8906)
-    # 
-    #   RqCqDFSeries2$sensorMeasurement[theseSensorRows][NAThese] <- NA
-    # }
+    # iterate over the sensors and calculate the z scores
+    j=1
+    for(i in 1:length(uniqueSensors)) {
+      theseSensorRows <-
+        which(RqCqDFSeries2$sensorName == uniqueSensors[j])
+
+      thisSensorMean <-
+        mean(RqCqDFSeries2$sensorMeasurement[theseSensorRows],na.rm=TRUE)
+      thisSensorSD <-
+        sd(RqCqDFSeries2$sensorMeasurement[theseSensorRows],na.rm=TRUE)
+
+      sensorZScores <-
+        (RqCqDFSeries2$sensorMeasurement[theseSensorRows] -
+           thisSensorMean) / thisSensorSD
+
+      NAThese <- which(sensorZScores >= 3.8906 | sensorZScores <= -3.8906)
+
+      RqCqDFSeries2$sensorMeasurement[theseSensorRows][NAThese] <- NA
+    }
     
     # RqCqDFSeries2 has replaced extreme values with NA
     
