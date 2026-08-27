@@ -2212,8 +2212,11 @@ if(!exists("saveResultsToPDF")) saveResultsToPDF <- FALSE
 # install.packages("rmarkdown")
 # library(rmarkdown)
 
-install.packages("tinytex")
-tinytex::install_tinytex()
+
+
+# install.packages("tinytex")
+# tinytex::install_tinytex()
+
 
 
 if(isTRUE(saveResultsToPDF)) {
