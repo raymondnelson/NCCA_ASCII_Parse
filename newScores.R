@@ -984,7 +984,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
                                      oss2AlphaT=oss2AlphaT,
                                      oss2AlphaD=oss2AlphaD,
                                      makeDF=FALSE,
-                                     saveCSV=saveCSV,
+                                     saveCSV=FALSE,
                                      analysisListName=analysisListName )
         
         # View(RqCqDFSeries)
@@ -1012,6 +1012,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
         
         # assign("RqCqDFSeries", RqCqDFSeries, pos=1)
         # if(seriesName == "3") stop()
+        
         # stop()
         
         RqCqDFSeries <- ROSSScoresFn(RqCqDFSeries=RqCqDFSeries,
