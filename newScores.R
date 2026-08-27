@@ -216,6 +216,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       analysisResultList <- as.list(NULL)
       analysisListName <- paste0(examName, "_ANALYSIS")
+      assign("analysisListName", analysisListName, envir=.GlobalEnv)
       # assign("analysisResultList", analysisResultList, envir=.GlobalEnv)
       assign(analysisListName, analysisResultList, envir=.GlobalEnv)
       # each scoring algorithm will access and add to this list
@@ -970,7 +971,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       if(isTRUE(getOSS2Scores)) {
         
-        # stop()
+        if(i == 3) stop()
         
         # OSS-2 is for 3 questions single issue exams with 3 CQs and 3 charts
         # OSS-2 compares each RQ to the preceding CQ
