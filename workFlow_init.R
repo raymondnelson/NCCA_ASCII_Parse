@@ -533,7 +533,7 @@ print("init parameters for the NCCA ASCII work flow")
   
   PADecisionRule <- "TSR"
   
-  OSS2DecisionRule <- "GTR"
+  OSS2DecisionRule <- "TSR"
   
   ROSSDecisionRule <- ifelse(DRule=="TSR", "GTR", "SSR")
   # ROSSDecisionRule <- "SSR"
