@@ -126,7 +126,7 @@ SSRFn <- function(subtotalScores=c(-2,2,3),
   if(isTRUE(flip)) {
     # only for decimal scores and decimal cutscores
     # use flip <- TRUE for bootstrap and PA algorithms
-    totalScore <- 1 - totalScore
+    subtotalScores <- 1 - subtotalScores
     cutScores <- 1 - cutScores
   }
   if(is.null(names(cutScores))) {
@@ -221,6 +221,7 @@ eTSRFn <- function(totalScore=6,
     # only for decimal scores and decimal cutscores
     # use flip <- TRUE for bootstrap and PA algorithms
     totalScore <- 1 - totalScore
+    subtotalScores <- 1- subtotalScores
     cutScores <- 1 - cutScores
   }
   # get the values needed to parse the result
@@ -232,12 +233,11 @@ eTSRFn <- function(totalScore=6,
   nRQ <- length(subtotalScores)
   if(is.integer(totalScore) && totalScore != sum(subtotalScores)) { 
     return("TSR input error: inconsistent grand total and subtotal scores") 
-  } else # if(!is.integer(totalScore) &&
+  } # else # if(!is.integer(totalScore) &&
     #   round(totalScore, 3) != round(pnorm(mean(qnorm(subtotalScores))), 3) ) {
     #   # return("TSR input error: inconsistent grand mean and subtotal means")
     # }
-    if(is.null(names(subtotalScores))) names(subtotalScores) <- 
-    paste0("R", c(1:nRQ))
+  if(is.null(names(subtotalScores))) names(subtotalScores) <- paste0("R", c(1:nRQ))
   thisSubtotalScore <- which.min(subtotalScores)
   minSubtotalScore <- subtotalScores[thisSubtotalScore]
   # first parse the test result in this order
@@ -306,6 +306,7 @@ TSRFn <- function(totalScore=6,
     # only for decimal scores and decimal cutscores
     # use flip <- TRUE for bootstrap and PA algorithms
     totalScore <- 1 - totalScore
+    subtotalScores <- 1- subtotalScores
     cutScores <- 1 - cutScores
   }
   # get the values needed to parse the result
@@ -588,6 +589,7 @@ SCNFn <- function(totalScore=inputPVal,
     # only for decimal scores and decimal cutscores
     # use flip <- TRUE for bootstrap and PA algorithms
     totalScore <- 1 - totalScore
+    subtotalScores <- 1- subtotalScores
     cutScores <- 1 - cutScores
   }
   
@@ -737,7 +739,8 @@ pSSRFn <- function(subtotalScores=c(-2,2,3),
   if(isTRUE(flip)) {
     # only for decimal scores and decimal cutscores
     # use flip <- TRUE for bootstrap and PA algorithms
-    totalScore <- 1 - totalScore
+    # totalScore <- 1 - totalScore
+    subtotalScores <- 1- subtotalScores
     cutScores <- 1 - cutScores
   }
   
