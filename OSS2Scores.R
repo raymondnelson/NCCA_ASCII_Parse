@@ -595,14 +595,106 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
       
     }
     
+    # View(RqCqDFChart)
+    
+    # RCScoresDF
+    # RCScoresVc
+    
   } # end i loop over charts
   
-  # View(RqCqDFChart)
+  #####################  OSS-2 summary tables  ######################
   
-  # RCScoresDF
-  # RCScoresVc
+  {
+    
+    # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
+    
+    ### OSS-2 measurements data frame 
+    
+    OSS2Sensors3 <- c("UPneumo", "LPneumo", "AutoEDA", "Cardio")
+    
+    OSS2MeasurementsDF <-
+      measurementTableFn(RqCqDFSeries=RqCqDFSeries,
+                         useSensors=OSS2Sensors3,
+                         decimals=2,
+                         makeDF=makeDF,
+                         saveCSV=writeCSV )
+    # View(OSS2MeasurementsDF)
+    
+    ### OSS-2 score sheet for the series 
+    
+    scoreSheetDF <- scoreSheetFn(RqCqDFSeries=RqCqDFSeries, 
+                                 useSensors=c("Pneumo", "AutoEDA", "Cardio"),
+                                 scoreType="OSS2Score",
+                                 outputName="OSS2ScoresheetDF",
+                                 makeDF=makeDF,
+                                 saveCSV=writeCSV)
+    # View(scoreSheetDF)
+    
+    ### construct a table of OSS-2 R/C ratios
+    
+    {
+      
+      # save this to put them back after initializing the RC Ration DF
+      saveOSS2Scores <- RqCqDFSeries$OSS2Score
+      
+      # put the RC scores to make the RC Ratio table
+      RqCqDFSeries$OSS2Score[allChartRows] <- RCScoresVc
+      
+      # include these sensors on the RC ratio table
+      RCSensors <- c("UPneumo",   "LPneumo", "AutoEDA", "Cardio")
+      
+      RCScoresDF <- scoreSheetFn(RqCqDFSeries=RqCqDFSeries,
+                                 useSensors=RCSensors,
+                                 scoreType="OSS2Score",
+                                 outputName="OSS2RCScoresDF",
+                                 makeDF=FALSE,
+                                 saveCSV=FALSE)
+      
+      # put thee OSS2 scores back after creating the RC table
+      RqCqDFSeries$OSS2Score <- saveOSS2Scores
+      
+      # kludgy way of doing this but it works
+      
+      # View(RCScoresDF)
+      
+    }
+    
+    ### OSS-2 series totals
+    
+    seriesTotalsDF <- seriesTotalsFn(scoreSheetDF=scoreSheetDF,
+                                     outputName="OSS2SeriesTotalsDF",
+                                     aggType="sum",
+                                     weightingCoefs=NULL,
+                                     aggMethod="within",
+                                     makeDF=makeDF,
+                                     saveCSV=saveCSV)
+    
+    # series totals are the RQ subtotals for all charts
+    subtotalScores <- as.vector(t(seriesTotalsDF[1, c(3:ncol(seriesTotalsDF))]))
+    names(subtotalScores) <- colnames(seriesTotalsDF)[c(3:ncol(seriesTotalsDF))]
+    minSubtotalScore <- subtotalScores[which.min(subtotalScores)]
+    
+    
+    ### OSS-2 chart subtotals, including RQ subtotals and chart subtotals
+    
+    chartTotalsDF <- chartTotalsFn(scoreSheetDF=scoreSheetDF,
+                                   outputName="OSS2ChartTotalsDF",
+                                   aggType="sum",
+                                   weightingCoefs=NULL,
+                                   makeDF=makeDF,
+                                   saveCSV=saveCSV)
+    
+    ### OSS-2 sensor subtotals for the series
+    
+    sensorTotalsDF <- sensorSubtotalsFn(scoreSheetDF=scoreSheetDF,
+                                        outputName="OSS2SensorTotalsDF",
+                                        aggType="sum",
+                                        makeDF=makeDF,
+                                        saveCSV=saveCSV)
+    
+  }
   
-  ########################### OSS-2 result ################################
+  ############### call the decision rule to get the OSS-2 result ###################
   
   {
     
@@ -618,29 +710,85 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
     
     # call the private function to use the grand total rule
-    OSS2Result <- GTRFn(totalScore=OSS2GrandTotal, 
-                        RQNames=uniqueRQs, 
-                        cutScores=cutScores, 
+    GTRResult <- GTRFn(totalScore=OSS2GrandTotal, 
+                       RQNames=uniqueRQs, 
+                       cutScores=c(GTNDI=cutScoreT, GTDI=cutScoreD), 
+                       flip=FALSE )
+    
+    TSRResult <- eTSRFn(totalScore=OSS2GrandTotal,
+                        subtotalScores=subtotalScores,
+                        cutScores=c(GTNDI=cutScoreT, GTDI=cutScoreD, STDI=cutScoreD),
                         flip=FALSE )
     
-    OSS2CategoricalResult <- OSS2Result$testResult
+    SSRResult <- SSRFn(subtotalScores=subtotalScores,
+                       cutScores=c(STNDI=cutScoreT, STDI=cutScoreD),
+                       flip=FALSE )
     
-    OSS2QuestionResults <- OSS2Result$subtotalResults
+  }
+  
+  ################# select the result for the decion rule #######################
+  
+  
+  {
     
-    resultUsing <- OSS2Result$resultUsing
+    ## the OSS-2 summary tables for some of the decision rules ##
     
-    # get the OSS-2 p-value
+    # OSS2Result <- GTRResult
+    # 
+    # OSS2CategoricalResult <- OSS2Result$testResult
+    # 
+    # OSS2QuestionResults <- OSS2Result$subtotalResults
+    # 
+    # resultUsing <- OSS2Result$resultUsing
     
-    thisRow <- ifelse(OSS2GrandTotal > 0,
-                      which(OSS2_reference_table$Total_Score == OSS2GrandTotal),
-                      which(OSS2_reference_table$Total_Score == OSS2GrandTotal) )
+    if(!exists("OSS2DecisionRule")) OSS2DecisionRule <- "GTR"
     
-    OSS2PVal <- ifelse(OSS2GrandTotal > 0,
-                       OSS2_reference_table$p_deceptive[thisRow],
-                       OSS2_reference_table$p_truthful[thisRow] )
-
+    OSS2CategoricalResult <- switch(OSS2DecisionRule,
+                                  "TSR"=TSRResult$testResult,
+                                  "eTSR"=TSRResult$testResult,
+                                  "SSR"=SSRResult$testResult,
+                                  "GTR"=GTRResult$testResult)
+    
+    OSS2QuestionResults <- switch(OSS2DecisionRule,
+                                "TSR"=TSRResult$subtotalResults,
+                                "eTSR"=TSRResult$subtotalResults,
+                                "SSR"=SSRResult$subtotalResults,
+                                "GTR"=GTRResult$subtotalResults)
+    
+    resultUsing <- switch(OSS2DecisionRule,
+                          "TSR"=TSRResult$resultUsing,
+                          "eTSR"=TSRResult$resultUsing,
+                          "SSR"=SSRResult$resultUsing,
+                          "GTR"=GTRResult$resultUsing)
+    
+    names(resultUsing) <- NULL
+    
+  }
+  
+  ############ get the OSS-2 p-value ##################
+  
+  {
+    
+    {
+      
+      thisSTRow <- which(OSS2_reference_table$Total_Score == minSubtotalScore)
+      
+      OSS2MinSubtotalPVal <- OSS2_reference_table$p_truthful[thisSTRow]
+      
+      thisRow <- ifelse(OSS2GrandTotal > 0,
+                        which(OSS2_reference_table$Total_Score == OSS2GrandTotal),
+                        which(OSS2_reference_table$Total_Score == OSS2GrandTotal) )
+      
+      OSS2PVal <- ifelse(OSS2GrandTotal > 0,
+                         OSS2_reference_table$p_deceptive[thisRow],
+                         OSS2_reference_table$p_truthful[thisRow] )
+      
+    }
+    
     # fix pval==0
     if(OSS2PVal == 0) OSS2PVal <- "<.01"
+    
+    if(OSS2MinSubtotalPVal == 0) OSS2MinSubtotalPVal <- "<.01"
     
     # pval for DI is the probability  
     # that a score was produced by a person represented by the 
@@ -652,91 +800,7 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
   } # end OSS-2 result
   
-  #####################  OSS-2 output  ######################
-  
-  # source(file.path(RPath, 'outputScores.R'), echo=FALSE)
-  
-  ### OSS-2 measurements data frame 
-  
-  OSS2Sensors3 <- c("UPneumo", "LPneumo", "AutoEDA", "Cardio")
-  
-  OSS2MeasurementsDF <-
-    measurementTableFn(RqCqDFSeries=RqCqDFSeries,
-                       useSensors=OSS2Sensors3,
-                       decimals=2,
-                       makeDF=makeDF,
-                       saveCSV=writeCSV )
-  # View(OSS2MeasurementsDF)
-  
-  ### OSS-2 score sheet for the series 
-  
-  scoreSheetDF <- scoreSheetFn(RqCqDFSeries=RqCqDFSeries, 
-                               useSensors=OSS2Sensors2,
-                               scoreType="OSS2Score",
-                               outputName="OSS2ScoresheetDF",
-                               makeDF=makeDF,
-                               saveCSV=writeCSV)
-  # View(scoreSheetDF)
-  
-  ### construct a table of OSS-2 R/C ratios
-  
-  {
-    
-    # save this to put them back after initializing the RC Ration DF
-    saveOSS2Scores <- RqCqDFSeries$OSS2Score
-    
-    # put the RC scores to make the RC Ratio table
-    RqCqDFSeries$OSS2Score[allChartRows] <- RCScoresVc
-    
-    # include these sensors on the RC ratio table
-    RCSensors <- c("UPneumo",   "LPneumo", "AutoEDA", "Cardio")
-
-    RCScoresDF <- scoreSheetFn(RqCqDFSeries=RqCqDFSeries,
-                               useSensors=RCSensors,
-                               scoreType="OSS2Score",
-                               outputName="OSS2RCScoresDF",
-                               makeDF=FALSE,
-                               saveCSV=FALSE)
-
-    # put thee OSS2 scores back after creating the RC table
-    RqCqDFSeries$OSS2Score <- saveOSS2Scores
-    
-    # kludgy way of doing this but it works
-    
-    # View(RCScoresDF)
-    
-  }
-  
-  ### OSS-2 series totals
-  
-  # series totals are the RQ subtotals for all charts
-  
-  seriesTotalsDF <- seriesTotalsFn(scoreSheetDF=scoreSheetDF,
-                                   outputName="OSS2SeriesTotalsDF",
-                                   aggType="sum",
-                                   weightingCoefs=NULL,
-                                   aggMethod="within",
-                                   makeDF=makeDF,
-                                   saveCSV=saveCSV)
-  
-  ### OSS-2 chart subtotals, including RQ subtotals and chart subtotals
-  
-  chartTotalsDF <- chartTotalsFn(scoreSheetDF=scoreSheetDF,
-                                 outputName="OSS2ChartTotalsDF",
-                                 aggType="sum",
-                                 weightingCoefs=NULL,
-                                 makeDF=makeDF,
-                                 saveCSV=saveCSV)
-  
-  ### OSS-2 sensor subtotals for the series
-  
-  sensorTotalsDF <- sensorSubtotalsFn(scoreSheetDF=scoreSheetDF,
-                                outputName="OSS2SensorTotalsDF",
-                                aggType="sum",
-                                makeDF=makeDF,
-                                saveCSV=saveCSV)
-  
-  ###########  construct a list to hold the OSS-2 result  ###########
+  ###########  construct a list to hold the OSS-2 output  ###########
   
   outputListName <- paste(examName, seriesName, "OSS2OutputList", sep="_")
   
@@ -757,6 +821,8 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                          OSS2CutScoreT=cutScoreT,
                          OSS2CutScoreD=cutScoreD,
                          OSS2ResultUsing=resultUsing,
+                         OSS2MinSubtotalScore=minSubtotalScore,
+                         OSS2MinSubtotalPVal=OSS2MinSubtotalPVal,
                          OSS2Sensors=OSS2Sensors3,
                          OSS2QuestionSequence=questionSequenceDF,
                          OSS2RCRatios=RCScoresDF,
