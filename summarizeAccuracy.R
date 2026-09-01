@@ -1595,9 +1595,9 @@ summarizeOSS3Sensors <- TRUE
 
 if(isTRUE(summarizeOSS3Sensors)) {
 
-  # fileNames <- list.files(pattern="OSS3SensorMeans")
+  fileNames <- list.files(pattern="OSS3SensorMeans")
   
-  # examNames <- str_sub(fileNames, 1, -23)
+  examNames <- str_sub(fileNames, 1, -23)
   
   # FZCT N60
   # examNames <- str_sub(fileNames, 2, -23)
@@ -1614,7 +1614,7 @@ if(isTRUE(summarizeOSS3Sensors)) {
   OSS3SensorMeansDF <- NA
   
   i=1
-  for(i in 1:length(examNames)) {
+  for(i in 1:length(analysisLists)) {
     
     # thisCSV <- read_csv(fileNames[i])
     
@@ -1622,6 +1622,7 @@ if(isTRUE(summarizeOSS3Sensors)) {
     thisAnalysis <-  get(analysisLists[i], pos=1)
     # View(thisAnalysis)
     
+    # examName <- fileNames[i]
     examName <- str_sub(analysisLists[i], 1, -10)
     
     # thisExamName <- examNames[i]
