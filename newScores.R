@@ -940,6 +940,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       if(isTRUE(getPAScores)) {
         
         # stop()
+        # if(i == 3) stop()
         
         RqCqDFSeries <- PAScoresFn(RqCqDFSeries=RqCqDFSeries,
                                    forced=TRUE,
@@ -971,7 +972,7 @@ newScoresFn <- function(uniqueExams=uniqueExams,
       
       if(isTRUE(getOSS2Scores)) {
         
-        if(i == 3) stop()
+        # if(i == 3) stop()
         
         # OSS-2 is for 3 questions single issue exams with 3 CQs and 3 charts
         # OSS-2 compares each RQ to the preceding CQ
