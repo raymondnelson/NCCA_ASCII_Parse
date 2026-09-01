@@ -6,7 +6,8 @@
 #
 ####
 
-# source(paste0(RPath, 'toMinSec.R'), echo=FALSE)
+
+# source(file.path(RPath, 'toMinSec.R'), echo=FALSE)
 
 
 dataTrimFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
@@ -204,7 +205,7 @@ dataTrimFn <- function(x="*_Data$", y="_Stimuli$", pre=8, post=20) {
               {
                 # fix the time scale
                 # Mar 3, 2024
-                source(paste0(RPath, 'toMinSec.R'), echo=FALSE)
+                # source(file.path(RPath, 'toMinSec.R'), echo=FALSE)
                 startTime <- fromMinSecFn(newChartDF$Time[1])
                 newTime <- fromMinSecFn(newChartDF$Time) - startTime
                 newTime <- toMinSecFn(as.numeric(newTime))
