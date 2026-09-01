@@ -18,6 +18,14 @@
 # requires the OSS-2 reference model
 source(file.path(RPath, 'OSS2Model.R'), echo=FALSE)
 
+cutScoreT <- OSS2_alfa_truthtelling$truthful_cutscore[
+  which.max(OSS2_alfa_truthtelling$alfa_truthtelling[
+    OSS2_alfa_truthtelling$alfa_truthtelling <= oss2AlphaT])]
+cutScoreD <- OSS2_alfa_deception$deceptive_cutscore[
+  which.max(OSS2_alfa_deception$alfa_deception[
+    OSS2_alfa_deception$alfa_deception <= oss2AlphaD])]
+
+
 # requires the grand total decision rule
 # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
 
@@ -192,13 +200,15 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # OSS2_alfa_truthtelling and OSS2_alfa_deception
     # are loaded with the OSS2Model.R script
     
-    # OSS-2 numerical cutscores
-    cutScoreT <- OSS2_alfa_truthtelling$truthful_cutscore[
-      which.max(OSS2_alfa_truthtelling$alfa_truthtelling[
-        OSS2_alfa_truthtelling$alfa_truthtelling <= oss2AlphaT])]
-    cutScoreD <- OSS2_alfa_deception$deceptive_cutscore[
-      which.max(OSS2_alfa_deception$alfa_deception[
-        OSS2_alfa_deception$alfa_deception <= oss2AlphaD])]
+    # OSS-2 numerical cutscores are now initialized in the global envir
+    
+    # cutScoreT <- OSS2_alfa_truthtelling$truthful_cutscore[
+    #   which.max(OSS2_alfa_truthtelling$alfa_truthtelling[
+    #     OSS2_alfa_truthtelling$alfa_truthtelling <= oss2AlphaT])]
+    # cutScoreD <- OSS2_alfa_deception$deceptive_cutscore[
+    #   which.max(OSS2_alfa_deception$alfa_deception[
+    #     OSS2_alfa_deception$alfa_deception <= oss2AlphaD])]
+    
   }
   
   #### iterate over the charts to get the RC ratios and OSS-2 scores ####
@@ -771,9 +781,17 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
     {
       
-      thisSTRow <- which(OSS2_reference_table$Total_Score == minSubtotalScore)
+      # View(OSS2_reference_table)
       
-      OSS2MinSubtotalPVal <- OSS2_reference_table$p_truthful[thisSTRow]
+      # OSS-2 RQ subtotals are used in the TSR only when they are < 0
+      if(minSubtotalScore > 0) {
+        thisSTRow <- NA
+        OSS2MinSubtotalPVal <- NA
+      } else {
+        thisSTRow <- which(OSS2_reference_table$Total_Score == minSubtotalScore)
+        OSS2MinSubtotalPVal <- OSS2_reference_table$p_truthful[thisSTRow]
+      }
+      
       
       thisRow <- ifelse(OSS2GrandTotal > 0,
                         which(OSS2_reference_table$Total_Score == OSS2GrandTotal),
@@ -788,7 +806,9 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # fix pval==0
     if(OSS2PVal == 0) OSS2PVal <- "<.01"
     
-    if(OSS2MinSubtotalPVal == 0) OSS2MinSubtotalPVal <- "<.01"
+    if(!is.na(OSS2MinSubtotalPVal)) {
+      if(OSS2MinSubtotalPVal == 0) OSS2MinSubtotalPVal <- "<.01"
+    }
     
     # pval for DI is the probability  
     # that a score was produced by a person represented by the 
