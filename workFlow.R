@@ -1140,6 +1140,8 @@ if(isTRUE(trimExcessTime)) {
   # must be after signal processing to avoid problems
   # Aug 24, 2020
   
+  source(file.path(RPath, 'toMinSec.R'), echo=FALSE)
+  
   # source(file.path(RPath, 'toMinSec.R'), echo=FALSE)
   source(file.path(RPath, 'dataTrim.R'), echo=FALSE)
   
