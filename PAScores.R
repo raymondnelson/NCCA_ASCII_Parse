@@ -703,17 +703,17 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
     # <> subtotal score rule (SSR) here
     
-    postTruthfulRQs
-    postDeceptiveRQs
+    # postTruthfulRQs
+    # postDeceptiveRQs
     
-    SSRResult <- SSRFn(subtotalScores=postDeceptiveRQs,
+    SSRResult <- SSRFn(subtotalScores=postTruthfulRQs,
                        cutScores=c(STDI=PACutProbD, STNDI=PACutProbT),
                        flip=FALSE )
     
     # <> two-stage rule (TSR) here
     
     TSRResult <- eTSRFn(totalScore=postTruthful,
-                        subtotalScores=postDeceptiveRQs,
+                        subtotalScores=postTruthfulRQs,
                         cutScores=c(GTDI=PACutProbD, GTNDI=PACutProbT, STDI=PACutProbD),
                         flip=FALSE )
     
