@@ -7,7 +7,7 @@
 {
   
   # for the measurementTableFn and scoreSheetFn
-  source('~/Dropbox/R/NCCA_ASCII_Parse/outputScores.R', echo=FALSE)
+  source(file.path(RPath, 'outputScores.R'), echo=FALSE)
   
   # source('~/Dropbox/R/NCCA_ASCII_Parse/PCASS2_helper_functions.R', echo=FALSE)
   
