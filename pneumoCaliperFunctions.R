@@ -5,7 +5,7 @@
 
 
 # source a scripte to load the pneumoMeasurementFn() function
-source("~/Dropbox/R/NCCA_ASCII_Parse/pneumoMeasurement.R", echo=FALSE)
+source(file.path(RPath, "pneumoMeasurement.R"), echo=FALSE)
 
 
 # pneumoDAT <- chartDF$c_UPneumoSm
@@ -288,7 +288,7 @@ pneumoRatePerCycleFn <- function(x=chartDF$c_UPneumoSm, buffer=65, peaks="upper"
 
 
 # source a script to load the pneumoMeasurementFn() function
-source("~/Dropbox/R/NCCA_ASCII_Parse/pneumoMeasurement.R", echo=FALSE)
+source(file.path(RPath, "pneumoMeasurement.R"), echo=FALSE)
 
 
 respirationLineExcursionFn <- function(x=chartDF$c_UPneumoSm, pnBufferLen=pneumoMeasurementBuffer) {
