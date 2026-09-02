@@ -254,15 +254,15 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             if(showNames==TRUE) print("  pneumo scale and offset - upper and lower")
             
             # scale the pneumo data 
-            chartDF$c_UPneumoSm <- scaleDataFn(x=chartDF$c_UPneumoSm, sec=30, times=6, ignore=4, yRange=scaleVals['uPneumo'], maxY=yMaxVals['uPneumo'], minY=yMinVals['uPneumo'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="uPneumo")
-            chartDF$c_LPneumoSm <- scaleDataFn(x=chartDF$c_LPneumoSm, sec=30, times=6, ignore=4, yRange=scaleVals['lPneumo'], maxY=yMaxVals['lPneumo'], minY=yMinVals['lPneumo'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="lPneumo")
+            chartDF$c_UPneumoSm <- scaleDataFn(x=chartDF$c_UPneumoSm, sec=30, times=6, ignore=4, yRange=scaleVals['uPneumo'], maxY=yMaxVals['uPneumo'], minY=yMinVals['uPneumo'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="uPneumo")
+            chartDF$c_LPneumoSm <- scaleDataFn(x=chartDF$c_LPneumoSm, sec=30, times=6, ignore=4, yRange=scaleVals['lPneumo'], maxY=yMaxVals['lPneumo'], minY=yMinVals['lPneumo'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="lPneumo")
             
             # plot.ts(chartDF$c_UPneumoSm)
             # plot.ts(chartDF$c_LPneumoSm)
             
             # offset the pneumo data
-            chartDF$c_UPneumoSm <- offsetDataFn(x=chartDF$c_UPneumoSm, y=yOffset['uPneumo'], maxY=yMaxVals['uPneumo'], minY=yMinVals['uPneumo'], firstRow=firstEvent, lastRow=(lastEventEnd))
-            chartDF$c_LPneumoSm <- offsetDataFn(x=chartDF$c_LPneumoSm, y=yOffset['lPneumo'], maxY=yMaxVals['lPneumo'], minY=yMinVals['lPneumo'], firstRow=firstEvent, lastRow=(lastEventEnd))
+            chartDF$c_UPneumoSm <- offsetDataFn(x=chartDF$c_UPneumoSm, y=yOffset['uPneumo'], maxY=yMaxVals['uPneumo'], minY=yMinVals['uPneumo'], firstRow=firstEvent, lastRow=(lastEvent))
+            chartDF$c_LPneumoSm <- offsetDataFn(x=chartDF$c_LPneumoSm, y=yOffset['lPneumo'], maxY=yMaxVals['lPneumo'], minY=yMinVals['lPneumo'], firstRow=firstEvent, lastRow=(lastEvent))
             
             ### make sure the pneumo channels are adequately separated at the first event
             # pneumoSepVal is initialized in the NCCAASCII_init.R script
@@ -274,9 +274,9 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             }
             
             ### make sure the pneumo channels are adequately separated at the last event
-            if( (chartDF$c_UPneumoSm[(lastEventEnd)] - chartDF$c_LPneumoSm[(lastEventEnd)]) < pneumoSepVal) {
+            if( (chartDF$c_UPneumoSm[(lastEvent)] - chartDF$c_LPneumoSm[(lastEvent)]) < pneumoSepVal) {
               # calculate the lowerOffset
-              lowerOffset2 <- (chartDF$c_UPneumoSm[(lastEventEnd)] - pneumoSepVal) - chartDF$c_LPneumoSm[(lastEventEnd)]
+              lowerOffset2 <- (chartDF$c_UPneumoSm[(lastEvent)] - pneumoSepVal) - chartDF$c_LPneumoSm[(lastEvent)]
               # add the second offset to the vector
               chartDF$c_LPneumoSm <- chartDF$c_LPneumoSm + lowerOffset2
             }
@@ -362,33 +362,33 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             gainRangeEDA <- scaleVals['eda'] * (gainVals['eda'] / 100)
             
             # scale the EDA data
-            # chartDF$c_AutoEDA <- scaleDataFn(x=chartDF$c_AutoEDA, sec=60, times=6, ignore=1, yRange=scaleVals['eda'], maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd))
-            chartDF$c_AutoEDA <- scaleDataFn(x=chartDF$c_AutoEDA, sec=30, times=6, ignore=3, yRange=gainRangeEDA, maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="eda")
+            # chartDF$c_AutoEDA <- scaleDataFn(x=chartDF$c_AutoEDA, sec=60, times=6, ignore=1, yRange=scaleVals['eda'], maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent))
+            chartDF$c_AutoEDA <- scaleDataFn(x=chartDF$c_AutoEDA, sec=30, times=6, ignore=3, yRange=gainRangeEDA, maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="eda")
             
             # Aug 2, 2023 adjust the max EDA range
             {
               
                 # new values to constrain the auto EDA
-                chartRange <- abs(diff(range(chartDF$c_AutoEDA[firstEvent:lastEventEnd])))
+                chartRange <- abs(diff(range(chartDF$c_AutoEDA[firstEvent:lastEvent])))
                 limRange <- yRange * .67
                 adjRange <- limRange / chartRange
                 lowLim <- yMaxVals['eda'] - limRange
               
               if(chartRange > limRange) {
                 # calculate the data length
-                useLen <- round(length(chartDF$c_AutoEDA[firstEvent:lastEventEnd]) / cps)
+                useLen <- round(length(chartDF$c_AutoEDA[firstEvent:lastEvent]) / cps)
                 # use the data length to scale the data using a single sample
                 chartDF$c_AutoEDA <- 
-                  scaleDataFn(x=chartDF$c_AutoEDA, sec=useLen, times=1, ignore=0, yRange=limRange, maxY=yMaxVals['eda'], minY=lowLim, firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="eda")
+                  scaleDataFn(x=chartDF$c_AutoEDA, sec=useLen, times=1, ignore=0, yRange=limRange, maxY=yMaxVals['eda'], minY=lowLim, firstRow=firstEvent, lastRow=(lastEvent), sensorName="eda")
                 # set the max value
-                # maxOffset <- trunc(max(chartDF$c_AutoEDA[firstEvent:lastEventEnd]) - yMaxVals['eda'])
+                # maxOffset <- trunc(max(chartDF$c_AutoEDA[firstEvent:lastEvent]) - yMaxVals['eda'])
                 # chartDF$c_AutoEDA <- chartDF$c_AutoEDA + maxOffset
               }
               
             }
             
-            # offset the EDA data
-            chartDF$c_AutoEDA <- offsetDataFn(x=chartDF$c_AutoEDA, y=yOffset['eda'], maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd))
+            # offset the Auto EDA data
+            chartDF$c_AutoEDA <- offsetDataFn(x=chartDF$c_AutoEDA, y=yOffset['eda'], maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent))
             
             # process the additional EDA channels
             chartDF$c_AutoEDAMid <- MASmooth(x=chartDF$c_AutoEDA, y=round(15*cps,0), times=5) # was y=150, times=6 11/26/2015
@@ -405,10 +405,10 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             gainRange <- scaleVals['eda'] * (gainVals['eda'] / 100)
             
             # scale the EDA data
-            chartDF$c_ManualEDA <- scaleDataFn(x=chartDF$c_ManualEDA, sec=60, times=6, ignore=1, yRange=gainRangeEDA, maxY=(yMaxVals['eda']), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="eda")
+            chartDF$c_ManualEDA <- scaleDataFn(x=chartDF$c_ManualEDA, sec=60, times=6, ignore=1, yRange=gainRangeEDA, maxY=(yMaxVals['eda']), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="eda")
             
             # offset the EDA data
-            chartDF$c_ManualEDA <- offsetDataFn(x=chartDF$c_ManualEDA, y=(yOffset['eda']-100), maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd))
+            chartDF$c_ManualEDA <- offsetDataFn(x=chartDF$c_ManualEDA, y=(yOffset['eda']-100), maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent))
             
             # process the additional EDA channels
             chartDF$c_ManualEDAMid <- MASmooth(x=chartDF$c_ManualEDA, y=round(5*cps,0), times=6) # was y=150, times=6 11/26/2015
@@ -427,10 +427,10 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               gainRange <- scaleVals['eda'] * (gainVals['eda'] / 100)
               
               # scale the EDA data
-              chartDF$c_EA <- scaleDataFn(x=chartDF$c_EA, sec=30, times=8, ignore=1, yRange=gainRange, maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="eda")
+              chartDF$c_EA <- scaleDataFn(x=chartDF$c_EA, sec=30, times=8, ignore=1, yRange=gainRange, maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="eda")
               
               # offset the EDA data
-              chartDF$c_EA <- offsetDataFn(x=chartDF$c_EA, y=(yOffset['eda']-25), maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_EA <- offsetDataFn(x=chartDF$c_EA, y=(yOffset['eda']-25), maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent))
               
               # scale and offset the additional EDA channels
               # chartDF$c_EAMid <- MASmooth(x=chartDF$c_EA, y=round(5*cps,0), times=6) # was y=150, times=6 11/26/2015
@@ -444,10 +444,10 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             ### also scale and offset the filtered EDA data
             
             # # scale the filtered EDA data
-            # chartDF$c_EDAFilt <- scaleDataFn(x=chartDF$c_EDAFilt, sec=40, times=10, ignore=2, yRange=scaleVals[3], maxY=yMax, minY=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEventEnd-450))
+            # chartDF$c_EDAFilt <- scaleDataFn(x=chartDF$c_EDAFilt, sec=40, times=10, ignore=2, yRange=scaleVals[3], maxY=yMax, minY=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEvent-450))
             # 
             # # offset the filtered EDA data
-            # chartDF$c_EDAFilt <- offsetDataFn(x=chartDF$c_EDAFilt, y=yOffset[3], maxY=yMax, minY=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEventEnd-450))
+            # chartDF$c_EDAFilt <- offsetDataFn(x=chartDF$c_EDAFilt, y=yOffset[3], maxY=yMax, minY=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEvent-450))
             # 
             # # scale and offset the additional filtered EDA channels
             # chartDF$c_EDAFiltMid <- MASmooth(x=chartDF$c_EDAFilt, y=round(5*cps,0), times=6)
@@ -464,11 +464,11 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             # Jan 17, 2023
             if( sum(pmatch(names(chartDF), "c_EDA2", nomatch=0)) != 0 ) {
               
-              # chartDF$c_ManualEDA2 <- scaleDataFn(x=chartDF$c_ManualEDA2, sec=60, times=6, ignore=1, yRange=scaleVals['eda'], maxY=(yMaxVals['eda']+250), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="eda")
-              # chartDF$c_ManualEDA2 <- scaleDataFn(x=chartDF$c_ManualEDA2, sec=30, times=6, ignore=3, yRange=scaleVals['eda'], maxY=(yMaxVals['eda']+250), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="eda")
+              # chartDF$c_ManualEDA2 <- scaleDataFn(x=chartDF$c_ManualEDA2, sec=60, times=6, ignore=1, yRange=scaleVals['eda'], maxY=(yMaxVals['eda']+250), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="eda")
+              # chartDF$c_ManualEDA2 <- scaleDataFn(x=chartDF$c_ManualEDA2, sec=30, times=6, ignore=3, yRange=scaleVals['eda'], maxY=(yMaxVals['eda']+250), minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="eda")
               
               # offset the EDA2 data
-              # chartDF$c_ManualEDA2 <- offsetDataFn(x=chartDF$c_ManualEDA2, y=(yOffset['eda']-200), maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              # chartDF$c_ManualEDA2 <- offsetDataFn(x=chartDF$c_ManualEDA2, y=(yOffset['eda']-200), maxY=yMaxVals['eda'], minY=yMinVals['eda'], firstRow=firstEvent, lastRow=(lastEvent))
               
               
             }
@@ -487,10 +487,10 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             chartDF$c_Cardio1 <- fixPeak(x=chartDF$c_Cardio1, times=2)
             
             # scale the cardio data 
-            chartDF$c_Cardio1 <- scaleDataFn(chartDF$c_Cardio1, sec=30, times=8, ignore=6, yRange=scaleVals['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="cardio")
+            chartDF$c_Cardio1 <- scaleDataFn(chartDF$c_Cardio1, sec=30, times=8, ignore=6, yRange=scaleVals['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="cardio")
             
             # offset the cardio data
-            chartDF$c_Cardio1 <- offsetDataFn(x=chartDF$c_Cardio1, y=yOffset['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEventEnd))
+            chartDF$c_Cardio1 <- offsetDataFn(x=chartDF$c_Cardio1, y=yOffset['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEvent))
             
             # scale and offset the additional cardio channels
             
@@ -635,10 +635,10 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               chartDF$c_eCardio <- fixPeak(x=chartDF$c_eCardio, times=2)
               
               # scale the electronic cardio cuff data
-              chartDF$c_eCardio <- scaleDataFn(chartDF$c_eCardio, sec=30, times=8, ignore=6, yRange=scaleVals['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="cardio")
+              chartDF$c_eCardio <- scaleDataFn(chartDF$c_eCardio, sec=30, times=8, ignore=6, yRange=scaleVals['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="cardio")
               
               # offset the electronic cardio cuff data
-              chartDF$c_eCardio <- offsetDataFn(x=chartDF$c_eCardio, y=yOffset['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_eCardio <- offsetDataFn(x=chartDF$c_eCardio, y=yOffset['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEvent))
               
               # scale and offset the additional electronic cardio cuff channels
               
@@ -673,10 +673,10 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               chartDF$c_FC <- fixPeak(x=chartDF$c_FC, times=2)
               
               # scale the finger cuff data
-              chartDF$c_FC <- scaleDataFn(chartDF$c_FC, sec=30, times=8, ignore=6, yRange=scaleVals['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="cardio")
+              chartDF$c_FC <- scaleDataFn(chartDF$c_FC, sec=30, times=8, ignore=6, yRange=scaleVals['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="cardio")
               
               # offset the finger cuff data
-              chartDF$c_FC <- offsetDataFn(x=chartDF$c_FC, y=yOffset['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_FC <- offsetDataFn(x=chartDF$c_FC, y=yOffset['cardio'], maxY=yMaxVals['cardio'], minY=yMinVals['cardio'], firstRow=firstEvent, lastRow=(lastEvent))
               
               # scale and offset the additional finger cuff channels
               # chartDF$c_CardioMA <- MASmooth(x=chartDF$c_Cardio1, y=round(1.5*cps,0), times=3)
@@ -732,10 +732,10 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               gainRangePLE <- scaleVals['ple'] * (gainVals['ple'] / 100)
               
               # scale the PLE data 
-              chartDF$c_PPG1 <- scaleDataFn(x=chartDF$c_PPG1, sec=30, times=8, ignore=3, yRange=gainRangePLE, maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="ple")
+              chartDF$c_PPG1 <- scaleDataFn(x=chartDF$c_PPG1, sec=30, times=8, ignore=3, yRange=gainRangePLE, maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="ple")
               
               # offset the PLE data
-              chartDF$c_PPG1 <- offsetDataFn(x=chartDF$c_PPG1, y=yOffset['ple'], maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_PPG1 <- offsetDataFn(x=chartDF$c_PPG1, y=yOffset['ple'], maxY=yMaxVals['ple'], minY=yMinVals['ple'], firstRow=firstEvent, lastRow=(lastEvent))
               
               # scale and offset the additional PLE channels
               chartDF$c_PPG1MA <- MASmooth(x=chartDF$c_PPG1, y=30, times=4) # y=15, times=3 will show the respiration
@@ -772,17 +772,17 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               if(showNames==TRUE) print("  activity scale and offset")
               
               # scale the activity sensor data 
-              chartDF$c_Move1 <- scaleDataFn(x=chartDF$c_Move1, sec=30, times=12, ignore=4, yRange=scaleVals['activity'], maxY=yMaxVals['activity'], minY=yMinVals['activity'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="activity")
+              chartDF$c_Move1 <- scaleDataFn(x=chartDF$c_Move1, sec=30, times=12, ignore=4, yRange=scaleVals['activity'], maxY=yMaxVals['activity'], minY=yMinVals['activity'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="activity")
               
               # offset the activity sensor data 
-              chartDF$c_Move1 <- offsetDataFn(x=chartDF$c_Move1, y=yOffset['activity'], maxY=yMaxVals['activity'], minY=yMinVals['activity'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_Move1 <- offsetDataFn(x=chartDF$c_Move1, y=yOffset['activity'], maxY=yMaxVals['activity'], minY=yMinVals['activity'], firstRow=firstEvent, lastRow=(lastEvent))
               
               # scale and offset the additions activity channels
               chartDF$c_Move1MA <- MASmooth(x=chartDF$c_Move1, y=round(7.5*cps,0), times=1)
               
               # scale and offset the processed activity sensor data
-              # chartDF$c_Move1Proc <- scaleDataFn(chartDF$c_Move1Proc, sec=12, times=20, yRange=scaleVals[6], maxY=yMax, minY=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="activity")
-              # chartDF$c_Move1Proc <- offsetDataFn(x=chartDF$c_Move1Proc, y=(yOffset[6]), yMax=yMax, yMin=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEventEnd-450))
+              # chartDF$c_Move1Proc <- scaleDataFn(chartDF$c_Move1Proc, sec=12, times=20, yRange=scaleVals[6], maxY=yMax, minY=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEvent), sensorName="activity")
+              # chartDF$c_Move1Proc <- offsetDataFn(x=chartDF$c_Move1Proc, y=(yOffset[6]), yMax=yMax, yMin=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEvent-450))
               
               # make a new processed activity data
               # was y=round(.0625*cps,0) 2020-06-6
@@ -822,16 +822,16 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               PTTPTTNa <- sort(unique(which(c(chartDF$PTTECG == -9.9), which(is.na(chartDF$PTTECG)))))
               
               # scale the PTT sensor data 
-              chartDF$c_PTTPTT <- scaleDataFn(x=chartDF$c_PTTPTT, sec=30, times=12, ignore=4, yRange=scaleVals['PTTPTT'], maxY=yMaxVals['PTTPTT'], minY=yMinVals['PTTPTT'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="PTTPTT") 
-              chartDF$c_PTTPPG <- scaleDataFn(x=chartDF$c_PTTPPG, sec=30, times=12, ignore=4, yRange=scaleVals['PTTPPG'], maxY=yMaxVals['PTTPPG'], minY=yMinVals['PTTPPG'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="PTTPPG") 
-              chartDF$c_PTTECG <- scaleDataFn(x=chartDF$c_PTTECG, sec=30, times=12, ignore=4, yRange=scaleVals['PTTECG'], maxY=yMaxVals['PTTECG'], minY=yMinVals['PTTECG'], firstRow=firstEvent, lastRow=(lastEventEnd), sensorName="PTTECG") 
+              chartDF$c_PTTPTT <- scaleDataFn(x=chartDF$c_PTTPTT, sec=30, times=12, ignore=4, yRange=scaleVals['PTTPTT'], maxY=yMaxVals['PTTPTT'], minY=yMinVals['PTTPTT'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="PTTPTT") 
+              chartDF$c_PTTPPG <- scaleDataFn(x=chartDF$c_PTTPPG, sec=30, times=12, ignore=4, yRange=scaleVals['PTTPPG'], maxY=yMaxVals['PTTPPG'], minY=yMinVals['PTTPPG'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="PTTPPG") 
+              chartDF$c_PTTECG <- scaleDataFn(x=chartDF$c_PTTECG, sec=30, times=12, ignore=4, yRange=scaleVals['PTTECG'], maxY=yMaxVals['PTTECG'], minY=yMinVals['PTTECG'], firstRow=firstEvent, lastRow=(lastEvent), sensorName="PTTECG") 
               
               # offset the PTT sensor data 
-              chartDF$c_PTTPTT <- offsetDataFn(x=chartDF$c_PTTPTT, y=yOffset['PTTPTT'], maxY=yMaxVals['PTTPTT'], minY=yMinVals['PTTPTT'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_PTTPTT <- offsetDataFn(x=chartDF$c_PTTPTT, y=yOffset['PTTPTT'], maxY=yMaxVals['PTTPTT'], minY=yMinVals['PTTPTT'], firstRow=firstEvent, lastRow=(lastEvent))
               # May 12, 2024 to prevent data from plotting off screen
               chartDF$c_PTTPTT[which(chartDF$c_PTTPTT < yMinVals['PTTPTT'])] <- yMinVals['PTTPTT']
-              chartDF$c_PTTPPG <- offsetDataFn(x=chartDF$c_PTTPPG, y=yOffset['PTTPPG'], maxY=yMaxVals['PTTPPG'], minY=yMinVals['PTTPPG'], firstRow=firstEvent, lastRow=(lastEventEnd))
-              chartDF$c_PTTECG <- offsetDataFn(x=chartDF$c_PTTECG, y=yOffset['PTTECG'], maxY=yMaxVals['PTTECG'], minY=yMinVals['PTTECG'], firstRow=firstEvent, lastRow=(lastEventEnd))
+              chartDF$c_PTTPPG <- offsetDataFn(x=chartDF$c_PTTPPG, y=yOffset['PTTPPG'], maxY=yMaxVals['PTTPPG'], minY=yMinVals['PTTPPG'], firstRow=firstEvent, lastRow=(lastEvent))
+              chartDF$c_PTTECG <- offsetDataFn(x=chartDF$c_PTTECG, y=yOffset['PTTECG'], maxY=yMaxVals['PTTECG'], minY=yMinVals['PTTECG'], firstRow=firstEvent, lastRow=(lastEvent))
               
               # slow moving average
               chartDF$c_PTTPTT_MA <- MASmooth(x=chartDF$c_PTTPTT, y=round(7.5*cps,0), times=3)
