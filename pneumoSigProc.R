@@ -80,7 +80,7 @@ MASmooth <- function(x=myData, y=round(.25*cps,0), times=5) {
 
 {
   
-  source("~/Dropbox/R/NCCA_ASCII_Parse/pneumoCaliperFunctions.R", echo=FALSE)
+  source(file.path(RPath, "pneumoCaliperFunctions.R"), echo=FALSE)
 
 }
        
