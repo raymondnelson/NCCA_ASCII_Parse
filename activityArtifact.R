@@ -1,7 +1,7 @@
 # activity artifact extraction
 
 
-source('~/Dropbox/R/NCCA_ASCII_Parse/sigProcHelper.R', echo=FALSE)
+source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
 
 
 activityArtifactFn <- function(x=chartDF) {
