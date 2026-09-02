@@ -176,7 +176,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # May 9, 2024 added PTT channels
   # scaleVals <- c(225, 225, 300, 300, 100, 50, 300, 225, 200, 200, 200)
   # 2026Apr16
-  scaleVals <- c(120, 120, 250, 110, 60, 40, 200, 200, 100, 100, 100)
+  scaleVals <- c(120, 120, 250, 110, 60, 35, 200, 200, 100, 100, 100)
   
   # scaleVals <- c(225, 225, 200, 300, 200, 50, 300, 225)
   # scaleVals <- c(225, 225, 100, 300, 300, 50, 300, 225)
