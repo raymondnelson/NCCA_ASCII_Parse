@@ -191,7 +191,7 @@ eTSRFn <- function(totalScore=6,
                    subtotalScores=c(1,2,3),
                    cutScores=c(GTDI=-3, GTNDI=3, STDIc=-7), 
                    flip=FALSE ) {
-  # two-stage rule aka Senter rule (Senter & Dollins, 2003)
+  # ESS-M modified two-stage rule aka Senter rule (Senter & Dollins, 2003)
   # to parse the categorical result from numerical or probability results
   # totalScore can be in integer or decimal form
   # input subtotalScores is a named vector of values for each RQ
@@ -206,6 +206,10 @@ eTSRFn <- function(totalScore=6,
   # flip can be used to invert the polarity of decimal scores and probability cutscores
   # use flip=FALSE for integer cutscores
   # output is a list of 2 items: grand total result and subtotal results
+  ###
+  # this eTSR is a modification of the TSR
+  # Stage 1 looks for deception using the grand total and lowest subtotal
+  # Stage 2 looks for truth-telling using the grand total
   ###  
   # if(length(totalScore)==0 && all(!is.na(subtotalScores))) {
   #   # August 11, 2023 to prevent scoring when data insufficient
