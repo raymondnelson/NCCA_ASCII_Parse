@@ -1499,7 +1499,7 @@ OSS3ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
       # don't use the upper tail for 
       RQPVals <- pRQsDeceptive
     } else {
-      # scr and TSR rules use only the truthful p-values
+      # SCR and TSR rules use only the truthful p-values
       RQPVals <- pRQsTruthful
     }
     # GTR does not use subtotals and so it does not matter which
@@ -1661,11 +1661,16 @@ OSS3ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                        cutScores=OSS3CutScores,
                        flip=FALSE )
     
-    # TSR alwayss uses pRQsTruthful
-    TSRResult <- TSRFn(totalScore=inputPVal, 
-                       subtotalScores=pRQsTruthful,
-                       cutScores=OSS3CutScores,
-                       flip=FALSE )
+    # # TSR alwayss uses pRQsTruthful
+    # TSRResult <- TSRFn(totalScore=inputPVal, 
+    #                    subtotalScores=pRQsTruthful,
+    #                    cutScores=OSS3CutScores,
+    #                    flip=FALSE )
+    
+    TSRResult <- eTSRFn(totalScore=inputPVal, 
+                        subtotalScores=pRQsTruthful,
+                        cutScores=OSS3CutScores,
+                        flip=FALSE )
     
     # need to input both sets of p-values for RQs 20200522
     SCNResult <- SCNFn(totalScore=inputPVal, 
