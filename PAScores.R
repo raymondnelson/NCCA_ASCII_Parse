@@ -689,7 +689,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
   
   {
     
-    cutScores <- c(GTDI=PACutProbD, GTNDI=PACutProbT, STDI=PACutProbD, STNDI=PACutProbT)
+    cutScores <- c(GTDI=PACutProbD, GTNDI=PACutProbT, STDI=PACutProbD, STNDIc=PACutProbT)
     
     # source(file.path(RPath, 'decisionRules.R'), echo=FALSE)
     
@@ -715,7 +715,7 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # 2026Sep03 use the original TSR not the modified eTSR
     TSRResult <- TSRFn(totalScore=postTruthful,
                        subtotalScores=postTruthfulRQs,
-                       cutScores=c(GTDI=PACutProbD, GTNDI=PACutProbT, STDI=PACutProbD),
+                       cutScores=c(GTDI=PACutProbD, GTNDI=PACutProbT, STDIc=PACutProbD),
                        flip=FALSE )
     
   }
