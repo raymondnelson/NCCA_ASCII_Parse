@@ -3215,6 +3215,9 @@ if(isTRUE(summarizeScoresProp)) {
   # View(sensorTotalsDF)
   
   print("normalized proportions for absolute sensor sums")
+  
+  ### use the sensorTotalsDF to summarize the frequency of scores 
+  
   # print(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)])) / 
   #         sum(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)])), na.rm=TRUE) )
   print(colSums(abs(sensorTotalsDF[,4:7])) / 
@@ -3223,27 +3226,27 @@ if(isTRUE(summarizeScoresProp)) {
   
   ### use the score sheet data frames to summarize the frequency of scores
   
-  # analysisLists <- ls(pattern =".ANALYSIS$")
-  # 
+  analysisLists <- ls(pattern =".ANALYSIS$")
+
   # # iterate over the analysisLists and save the ESSM scoreSheeets
   # if(length(analysisLists) > 0) {
   #   i=1
   #   for(i in 1:length(analysisLists)) {
   #     thisAnalysis <- get(analysisLists[i], envir=.GlobalEnv)
-  #     # thisSeries <- seriesName 
+  #     # thisSeries <- seriesName
   #     if(is.null(thisAnalysis)) {
   #       assign("thisAnalysis", thisAnalysis, envir=.GlobalEnv)
   #       stop()
   #     }
   #     thisSeries <- "series_X"
   #     # names(thisAnalysis[[thisSeries]][["ESSMOutput"]][["ESSMScoreSheetDF"]])
-  #     thisScoreSheet <- 
+  #     thisScoreSheet <-
   #       thisAnalysis[[thisSeries]][["ESSMOutput"]][["ESSMScoreSheetDF"]]
   #     scoreSheetName <- paste(thisScoreSheet$examName[1],
   #                             thisScoreSheet$seriesName[1],
   #                             "ESSMScoresheet.csv",
   #                             sep="_")
-  #     write.csv(thisScoreSheet, row.names=FALSE, 
+  #     write.csv(thisScoreSheet, row.names=FALSE,
   #               file=scoreSheetName)
   #   }
   # }
