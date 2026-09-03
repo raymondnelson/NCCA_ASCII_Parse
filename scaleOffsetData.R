@@ -777,11 +777,11 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
               # offset the activity sensor data 
               chartDF$c_Move1 <- offsetDataFn(x=chartDF$c_Move1, y=yOffset['activity'], maxY=yMaxVals['activity'], minY=yMinVals['activity'], firstRow=firstEvent, lastRow=(lastEvent))
               
+              # truncate the lower boundary
+              chartDF$c_Move1[chartDF$c_Move1 <= yMin] <- yMin
+              
               # scale and offset the additions activity channels
               chartDF$c_Move1MA <- MASmooth(x=chartDF$c_Move1, y=round(7.5*cps,0), times=1)
-              
-              # truncate the lower boundary
-              chartDF$c_Move1MA[chartDF$c_Move1MA <= yMin] <- yMin
               
               # scale and offset the processed activity sensor data
               # chartDF$c_Move1Proc <- scaleDataFn(chartDF$c_Move1Proc, sec=12, times=20, yRange=scaleVals[6], maxY=yMax, minY=(yMin+(.05*yRange)), firstRow=firstEvent, lastRow=(lastEvent), sensorName="activity")
