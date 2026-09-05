@@ -46,7 +46,7 @@
   source(file.path(RPath, 'pneumoMeasurement.R'), echo=FALSE)
   
   # experimental functions for extracting respiration patterns 
-  source(file.path(RPath, "pneumoPatterns.R"), echo=FALSE)
+  # source(file.path(RPath, "pneumoPatterns.R"), echo=FALSE)
   
   # amplitude extraction for EDA and cardio
   source(file.path(RPath, 'amplitudeExtractPC.R'), echo=FALSE)
