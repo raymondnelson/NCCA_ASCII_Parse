@@ -407,7 +407,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
   extractCardio <- TRUE
   extractPLE <- TRUE
   
-  extractPneumoPatterns <- TRUE
+  extractPneumoPatterns <- FALSE
   
   # second EDA sensor
   extractEDA2 <- TRUE
