@@ -535,18 +535,18 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # the allowed descent proportion is set by the "descProp" parameter in this script
   # FALSE will also make use of the descentRule parameter
   EDAStrictROW <- TRUE
-  EDAStrictROW <- FALSE
+  # EDAStrictROW <- FALSE
   cardioStrictROW <- TRUE
-  cardioStrictROW <- FALSE
+  # cardioStrictROW <- FALSE
   
   # strictWindow = TRUE will force a strict EDA and cardio evaluation window
   # strict means that measured responses end at the end of the EW 
   # even if the response continues to a peak ofter the end of the EW
   # FALSE will score to the end of reaction even if outside the EW
   EDAStrictWindow <- TRUE
-  EDAStrictWindow <- FALSE
+  # EDAStrictWindow <- FALSE
   cardioStrictWindow <- TRUE
-  cardioStrictWindow <- FALSE
+  # cardioStrictWindow <- FALSE
   
   # number of seconds to shorten the window when strictWindow == FALSE
   shortenEW <- 1.5
