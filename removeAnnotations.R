@@ -7,9 +7,9 @@
 
 
 # source a script to load the excludeAnnotations vector
-source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
-
-
+# source(paste0(RPath, 'excludedEvents.R'), echo=FALSE)
+source(file.path(RPath, "excludedEvents.R"), echo=FALSE)
+# source("~/Dropbox/R/NCCA_ASCII_Parse/excludedEvents.R")
 
 removeAnnotationsFn <- function(uniqueExams=uniqueExams) {
   # R Function to remove annotations from the NCCA ASCII time series data after importations
