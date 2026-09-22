@@ -109,6 +109,9 @@
     showCardioData <- TRUE
     # showCardioData <- FALSE
     
+    showCardioMidLine <- TRUE
+    # showCardioMidLine <- FALSE
+    
     showPLEData <- TRUE
     # showPLEData <- FALSE
     
@@ -125,7 +128,7 @@
     showPTTPTT <- FALSE
     
     showManualEDA <- TRUE
-    # showManualEDA <- FALSE
+    showManualEDA <- FALSE
     
     # Jan 17, 2023
     # second EDA sensor
@@ -140,7 +143,18 @@
     showEA <- FALSE
     
     # show tracing baselines
+    showBaselines <- TRUE
     showBaselines <- FALSE
+    
+    # show peak to peak lines
+    showPeakLines <- TRUE
+    showPeakLines <- FALSE
+    
+    showQuartileLines <- TRUE
+    # showQuartileLines <- FALSE
+    
+    showTukeyLines <- TRUE
+    # showTukeyLines <- FALSE
     
     configLXCAT <- TRUE
     configLXCAT <- FALSE
@@ -173,44 +187,61 @@
       outputChartFileName <- paste0("_NO_SCORES", outputChartFileName)
     }
     
-    # also changes the showMeasurements (lines)
+    {
+      
+      ## ESS-M scores ##
+      
+      # also changes the showMeasurements (lines)
+      
+      showPneumoScores <- showScores
+      # showPneumoScores <- FALSE
+      showEDAScores <- showScores
+      # showEDAScores <- FALSE
+      showCardioScores <- showScores
+      # showCardioScores <- FALSE
+      showPLEScores <- showScores
+      # showPLEScores <- FALSE
+      
+      showRCRatio <- showScores
+      # showRCRatio <- FALSE
+      
+      showCQSelection <- showScores
+      # showCQSelection <- FALSE
+      
+      showFCScores <- showScores
+      showFCScores <- FALSE
+      
+      # includePLEData is set workFlow_init.R script
+      if(!isTRUE(includePLEData)) showPLEScores <- FALSE
+      
+    }
     
-    showPneumoScores <- TRUE
-    showEDAScores <- TRUE
-    showCardioScores <- TRUE
-    showPLEScores <- TRUE
+    showESSMScores <- TRUE
     
-    showFCScores <- FALSE
-    
-    # includePLEData is set workFlow_init.R script
-    if(!isTRUE(includePLEData)) showPLEScores <- FALSE
-    
-    showRCRatio <- TRUE
-    
+    showIPZScores <- TRUE
     showIPZScores <- FALSE
     
+    showOSS3Scores <- TRUE
     showOSS3Scores <- FALSE
     
-    # showOSS2Scores <- TRUE
+    showOSS2Scores <- TRUE
     showOSS2Scores <- FALSE
     
-    showCQSelection <- TRUE
-    
-    # showRankValues <- TRUE
-    # showRankValues <- FALSE
+    showRankValues <- TRUE
     showRankValues <- showScores
+    # showRankValues <- FALSE
     
     ## question intervals
-    showQuestionIntervals <- TRUE
+    showQuestionIntervals <- showScores
     # showQuestionIntervals <- FALSE
     
     ## cardio rate caliper
-    showCardioRateCaliperVals <- TRUE
-    showCardioRateCaliperVals <- FALSE
+    showCardioRateCaliperVals <- showScores
+    # showCardioRateCaliperVals <- FALSE
     
     ## respiration caliper values
-    showRespirationCalipers <- TRUE
-    showRespirationCalipers <- FALSE
+    showRespirationCalipers <- showScores
+    # showRespirationCalipers <- FALSE
 
     if(!(showScores)) showQuestionIntervals <- showScores
     
@@ -259,7 +290,7 @@
     
   }
   
-  #### select measurement lines ####
+  #### select measurement lines and measurement values ####
   
   {
     
@@ -268,6 +299,7 @@
     # showMeasurements <- TRUE
     
     showExtractionVals <- showScores
+    # showExtractionVals <- FALSE
     
     showPLEMeasurement <- showPLEScores
     if(!isTRUE(includePLEData)) showPLEMeasurement <- FALSE
@@ -1232,26 +1264,30 @@ for(i in 1:length(uniqueExams)) {
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoSm), color="blue3", linewidth=.4) # + coord_cartesian(ylim=c(yMin, yMax))
           # mid line
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoMid), color="blue3", linewidth=.15, alpha=.5) # + coord_cartesian(ylim=c(yMin, yMax))
-          # inhalation exhalation lines
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoInh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoExh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
-          # quantiles
-          uPnQ1 <- quantile(chartDF$c_UPneumoSm, .25)
-          uPnQ2 <- quantile(chartDF$c_UPneumoSm, .50)
-          uPnQ3 <- quantile(chartDF$c_UPneumoSm, .75)
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # tukey fences
-          uPnIQR <- uPnQ3 - uPnQ1
-          uPnInnerFenceUpper <- uPnQ3 + (1.5 * uPnIQR)
-          uPnInnerFenceLower <- uPnQ1 - (1.5 * uPnIQR)
-          uPnOuterFenceUpper <- uPnQ3 + (3 * uPnIQR)
-          uPnOuterFenceLower <- uPnQ1 - (3 * uPnIQR)
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceUpper), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceLower), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnOuterFenceUpper), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnOuterFenceLower), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          if(showPeakLines) {
+            # inhalation exhalation lines
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoInh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoExh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
+          if(showQuartileLines) {
+            # upper pneumo quantiles
+            uPnQ1 <- quantile(chartDF$c_UPneumoSm, .25)
+            uPnQ2 <- quantile(chartDF$c_UPneumoSm, .50)
+            uPnQ3 <- quantile(chartDF$c_UPneumoSm, .75)
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # upper pneumo tukey fences
+            uPnIQR <- uPnQ3 - uPnQ1
+            uPnInnerFenceUpper <- uPnQ3 + (1 * uPnIQR)
+            uPnInnerFenceLower <- uPnQ1 - (1 * uPnIQR)
+            uPnOuterFenceUpper <- uPnQ3 + (2 * uPnIQR)
+            uPnOuterFenceLower <- uPnQ1 - (2 * uPnIQR)
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceUpper), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceLower), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnOuterFenceUpper), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnOuterFenceLower), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
           # excursionLine
           # chartDF$c_UPneumoExcursion
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoExcursion), color="blue3", linewidth=.15, alpha=.5) # + coord_cartesian(ylim=c(yMin, yMax))
@@ -1261,26 +1297,30 @@ for(i in 1:length(uniqueExams)) {
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoSm), color="blue4", linewidth=.4) # + coord_cartesian(ylim=c(yMin, yMax))
           # mid line
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoMid), color="blue4", linewidth=.15, alpha=.5) # + coord_cartesian(ylim=c(yMin, yMax))
-          # inhalation exhalation lines
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoInh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoExh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
-          # quantiles
-          lPnQ1 <- quantile(chartDF$c_LPneumoSm, .25)
-          lPnQ2 <- quantile(chartDF$c_LPneumoSm, .50)
-          lPnQ3 <- quantile(chartDF$c_LPneumoSm, .75)
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # tukey fences
-          lPnIQR <- lPnQ3 - lPnQ1
-          lPnInnerFenceUpper <- lPnQ3 + (1.5 * lPnIQR)
-          lPnInnerFenceLower <- lPnQ1 - (1.5 * lPnIQR)
-          lPnOuterFenceUpper <- lPnQ3 + (3 * lPnIQR)
-          lPnOuterFenceLower <- lPnQ1 - (3 * lPnIQR)
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceUpper), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceLower), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnOuterFenceUpper), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnOuterFenceLower), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          if(showPeakLines) {
+            # inhalation exhalation lines
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoInh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoExh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
+          if(showQuartileLines) {
+            # lower pneumo quantiles
+            lPnQ1 <- quantile(chartDF$c_LPneumoSm, .25)
+            lPnQ2 <- quantile(chartDF$c_LPneumoSm, .50)
+            lPnQ3 <- quantile(chartDF$c_LPneumoSm, .75)
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # lower pneumo tukey fences
+            lPnIQR <- lPnQ3 - lPnQ1
+            lPnInnerFenceUpper <- lPnQ3 + (1 * lPnIQR)
+            lPnInnerFenceLower <- lPnQ1 - (1 * lPnIQR)
+            lPnOuterFenceUpper <- lPnQ3 + (2 * lPnIQR)
+            lPnOuterFenceLower <- lPnQ1 - (2 * lPnIQR)
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceUpper), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceLower), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnOuterFenceUpper), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnOuterFenceLower), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
           # excursion line
           # chartDF$c_LPneumoExcursion
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoExcursion), color="blue4", linewidth=.15, alpha=.5) # + coord_cartesian(ylim=c(yMin, yMax))
@@ -1300,21 +1340,27 @@ for(i in 1:length(uniqueExams)) {
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Cardio1), color="red", linewidth=.15, alpha=.7) # + coord_cartesian(ylim=c(yMin, yMax))
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_cardioRateSystolic), color="brown", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioMA), color="black", linewidth=.35, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))# if(showCardioData) {
-          if(showScores) {
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioMid), color="brown", linewidth=.1, alpha=.7) # + coord_cartesian(ylim=c(yMin, yMax))
+          if(showCardioMidLine) {
+            # cardio mid line
+            # c_CardioMid is a faster moving cardio mid line that also shows some pulse info
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioMid), color="brown", linewidth=.1, alpha=.7) # + coord_cartesian(ylim=c(yMin, yMax))
+            # c_CardioMA is the slow moving cardio midline
             g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioMA), color="black", linewidth=.35, alpha=.7) # + coord_cartesian(ylim=c(yMin, yMax))
           }
-          # systolic diastolic peak lines
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioDiastolic), color="grey60", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioSystolic), color="grey60", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          
-          # cardio quartile lines
-          cdoQ1 <- quantile(chartDF$c_Cardio1, .25)
-          cdoQ2 <- quantile(chartDF$c_Cardio1, .5)
-          cdoQ3 <- quantile(chartDF$c_Cardio1, .75)
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ1), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ3), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          if(showPeakLines) {
+            # systolic diastolic peak lines
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioDiastolic), color="grey60", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioSystolic), color="grey60", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
+          if(showQuartileLines) {
+            # cardio quartile lines
+            cdoQ1 <- quantile(chartDF$c_Cardio1, .25)
+            cdoQ2 <- quantile(chartDF$c_Cardio1, .5)
+            cdoQ3 <- quantile(chartDF$c_Cardio1, .75)
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=cdoQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
           
           # signal processing Stern Ray & Quigley 19
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_CardioSRQ1+125), color="red3", linewidth=.15, alpha=.7) # + coord_cartesian(ylim=c(yMin, yMax))
@@ -1351,18 +1397,21 @@ for(i in 1:length(uniqueExams)) {
             # Filtered EDA data
             g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDA), color="green4", linewidth=.45) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDAMid), color="grey60", linewidth=.15, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
-            # wire frame lines
-            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDAPeak), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
-            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDABase), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
-            
-            # EDA quartile lines
-            edaQ1 <- quantile(chartDF$c_AutoEDA, .25)
-            edaQ2 <- quantile(chartDF$c_AutoEDA, .5)
-            edaQ3 <- quantile(chartDF$c_AutoEDA, .75)
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ1), color="green2", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ2), color="yellow", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ3), color="green2", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            
+            if(showPeakLines) {
+              # auto EDA wire frame lines
+              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDAPeak), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_AutoEDABase), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+            }
+            if(showQuartileLines) {
+              # Auto EDA quartile lines
+              edaQ1 <- quantile(chartDF$c_AutoEDA, .25)
+              edaQ2 <- quantile(chartDF$c_AutoEDA, .5)
+              edaQ3 <- quantile(chartDF$c_AutoEDA, .75)
+              # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ1), color="green2", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+              # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ2), color="yellow", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+              # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=edaQ3), color="green2", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            }
+              
           }
           
           if(isTRUE(showManualEDA)) {
@@ -1370,9 +1419,11 @@ for(i in 1:length(uniqueExams)) {
             g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_ManualEDA), color="brown", alpha=.7, linewidth=.45) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_ManualEDAMid), color="black", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_ManualEDA), color="blue2", linewidth=.5) # + coord_cartesian(ylim=c(yMin, yMax))
-            # wire frame 
-            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_ManualEDAPeak), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
-            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_ManualEDABase), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+            if(showPeakLines) {
+              # Manual wire frame 
+              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_ManualEDAPeak), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_ManualEDABase), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+            }
           }
           
           if(isTRUE(showEA) && "c_EA" %in% colnames(chartDF)) {
@@ -1394,18 +1445,20 @@ for(i in 1:length(uniqueExams)) {
             # var(chartDF$c_PPG1)
             g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1), color="brown", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1MA), color="brown", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
-            # systolic diastolic peak lines
-            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1Max), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
-            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1Min), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
-            
-            # PPG1 quantiles
-            ppgQ1 <- quantile(chartDF$c_PPG1, .25)
-            ppgQ2 <- quantile(chartDF$c_PPG1, .5)
-            ppgQ3 <- quantile(chartDF$c_PPG1, .75)
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ1), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ3), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            
+            if(showPeakLines) {
+              # systolic diastolic peak lines
+              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1Max), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+              g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_PPG1Min), color="grey60", linewidth=.15) # + coord_cartesian(ylim=c(yMin, yMax))
+            }
+            if(showQuartileLines) {
+              # PPG1 quantiles
+              ppgQ1 <- quantile(chartDF$c_PPG1, .25)
+              ppgQ2 <- quantile(chartDF$c_PPG1, .5)
+              ppgQ3 <- quantile(chartDF$c_PPG1, .75)
+              # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+              # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+              # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=ppgQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            }
           } # end if for PLE
         }
         
@@ -1420,31 +1473,37 @@ for(i in 1:length(uniqueExams)) {
           # results
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Result), color="red", linewidth=.25) # + coord_cartesian(ylim=c(yMin, yMax))
           # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Abstrct1), color="grey35", linewidth=.25) # + coord_cartesian(ylim=c(yMin, yMax))
-          # upper and lower peak lines
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Min), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Max), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
-          # Move1 quantiles
-          actQ1 <- quantile(chartDF$c_Move1Proc, .25)
-          actQ2 <- quantile(chartDF$c_Move1Proc, .5)
-          actQ3 <- quantile(chartDF$c_Move1Proc, .75)
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-          # IQR
-          activityQ1 <- quantile(chartDF$c_Move1Proc, .25)
-          activityQ2 <- quantile(chartDF$c_Move1Proc, .50)
-          activityQ3 <- quantile(chartDF$c_Move1Proc, .75)
-          activityIQR <- activityQ3 - activityQ1
-          # tukey fences
-          activityInnerFenceUpper <- activityQ3 + (1 * activityIQR)
-          activityInnerFenceLower <- activityQ1 - (1 * activityIQR)
-          activityOuterFenceUpper <- activityQ3 + (2 * activityIQR)
-          activityOuterFenceLower <- activityQ1 - (2 * activityIQR)
-          # Tukey fences
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityInnerFenceUpper), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityInnerFenceLower), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityOuterFenceUpper), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
-          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityOuterFenceLower), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
+          if(showPeakLines) {
+            # upper and lower peak lines
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Min), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_Move1Max), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
+          if(showQuartileLines) {
+            # Move1 quantiles
+            actQ1 <- quantile(chartDF$c_Move1Proc, .25)
+            actQ2 <- quantile(chartDF$c_Move1Proc, .5)
+            actQ3 <- quantile(chartDF$c_Move1Proc, .75)
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ1), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ2), color="black", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=actQ3), color="blue3", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
+          if(showTukeyLines) {
+            # IQR
+            activityQ1 <- quantile(chartDF$c_Move1Proc, .25)
+            activityQ2 <- quantile(chartDF$c_Move1Proc, .50)
+            activityQ3 <- quantile(chartDF$c_Move1Proc, .75)
+            activityIQR <- activityQ3 - activityQ1
+            # tukey fences
+            activityInnerFenceUpper <- activityQ3 + (1 * activityIQR)
+            activityInnerFenceLower <- activityQ1 - (1 * activityIQR)
+            activityOuterFenceUpper <- activityQ3 + (2 * activityIQR)
+            activityOuterFenceLower <- activityQ1 - (2 * activityIQR)
+            # Move1 Tukey fences
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityInnerFenceUpper), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
+            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityInnerFenceLower), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityOuterFenceUpper), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=activityOuterFenceLower), color="red", linewidth=.125, alpha=.4) # + coord_cartesian(ylim=c(yMin, yMax))
+          }
         }
         
         if(isTRUE(showPTTPTT) && "c_PTTPTT" %in% colnames(chartDF)) {
@@ -2360,38 +2419,6 @@ for(i in 1:length(uniqueExams)) {
       
       if(showMeasurements == TRUE && showExtractionVals == TRUE) {
         
-        # ####  make a private function to remove leading zeroes from numeric scores
-        # 
-        # numFormat2Fn <- function(x) {
-        #   # function to remove leading zeros and keep 2 decimals
-        #   # vectorized already and needs no loop
-        #   outVector <- x
-        #   useIdx <- which(!(is.na(x) | x == ""))
-        #   x2 <- sub("^(-?)0.", "\\1.", as.numeric(sprintf("%.2f", as.numeric(x[useIdx]))) )
-        #   outVector[useIdx] <- x2
-        #   return(outVector)
-        # }
-        # 
-        # numFormat3Fn <- function(x) {
-        #   # function to remove leading zeros and keep 3 decimals
-        #   # vectorized already and needs no loop
-        #   outVector <- x
-        #   useIdx <- which(!(is.na(x) | x == ""))
-        #   x2 <- sub("^(-?)0.", "\\1.", as.numeric(sprintf("%.3f", as.numeric(x[useIdx]))) )
-        #   outVector[useIdx] <- x2
-        #   return(outVector)
-        # }
-        # 
-        # numFormatIntFn <- function(x) {
-        #   # function to format values as integers
-        #   # vectorized already and needs no loop
-        #   outVector <- x
-        #   useIdx <- which(!(is.na(x) | x == ""))
-        #   x2 <- sub("^(-?)0.", "\\1.", as.numeric(sprintf("%.1f", as.numeric(x[useIdx]))) )
-        #   outVector[useIdx] <- x2
-        #   return(outVector)
-        # }
-        
         #### work with the measurements from the _Measurements data frame for the exam ####
         
         {
@@ -2456,6 +2483,10 @@ for(i in 1:length(uniqueExams)) {
         ##############    question intervals  Oct 15, 2023  ##################
         
         if(showQuestionIntervals) {
+          
+          # located at yMin, the bottom of the y-axis
+          # indicates the number of seconds between the onset of an RQ or CQ
+          # and the previous evnt
           
           # chartDF$eventLabel[which(chartDF$eventLabel!="")]
           
@@ -3074,14 +3105,16 @@ for(i in 1:length(uniqueExams)) {
             }
           }
           
-          # use a function to remove leading zeros
+          # call a function to remove leading zeros
           printScores <- numFormat2Fn(printScores)
           
           ###
           
           if(isTRUE(showPneumoData) && showPneumoScores==TRUE) {
             
-            ###  upper pneumo  ### 
+            ###  upper pneumo score  ### 
+            
+            # located at the y-axis for the thoracic sensor
             
             # get all row indices for the upper pneumo data
             uPneumoSensorRows <- which(chartMeasurementDF$sensorName == "UPneumo")
@@ -3107,6 +3140,8 @@ for(i in 1:length(uniqueExams)) {
             
             ### lower pneumo  ###
             
+            # located at the y-axis for the abdominal sensor
+            
             # get all row indices for the lower pneumo data
             lPneumoSensorRows <- which(chartMeasurementDF$sensorName == "LPneumo")
             # then select the row indices for the lower pneumo scores in the chart measurements
@@ -3130,6 +3165,8 @@ for(i in 1:length(uniqueExams)) {
             }
             
             ### combined pneumo score  ###
+            
+            # shown at the mean of the thoracic and abdominal y-axis offsets
             
             # get all row indices for the combined pneumo score
             pneumoSensorRows <- which(chartMeasurementDF$sensorName == "Pneumo")
@@ -3162,6 +3199,8 @@ for(i in 1:length(uniqueExams)) {
             
             ### Auto EDA
             
+            # shown at the y-axis offset for the Auto EDA sensor
+            
             # get all row indices for the EDA data
             AutoEDASensorRows <- which(chartMeasurementDF$sensorName == "AutoEDA")
             # then select the row indices for the EDA scores 
@@ -3189,6 +3228,8 @@ for(i in 1:length(uniqueExams)) {
             ### Manual/un-filtered EDA
             
             if(isTRUE(showManualEDA)) {
+              
+              # shown at the y-axis offset for Manual EDA
               
               # get all row indices for the EDA data
               ManualEDASensorRows <- which(chartMeasurementDF$sensorName == "ManualEDA")
@@ -3222,6 +3263,8 @@ for(i in 1:length(uniqueExams)) {
           ###  Cardio  ###
           
           if(isTRUE(showCardioData) && showCardioScores==TRUE) {
+            
+            # shown at the y-axis offset for the Cardio data
             
             # get all row indices for the Cardio data
             cardioSensorRows <- which(chartMeasurementDF$sensorName == "Cardio")
@@ -3279,6 +3322,8 @@ for(i in 1:length(uniqueExams)) {
           
           if( all(isTRUE(showPLEData), showPLEScores==TRUE, var(chartDF$c_PPG1) != 0) ) {
             
+            # showsn at the y-axis offset for the PLE data
+            
             # get all row indices for the PLE data
             pleSensorRows <- which(chartMeasurementDF$sensorName == "PLE")
             # then select the row indices for the PLE scores in the chart measurements
@@ -3315,7 +3360,7 @@ for(i in 1:length(uniqueExams)) {
              !isTRUE(PCASSFormat) ) ) {
         
         CQXOffset <- -125
-        CQYOffset <- 25
+        CQYOffset <- 35
         
         # get the measurement data frame
         measurementDFName <- paste0(examName, "_Measurements")
@@ -3348,6 +3393,8 @@ for(i in 1:length(uniqueExams)) {
           
           ###  upper pneumo  ### 
           
+          # shown before quesiton onset at the y-axis offset for UPneumo
+          
           # get all row indices for the upper pneumo data
           uPneumoSensorRows <- which(chartMeasurementDF$sensorName == "UPneumo")
           # then select the row indices for the upper pneumo scores in the chart measurements
@@ -3371,6 +3418,8 @@ for(i in 1:length(uniqueExams)) {
           }
           
           ### lower pneumo  ###
+          
+          # shown before quesiton onset at the y-axis offset for UPneumo
           
           # get all row indices for the lower pneumo data
           lPneumoSensorRows <- which(chartMeasurementDF$sensorName == "LPneumo")
@@ -3396,6 +3445,8 @@ for(i in 1:length(uniqueExams)) {
           
           ### combined pneumo score  ###
           
+          # shown before question onset at the y-axis offset for LPneumo
+          
           # get all row indices for the combined pneumo score
           pneumoSensorRows <- which(chartMeasurementDF$sensorName == "Pneumo")
           # then select the row indices for the combined pneumo scores in the chart measurements
@@ -3410,14 +3461,14 @@ for(i in 1:length(uniqueExams)) {
           pneumoScoreIndices <- pneumoScoreIndices[!is.na(pneumoCQNames)]
           pneumoCQNames <- pneumoCQNames[!is.na(pneumoCQNames)]
           # plot the combined pneumo scores
-          # if(length(pneumoCQNames) != 0) {
-          #   g <- g + annotate(geom="text",
-          #                     x=(pneumoScoreIndices + CQXOffset),
-          #                     y=rep(yPneumo, times=length(pneumoCQNames)),
-          #                     label=pneumoCQNames,
-          #                     color="black",
-          #                     size=3)
-          # }
+          if(length(pneumoCQNames) != 0) {
+            # g <- g + annotate(geom="text",
+            #                   x=(pneumoScoreIndices + CQXOffset),
+            #                   y=rep(yPneumo, times=length(pneumoCQNames)),
+            #                   label=pneumoCQNames,
+            #                   color="black",
+            #                   size=3)
+          }
           
         } # end if showPneumoScores == TRUE
         
@@ -3426,6 +3477,8 @@ for(i in 1:length(uniqueExams)) {
         if(isTRUE(showEDAData) && showEDAScores==TRUE) {
           
           ### Auto EDA
+          
+          # shown before quesiton onset at the y-axis offset for Auto EDA
           
           # get all row indices for the EDA data
           AutoEDASensorRows <- which(chartMeasurementDF$sensorName == "AutoEDA")
@@ -3454,6 +3507,8 @@ for(i in 1:length(uniqueExams)) {
           ### Manual/un-filtered EDA
           
           if(isTRUE(showManualEDA)) {
+            
+            # # shown before quesiton onset at the y-axis offset for Manual EDA
             
             # get all row indices for the EDA data
             ManualEDASensorRows <- which(chartMeasurementDF$sensorName == "ManualEDA")
@@ -3488,6 +3543,8 @@ for(i in 1:length(uniqueExams)) {
         
         if(isTRUE(showCardioData) && showCardioScores==TRUE) {
           
+          # # shown before quesiton onset at the y-axis offset for Cardio
+          
           # get all row indices for the Cardio data
           cardioSensorRows <- which(chartMeasurementDF$sensorName == "Cardio")
           # then select the row indices for the Cardio scores in the chart measurements
@@ -3513,6 +3570,8 @@ for(i in 1:length(uniqueExams)) {
           ### forearm cuff or finger cuff scores ###
           
           if(showFCData==TRUE && showFCScores==TRUE) {
+            
+            # # shown before quesiton onset at the y-axis offset for FC 
             
             # get all row indices for the FC data
             FCSensorRows <- which(chartMeasurementDF$sensorName == "FC")
@@ -3543,6 +3602,8 @@ for(i in 1:length(uniqueExams)) {
         ###  PLE  ###
         
         if( all(isTRUE(showPLEData), showPLEScores==TRUE, var(chartDF$c_PPG1) != 0) ) {
+          
+          # shown before quesiton onset at the y-axis offset for PLE
           
           # get all row indices for the PLE data
           pleSensorRows <- which(chartMeasurementDF$sensorName == "PLE")
@@ -3577,8 +3638,8 @@ for(i in 1:length(uniqueExams)) {
              isTRUE(showRCRatio),
              !isTRUE(PCASSFormat) ) ) {
         
-        RCXOffset <- 575
-        RCYoffset <- -25
+        RCXOffset <- -125
+        RCYoffset <- -35
         
         # get the measurement data frame
         measurementDFName <- paste0(examName, "_Measurements")
@@ -4059,6 +4120,11 @@ for(i in 1:length(uniqueExams)) {
              isTRUE(showOSS3Scores),
              !isTRUE(PCASSFormat) ) ) {
         
+        # OSS-3 scores will be shown above the ESSM score
+        
+        oss3YOffset <- 90
+        oss3XOffset <- 200
+        
         # get the measurement data frame
         measurementDFName <- paste0(examName, "_Measurements")
         measurementDF <- get(measurementDFName, pos=1)
@@ -4093,7 +4159,7 @@ for(i in 1:length(uniqueExams)) {
           
           if(isTRUE(showPneumoData) && showPneumoScores==TRUE) {
             
-            ###  upper pneumo ipsative Z Scores ### 
+            ###  upper pneumo OSS-3 Scores ### 
             
             # get all row indices for the upper pneumo data
             uPneumoSensorRows <- which(chartMeasurementDF$sensorName == "UPneumo")
@@ -4109,8 +4175,8 @@ for(i in 1:length(uniqueExams)) {
             # plot the upper pneumo OSS-3 Scores
             if(length(uPneumoOSS3Scores) != 0) {
               g <- g + annotate(geom="text",
-                                x=(uPneumoScoreIndices+200),
-                                y=rep((yOffset['uPneumo']+90), times=length(uPneumoOSS3Scores)),
+                                x=(uPneumoScoreIndices+oss3XOffset),
+                                y=rep((yOffset['uPneumo']+oss3YOffset), times=length(uPneumoOSS3Scores)),
                                 label=uPneumoOSS3Scores,
                                 color="black",
                                 alpha=.3,
@@ -4133,8 +4199,8 @@ for(i in 1:length(uniqueExams)) {
             # plot the lower pneumo OSS03 Scores
             if(length(lPneumoOSS3Scores) != 0) {
               g <- g + annotate(geom="text",
-                                x=(lPneumoScoreIndices+200),
-                                y=rep((yOffset['lPneumo']+90), times=length(lPneumoOSS3Scores)),
+                                x=(lPneumoScoreIndices+oss3XOffset),
+                                y=rep((yOffset['lPneumo']+oss3YOffset), times=length(lPneumoOSS3Scores)),
                                 label=lPneumoOSS3Scores,
                                 color="black",
                                 alpha=.3,
@@ -4142,6 +4208,8 @@ for(i in 1:length(uniqueExams)) {
             }
             
             ### combined pneumo score OSS-3 Scores ###
+            
+            ## combined OSS-3 pneumo score will plot to the left of the ESS-M score
             
             # get all row indices for the combined pneumo score
             pneumoSensorRows <- which(chartMeasurementDF$sensorName == "Pneumo")
@@ -4158,8 +4226,9 @@ for(i in 1:length(uniqueExams)) {
             pneumoOSS3cores <- pneumoOSS3cores[!is.na(pneumoOSS3cores)]
             # plot the combined pneumo ipsative Z Scores
             if(length(pneumoOSS3cores) != 0) {
+              # to the left of the quesiton onset
               g <- g + annotate(geom="text",
-                                x=(pneumoScoreIndices-200),
+                                x=(pneumoScoreIndices-oss3XOffset),
                                 y=rep(yPneumo, times=length(pneumoOSS3cores)),
                                 label=pneumoOSS3cores,
                                 color="black",
@@ -4169,7 +4238,7 @@ for(i in 1:length(uniqueExams)) {
             
           } # end if showPneumoScores == TRUE
           
-          ###  EDA OSS-3##
+          ###  EDA OSS-3 ##
           
           if(isTRUE(showEDAData) && showEDAScores==TRUE) {
             
@@ -4190,8 +4259,8 @@ for(i in 1:length(uniqueExams)) {
               # plot the EDA OSS-3 Scores
               if(length(AutoEDAOSS3Scores) != 0) {
                 g <- g + annotate(geom="text",
-                                  x=(AutoEDAScoreIndices+200),
-                                  y=rep((yOffset['eda']+90), times=length(AutoEDAOSS3Scores)),
+                                  x=(AutoEDAScoreIndices+oss3XOffset),
+                                  y=rep((yOffset['eda']+oss3YOffset), times=length(AutoEDAOSS3Scores)),
                                   label=AutoEDAOSS3Scores,
                                   color="black",
                                   size=3,
@@ -4218,8 +4287,8 @@ for(i in 1:length(uniqueExams)) {
                 # plot the EDA OSS-3 Scores
                 if(length(ManualEDAOSS3CScores) != 0) {
                   # g <- g + annotate(geom="text",
-                  #                   x=(ManualEDAScoreIndices+200),
-                  #                   y=rep((yOffset['eda']+90), times=length(ManualEDAOSS3CScores)),
+                  #                   x=(ManualEDAScoreIndices+oss3XOffset),
+                  #                   y=rep((yOffset['eda']+oss3YOffset), times=length(ManualEDAOSS3CScores)),
                   #                   label=ManualEDAOSS3CScores,
                   #                   color="black",
                   #                   alpha=.3,
@@ -4248,9 +4317,9 @@ for(i in 1:length(uniqueExams)) {
               # plot the Cardio OSS-3 Scores
               if(length(cardioOSS3Scores) != 0) {
                 g <- g + annotate(geom="text",
-                                  x=(cardioScoreIndices+200),
+                                  x=(cardioScoreIndices+oss3XOffset),
                                   # need to use rep() for y in order to avoid a warning about names
-                                  y=rep((yOffset['cardio'] + 90 + 0), times=length(cardioOSS3Scores)),
+                                  y=rep((yOffset['cardio'] + oss3YOffset + 0), times=length(cardioOSS3Scores)),
                                   label=cardioOSS3Scores,
                                   color="black",
                                   size=3,
@@ -4276,9 +4345,9 @@ for(i in 1:length(uniqueExams)) {
               # plot the PLE ipsative Z Scores
               if(length(pleOSS3Scores) != 0) {
                 g <- g + annotate(geom="text",
-                                  x=(pleScoreIndices+100),
+                                  x=(pleScoreIndices+oss3XOffset),
                                   # need to use rep() for y in order to avoid a warning about names
-                                  y=rep((yOffset['ple']+90), times=length(pleOSS3Scores)),
+                                  y=rep((yOffset['ple']+oss3YOffset), times=length(pleOSS3Scores)),
                                   label=pleOSS3Scores,
                                   color="black",
                                   size=3,
@@ -4303,6 +4372,9 @@ for(i in 1:length(uniqueExams)) {
         measurementDFName <- paste0(examName, "_Measurements")
         measurementDF <- get(measurementDFName, pos=1)
         # View(measurementDF)
+        
+        oss2XOffset <- -150
+        oss2YOffset <- -60
         
         if(!is.null(measurementDF)) {
           
@@ -4333,7 +4405,7 @@ for(i in 1:length(uniqueExams)) {
           
           if(isTRUE(showPneumoData) && showPneumoScores==TRUE) {
             
-            ###  upper pneumo ipsative Z Scores ### 
+            ###  upper pneumo OSS-2 Scores ### 
             
             # get all row indices for the upper pneumo data
             uPneumoSensorRows <- which(chartMeasurementDF$sensorName == "UPneumo")
@@ -4349,8 +4421,8 @@ for(i in 1:length(uniqueExams)) {
             # plot the upper pneumo OSS-2 Scores
             if(length(uPneumoOSS2Scores) != 0) {
               g <- g + annotate(geom="text",
-                                x=(uPneumoScoreIndices-200),
-                                y=rep((yOffset['uPneumo']-35), times=length(uPneumoOSS2Scores)),
+                                x=(uPneumoScoreIndices+oss2XOffset),
+                                y=rep((yOffset['uPneumo']+oss2YOffset), times=length(uPneumoOSS2Scores)),
                                 label=uPneumoOSS2Scores,
                                 color="black",
                                 alpha=.3,
@@ -4373,8 +4445,8 @@ for(i in 1:length(uniqueExams)) {
             # plot the lower pneumo OSS03 Scores
             if(length(lPneumoOSS2Scores) != 0) {
               g <- g + annotate(geom="text",
-                                x=(lPneumoScoreIndices-200),
-                                y=rep((yOffset['lPneumo']-35), times=length(lPneumoOSS2Scores)),
+                                x=(lPneumoScoreIndices+oss2XOffset),
+                                y=rep((yOffset['lPneumo']+oss2YOffset), times=length(lPneumoOSS2Scores)),
                                 label=lPneumoOSS2Scores,
                                 color="black",
                                 alpha=.3,
@@ -4399,8 +4471,8 @@ for(i in 1:length(uniqueExams)) {
             # plot the combined pneumo ipsative Z Scores
             if(length(pneumoOSS2Scores) != 0) {
               g <- g + annotate(geom="text",
-                                x=(pneumoScoreIndices-200),
-                                y=rep(yPneumo-35, times=length(pneumoOSS2Scores)),
+                                x=(pneumoScoreIndices+oss2XOffset),
+                                y=rep(yPneumo+oss2YOffset, times=length(pneumoOSS2Scores)),
                                 label=pneumoOSS2Scores,
                                 color="black",
                                 alpha=.95,
@@ -4430,8 +4502,8 @@ for(i in 1:length(uniqueExams)) {
               # plot the EDA OSS-2 Scores
               if(length(AutoEDAOSS2Scores) != 0) {
                 g <- g + annotate(geom="text",
-                                  x=(AutoEDAScoreIndices-200),
-                                  y=rep((yOffset['eda']-35), times=length(AutoEDAOSS2Scores)),
+                                  x=(AutoEDAScoreIndices+oss2XOffset),
+                                  y=rep((yOffset['eda'] + oss2YOffset), times=length(AutoEDAOSS2Scores)),
                                   label=AutoEDAOSS2Scores,
                                   color="black",
                                   size=3,
@@ -4458,8 +4530,8 @@ for(i in 1:length(uniqueExams)) {
                 # plot the EDA OSS-2 Scores
                 if(length(ManualEDAOSS2Scores) != 0) {
                   # g <- g + annotate(geom="text",
-                  #                   x=(ManualEDAScoreIndices-200),
-                  #                   y=rep((yOffset['eda']-35), times=length(ManualEDAOSS22Scores)),
+                  #                   x=(ManualEDAScoreIndices-oss2XOffset),
+                  #                   y=rep((yOffset['eda'] + oss2YOffset), times=length(ManualEDAOSS22Scores)),
                   #                   label=ManualEDAOSS2Scores,
                   #                   color="black",
                   #                   alpha=.3,
@@ -4487,14 +4559,14 @@ for(i in 1:length(uniqueExams)) {
               cardioScoreIndices <- which(chartDF$eventLabel %in% chartMeasurementDF$eventLabel[cardioSelectRows])
               # plot the Cardio OSS-2 Scores
               if(length(cardioOSS2Scores) != 0) {
-                # g <- g + annotate(geom="text",
-                #                   x=(cardioScoreIndices-200),
-                #                   # need to use rep() for y in order to avoid a warning about names
-                #                   y=rep((yOffset['cardio'] -35 + 0), times=length(cardioOSS2Scores)),
-                #                   label=cardioOSS2Scores,
-                #                   color="black",
-                #                   size=3,
-                #                   na.rm=TRUE)
+                g <- g + annotate(geom="text",
+                                  x=(cardioScoreIndices-oss2XOffset),
+                                  # need to use rep() for y in order to avoid a warning about names
+                                  y=rep((yOffset['cardio'] + oss2YOffset + 0), times=length(cardioOSS2Scores)),
+                                  label=cardioOSS2Scores,
+                                  color="black",
+                                  size=3,
+                                  na.rm=TRUE)
               }
             }
             
@@ -4516,9 +4588,9 @@ for(i in 1:length(uniqueExams)) {
               # plot the PLE ipsative Z Scores
               # if(length(pleOSS2Scores) != 0) {
               #   g <- g + annotate(geom="text",
-              #                     x=(pleScoreIndices-2--),
+              #                     x=(pleScoreIndices-oss2XOffset),
               #                     # need to use rep() for y in order to avoid a warning about names
-              #                     y=rep((yOffset['ple']-35+90), times=length(pleOSS2Scores)),
+              #                     y=rep((yOffset['ple'] + oss2YOffset + 90), times=length(pleOSS2Scores)),
               #                     label=pleOSS2Scores,
               #                     color="black",
               #                     size=3,
