@@ -223,6 +223,9 @@ activityAmplitudeFn <- function(x, y) {
 
 newActivityCheckFn <- function(chartDF=chartDF) {
   # R function to extract phyiscal activity artifacts from seat activity sensor data
+  # Raymond Nelson
+  # April 20225
+  ####
   # main function to check for significant physical activity 
   # input is the chartDF
   # output is the chartDF with artifacts labeled in the Move1_a vector
@@ -266,9 +269,11 @@ newActivityCheckFn <- function(chartDF=chartDF) {
         answerBuffer <- c(answerBuffer, answerBuffOn[i]:answerBuffOff[i])
       }
     } 
+    # the answerBuffer can be useful because some movement/artifact is common/expected when an examinee answers verbally
+    # the answerBuffer can be used to reduce sensitivity to false artifacts
   }
   
-  #### initialize an artifact vector #### 
+  #### initialize some artifact vectors #### 
   
   {
     DBVc <- NULL
