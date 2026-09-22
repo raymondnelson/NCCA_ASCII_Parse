@@ -1085,6 +1085,7 @@ if(isTRUE(removeAnnotations)) {
   # load the getFirstLastEventsFn()
   if(!exists("getFirstLastEventFn")) {
     source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
+    excludedEvents.R
   }
   
   removeAnnotationsFn(uniqueExams=uniqueExams)
