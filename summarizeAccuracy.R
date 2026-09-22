@@ -199,12 +199,13 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   
   # initialize a data frame to aggregate the series totals
   RQNames <- c("R1", "R2", "R3", "R4")
+  # RQNames <- c("R4", "R5", "R7", "R8")
   # RQNames <- c("R5", "R7", "R10", "none") # use this for column alignment during aggregation
   # RQNames <- c("R4", "R6", "R8", "none")
   # RQNames <- c("R5", "R7", "R10")
   # RQNames <- c("R5", "R7", "none", "none")
   # RQNames <- c("R3", "R5", "R8", "R9")
-  RQNames <- c("R5", "R8", "R11", "none")
+  # RQNames <- c("R5", "R8", "R11", "none")
   # RQNames <- c("R1", "R2", "none", "none")
   # RQNames <- c("R1", "R2", "R3", "none")
   
@@ -683,11 +684,11 @@ if(isTRUE(summarizeResults)) {
   # library(stringr)
   
   # get the criterion state for all exams
-  if(!exists("criterionStateDF")) {
-    criterionStateDF <- read.csv(list.files(pattern="criterionState.csv")[1], 
-                                 header=TRUE,
-                                 stringsAsFactors=FALSE)
-  }
+  # if(!exists("criterionStateDF")) {
+  #   criterionStateDF <- read.csv(list.files(pattern="criterionState.csv")[1], 
+  #                                header=TRUE,
+  #                                stringsAsFactors=FALSE)
+  # }
   # View(criterionStateDF)
   
   names(criterionStateDF)[1] <- c("examName")
@@ -715,14 +716,14 @@ if(isTRUE(summarizeResults)) {
   numbCases <- length(analysisLists)
   
   # initialize a data frame for the criterion state if none exists
-  if(!exists("criterionStateDF")) {
-    # criterionStateDF <- 
-    #   cbind.data.frame(examName=str_sub(seriesTotalFiles, 2, -24), 
-    #                    criterionState=rep(NA, length(analysisLists)))
-    criterionStateDF <- 
-      cbind.data.frame(examName=str_sub(analysisLists, 1, -10), 
-                       criterionState=rep(NA, length(analysisLists)))
-  }
+  # if(!exists("criterionStateDF")) {
+  #   # criterionStateDF <- 
+  #   #   cbind.data.frame(examName=str_sub(seriesTotalFiles, 2, -24), 
+  #   #                    criterionState=rep(NA, length(analysisLists)))
+  #   criterionStateDF <- 
+  #     cbind.data.frame(examName=str_sub(analysisLists, 1, -10), 
+  #                      criterionState=rep(NA, length(analysisLists)))
+  # }
   
   # # set these for the test format
   # # testFormat <- "Utah"
