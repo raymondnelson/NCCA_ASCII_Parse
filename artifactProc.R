@@ -74,8 +74,9 @@
   source(file.path(RPath, 'pleArtifact.R'), echo=FALSE)
   
   ## activity ##
-  source(file.path(RPath, 'activityCheck.R'), echo=FALSE)
-  source(file.path(RPath, 'activityArtifact.R'), echo=FALSE)
+  # source(file.path(RPath, 'activityCheck.R'), echo=FALSE)
+  # source(file.path(RPath, 'activityArtifact.R'), echo=FALSE)
+  # April 2025
   source(file.path(RPath, "newActivityCheck.R"), echo=FALSE)
 
 }
@@ -202,19 +203,19 @@ artifactProcFn<- function(x=uniqueExams) {
           
         }
         
-        ##############
+        ############## reset the artifact columns #############
         
         {
         
           # was previously in the feature extraction script.
           # 2025, May 10
           
-          chartDF$AutoEDA_a <- 0
-          chartDF$Artifacts_a <- 0
           chartDF$UPneumo_a <- 0
           chartDF$LPneumo_a <- 0
           chartDF$Pneumo_a <- 0
+          chartDF$AutoEDA_a <- 0
           chartDF$Cardio1_a <- 0
+          chartDF$Artifacts_a <- 0
           if(sum(pmatch(names(chartDF), "c_PPG1", nomatch=0))!=0) {
             chartDF$PPG1_a <- 0
           }
@@ -293,8 +294,8 @@ artifactProcFn<- function(x=uniqueExams) {
           # # source(file.path(RPath, 'cardioRate.R'), echo=FALSE)
           # # source(file.path(RPath, 'cardioArrythmia.R'), echo=FALSE)
           # # source(file.path(RPath, 'artifactExtractHelper.R'), echo=FALSE)
-          # 
-          # chartDF <- cardioArtifactFn(x=chartDF)
+
+          chartDF <- cardioArtifactFn(x=chartDF)
 
         }
         
@@ -312,14 +313,14 @@ artifactProcFn<- function(x=uniqueExams) {
           # inclPLE <- FALSE
           # 
           # # check to see if PLE data are present in the exam data frame
-          # if(sum(pmatch(names(examDF), "c_PL", nomatch=0)) != 0) {
-          # 
-          #   inclPLE <- TRUE
-          # 
-          #   if(showNames==TRUE) print("  PLE artifacts")
-          #   chartDF <- pleArtifactFn(x=chartDF)
-          # 
-          # } # end if for PLE
+          if(sum(pmatch(names(examDF), "c_PL", nomatch=0)) != 0) {
+
+            inclPLE <- TRUE
+
+            if(showNames==TRUE) print("  PLE artifacts")
+            chartDF <- pleArtifactFn(x=chartDF)
+
+          } # end if for PLE
           
         }
         
@@ -336,8 +337,10 @@ artifactProcFn<- function(x=uniqueExams) {
             # only if there is some activity in the activity sensor data
             if( max(chartDF$c_Move1) != min(chartDF$c_Move1) ) {
               
+              # old function
               # source(file.path(RPath, 'activityCheck.R'), echo=FALSE)
               
+              # April 2025
               # source(file.path(RPath, "newActivityCheck.R", echo=FALSE)
               
               inclActivity <- TRUE
