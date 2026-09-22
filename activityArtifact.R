@@ -175,5 +175,5 @@ activityArtifactFn <- function(x=chartDF) {
   
   return(chartDF)
   
-}
+} # end activityArtifactFn()
 
