@@ -316,7 +316,7 @@ print("init parameters for the NCCA ASCII work flow")
       
       # used in the 
       removeAnnotations <- FALSE
-      # removeAnnotations <- TRUE
+      removeAnnotations <- TRUE
       
       # Sep 12, 2023
       # stop if missing X or XX announcement
@@ -356,7 +356,7 @@ print("init parameters for the NCCA ASCII work flow")
     # processArtifacts <- FALSE
     
     PLEBaseline <- FALSE
-    # PLEBaseline <- TRUE
+    PLEBaseline <- TRUE
     
     EDAFilt="laf18"
     # EDAFilt="none"
