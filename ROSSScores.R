@@ -356,9 +356,9 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     ### select the result per the decision rule
     
     ROSSResult <- switch(ROSSDecisionRule,
-                             "TSR"=TSRResult$testResult,
-                             "SSR"=SSRResult$testResult,
-                             "GTR"=GTRResult$testResult )
+                             "TSR"=TRSResult,
+                             "SSR"=SSRResult,
+                             "GTR"=GTRResult )
     
     ROSSTestResult <- ROSSResult$testResult
     
