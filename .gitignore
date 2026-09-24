@@ -1,0 +1,49 @@
+data/*
+CSV/*
+dump/*
+backup/*
+archive/*
+plots/*
+essm_tables/*
+DSP_filters/*
+filter_coefs/*
+git copy 2025Jun12/*
+KWANOVA/*
+markdown_stuff/*
+PDFs/*
+plots/*
+R_docs/*
+delete_OSS2_tables/*
+data_working/*
+spoof/*
+spreadsheets/*
+.DS_Store
+.Rproj.user/*
+# .gitignore
+# .gitignore
+# *.Rproj
+*.pdf
+*.RData
+*.01A
+*.02A
+*.03A
+*.04A
+*.05A
+*.06A
+*.07A
+*.08A
+*.09A
+sync.ffs_db
+# .Rproj.user
+# activitySpoof.R
+# PLESpoof.R
+*.Rds
+*.RDa
+.positai
+.Rproj.user/
+.Rhistory
+.RData
+.RData.Tmp
+.Ruserdata
+feature_extraction_2026Sep/*
+
