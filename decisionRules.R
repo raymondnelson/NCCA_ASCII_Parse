@@ -94,7 +94,6 @@ GTRFn <- function(totalScore=.7,
 
 ########## Subtotal Score Rule ##############
 
-# private function
 SSRFn <- function(subtotalScores=c(-2,2,3),
                   cutScores=c(STDI=-3, STNDI=1), 
                   flip=FALSE ) {
