@@ -726,7 +726,8 @@ OSS2ScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                        flip=FALSE )
     
     # 2026Sep03 use the original TSR not the modified eTSR
-    TSRResult <- TSRFn(totalScore=OSS2GrandTotal,
+    # 2026Sep22 use the modified TSR
+    TSRResult <- eTSRFn(totalScore=OSS2GrandTotal,
                         subtotalScores=subtotalScores,
                         cutScores=c(GTNDI=cutScoreT, GTDI=cutScoreD, STDIc=cutScoreD),
                         flip=FALSE )

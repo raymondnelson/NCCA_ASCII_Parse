@@ -713,7 +713,8 @@ PAScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # <> two-stage rule (TSR) here
     
     # 2026Sep03 use the original TSR not the modified eTSR
-    TSRResult <- TSRFn(totalScore=postTruthful,
+    # 2026Sep22 use the modified TSR
+    TSRResult <- eTSRFn(totalScore=postTruthful,
                        subtotalScores=postTruthfulRQs,
                        cutScores=c(GTDI=PACutProbD, GTNDI=PACutProbT, STDIc=PACutProbD),
                        flip=FALSE )

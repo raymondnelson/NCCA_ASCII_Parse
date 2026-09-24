@@ -128,7 +128,7 @@
     showPTTPTT <- FALSE
     
     showManualEDA <- TRUE
-    showManualEDA <- FALSE
+    # showManualEDA <- FALSE
     
     # Jan 17, 2023
     # second EDA sensor
