@@ -2,12 +2,22 @@
 
 
 
+
+# source(file.path(RPath, "decisionRules.R"))
+
+
+
 # a function to calculate the population st dev
 sdp <- function(x) {
   # using the sample variance function to recalc the pop st dev
   # input is a vector of numeric values
   (sqrt(var(x, na.rm=TRUE)*(length(x)-1)/length(x)))
 }
+
+
+
+
+########## main function ################
 
 
 bootstrapScoresFn <- function (RqCqDFSeries=RqCqDFSeries,
@@ -306,7 +316,7 @@ bootstrapScoresFn <- function (RqCqDFSeries=RqCqDFSeries,
     
     resampleDiffs <- rep(NA, length=numberReSamples)
     
-    # uses mean repelacement if isTRUE(forced)
+    # uses mean replacement if isTRUE(forced)
     CQLength <- length(CQScores)
     RQLength <- length(RQScores)
     
@@ -378,7 +388,9 @@ bootstrapScoresFn <- function (RqCqDFSeries=RqCqDFSeries,
                      )
     )
     
-    # call the private function to use the grand total rule
+    # source(file.path(RPath, "decisionRules.R"))
+    
+    # call a function to use the grand total rule
     # use flip=TRUE to invert the probability score and probability cutscores
     GTRResult <- GTRFn(totalScore=(postP), 
                        RQNames=uniqueRQs,
@@ -386,6 +398,19 @@ bootstrapScoresFn <- function (RqCqDFSeries=RqCqDFSeries,
                        flip=TRUE )
     # using only the postTruthful value 
     # because it is the compliment of postDeceptive
+    
+    # this bootstrap scoring algorithm does not translate conceptually to
+    # multiple issue exams because all RQs and CQs are resampled together
+    
+    # SSRResult <- SSRFn(subtotalScores=postP,
+    #                    cutScores=cutScores, 
+    #                    flip=FALSE )
+    # 
+    # 
+    # TSRResult <- eTSRFn(totalScore=(postP), 
+    #                     subtotalScores=c(1,2,3),
+    #                     cutScores=cutScores, 
+    #                     flip=TRUE)
     
     bootstrapCategoricalResult <- GTRResult$testResult
     
