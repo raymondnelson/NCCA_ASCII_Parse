@@ -225,7 +225,7 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
   } 
   
-  ################# calculate the ROSS result #################
+  ################# calculate the ROSS total RQ and CQ scores #################
   
   {
     
@@ -340,37 +340,53 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     
     GTRResult <- GTRFn(totalScore=CRDiffScore, 
                        RQNames=uniqueRQs,
-                       cutScores=ROSSCutScores, 
+                       cutScores=ROSSCutScores[1:2], 
                        flip=FALSE )
     
     # 2026Sep24 added the two-stage rule to increase sensitivity with single issue exams
-    TRSResult <- TSRFn(totalScore=CRDiffScore,
-                       subtotalScores=RQDiffScores,
-                       cutScores=ROSSCutScores, 
-                       flip=FALSE )
+    TRSResult <- eTSRFn(totalScore=CRDiffScore,
+                        subtotalScores=RQDiffScores,
+                        cutScores=ROSSCutScores[1:2], 
+                        flip=FALSE )
     
     SSRResult <- SSRFn(subtotalScores=RQDiffScores, 
-                       cutScores=ROSSCutScores, 
+                       cutScores=ROSSCutScores[3:4], 
                        flip=FALSE )
     
     ### select the result per the decision rule
     
-    ROSSTestResult <- ifelse(ROSSDecisionRule=="GTR",
-                             GTRResult$testResult,
-                             SSRResult$testResult )
+    ROSSResult <- switch(ROSSDecisionRule,
+                             "TSR"=TSRResult$testResult,
+                             "SSR"=SSRResult$testResult,
+                             "GTR"=GTRResult$testResult )
     
-    # ifelse is vectorized internally, but returns only the first item
-    ifelse(ROSSDecisionRule=="GTR",
-           ROSSQuestionResults <- GTRResult$subtotalResults,
-           ROSSQuestionResults <- SSRResult$subtotalResults )
+    ROSSTestResult <- ROSSResult$testResult
     
-    ifelse(ROSSDecisionRule=="GTR",
-           resultUsing <- GTRResult$resultUsing,
-           resultUsing <- SSRResult$resultUsing )
+    ROSSQuestionResults <- ROSSResult$subtotalResults
     
-    ifelse(ROSSDecisionRule == "GTR",
-           outputCutscores <- ROSSCutScores[1:2],
-           outputCutscores <- ROSSCutScores[3:4])
+    resultUsing <- ROSSResult$resultUsing
+    
+    outputCutscores <-  switch(ROSSDecisionRule,
+                               "GTR"=ROSSCutScores[1:2], 
+                               "TSR"=ROSSCutScores[1:2],
+                               "SSR"=ROSSCutScores[3:4] )
+    
+    # ROSSTestResult <- ifelse(ROSSDecisionRule=="GTR",
+    #                          GTRResult$testResult,
+    #                          SSRResult$testResult )
+    
+    # # ifelse is vectorized internally, but returns only the first item
+    # ifelse(ROSSDecisionRule=="GTR",
+    #        ROSSQuestionResults <- GTRResult$subtotalResults,
+    #        ROSSQuestionResults <- SSRResult$subtotalResults )
+    
+    # ifelse(ROSSDecisionRule=="GTR",
+    #        resultUsing <- GTRResult$resultUsing,
+    #        resultUsing <- SSRResult$resultUsing )
+    
+    # ifelse(ROSSDecisionRule == "GTR",
+    #        outputCutscores <- ROSSCutScores[1:2],
+    #        outputCutscores <- ROSSCutScores[3:4])
     
   }
   
