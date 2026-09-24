@@ -343,6 +343,12 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                        cutScores=ROSSCutScores, 
                        flip=FALSE )
     
+    # 2026Sep24 added the two-stage rule to increase sensitivity with single issue exams
+    TRSResult <- TSRFn(totalScore=CRDiffScore,
+                       subtotalScores=RQDiffScores,
+                       cutScores=ROSSCutScores, 
+                       flip=FALSE )
+    
     SSRResult <- SSRFn(subtotalScores=RQDiffScores, 
                        cutScores=ROSSCutScores, 
                        flip=FALSE )
@@ -353,7 +359,7 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                              GTRResult$testResult,
                              SSRResult$testResult )
     
-    # ifelse is vecorized internally, but returns only the first item
+    # ifelse is vectorized internally, but returns only the first item
     ifelse(ROSSDecisionRule=="GTR",
            ROSSQuestionResults <- GTRResult$subtotalResults,
            ROSSQuestionResults <- SSRResult$subtotalResults )
