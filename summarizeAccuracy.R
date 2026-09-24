@@ -52,6 +52,13 @@
 # }
 
 
+########
+
+
+library(stringr)
+
+library(readr)
+
 
 ######### Set the dropbox path #########
 
@@ -198,8 +205,8 @@ if(length(ls(pattern="ANALYSIS"))==0) {
   # testFormat <- str_sub(seriesTotalFiles, 9, -24)
   
   # initialize a data frame to aggregate the series totals
-  RQNames <- c("R1", "R2", "R3", "R4")
-  # RQNames <- c("R4", "R5", "R7", "R8")
+  # RQNames <- c("R1", "R2", "R3", "R4")
+  RQNames <- c("R4", "R5", "R7", "R8")
   # RQNames <- c("R5", "R7", "R10", "none") # use this for column alignment during aggregation
   # RQNames <- c("R4", "R6", "R8", "none")
   # RQNames <- c("R5", "R7", "R10")
@@ -549,6 +556,8 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
   
   analysisLists <- ls(pattern =".ANALYSIS$")
   
+  numbCases <- length(analysisLists)
+  
   # exclude cases that consist only of the ACQT
   analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
   
@@ -618,6 +627,8 @@ colSDs <- function(x=CQSensorMeansDF[2:ncol(CQSensorMeansDF)],pop=FALSE, na.rm=F
   # criterionStateDF <- read_csv("~/Dropbox/DATASETS/LEPET/LEPET_NCCAASCII/LEPET_N60_NCCAASCII/criterionState.csv")
   # criterionStateDF <- read_csv("./.criterionState.csv")
   criterionStateDF <- read_csv(criterionStateFileName)
+  
+  # names(criterionStateDF)[1] <- c("examName")
   
   # remove punctuation characters from Axciton file names
   # names(criterionStateDF)[1] <- "examName"
@@ -691,7 +702,7 @@ if(isTRUE(summarizeResults)) {
   # }
   # View(criterionStateDF)
   
-  names(criterionStateDF)[1] <- c("examName")
+  # names(criterionStateDF)[1] <- c("examName")
   # criterionStateDF$examName
   
   # get the ESS-M series totals for all 
@@ -713,7 +724,7 @@ if(isTRUE(summarizeResults)) {
   # numbCases <- length(seriesTotalFiles)
   
   # numbCases <- length(scoreSheetFiles)
-  numbCases <- length(analysisLists)
+  # numbCases <- length(analysisLists)
   
   # initialize a data frame for the criterion state if none exists
   # if(!exists("criterionStateDF")) {
@@ -744,10 +755,10 @@ if(isTRUE(summarizeResults)) {
   # initialize a data frame using the score sheet files
   # seriesTotalsDF <- as.data.frame(matrix(ncol=(5+(1*length(RQNames))), 
   #                                        nrow=length(scoreSheetFiles)))
-  seriesTotalsDF <- as.data.frame(matrix(ncol=(5+(1*length(RQNames))), 
+  seriesTotalsDF <- as.data.frame(matrix(ncol=(6+(1*length(RQNames))), 
                                          nrow=length(analysisLists)))
   # paste0(RQNames, "_sTot"), 
-  names(seriesTotalsDF) <- c("examName", "series", "testFormat", RQNames, "grandTotal", "criterionState")
+  names(seriesTotalsDF) <- c("examName", "series", "testFormat", "testResult", RQNames, "grandTotal", "criterionState")
   # View(seriesTotalsDF)
   
   # iterate over the series totals to aggregate the totals for all exams
@@ -755,22 +766,26 @@ if(isTRUE(summarizeResults)) {
   # for (i in 1:length(scoreSheetFiles)) {
   for (i in 1:length(analysisLists)) {
     
-    if(i > length(analysisLists)) break()
-    # if(i > length(scoreSheetFiles)) break()
-    
-    thisAnalysis <-  get(analysisLists[i], pos=1)
-    # View(thisAnalysis)
-    
-    examName <- str_sub(analysisLists[i], 1, -10)
-    
-    # ohio
-    # examName <- str_sub(examName, 1, -2)
-    
-    # thisCaseNumber <- str_sub(scoreSheetFiles[i], 2, 4)
-    # 
-    # thisDFRow <- which(seriesTotalsDF$examName == thisCaseNumber)
-    
-    # thisCSV <- read.csv(seriesTotalFiles[i], header=TRUE, stringsAsFactors=FALSE)
+    {
+      
+      if(i > length(analysisLists)) break()
+      # if(i > length(scoreSheetFiles)) break()
+      
+      thisAnalysis <-  get(analysisLists[i], pos=1)
+      # View(thisAnalysis)
+      
+      examName <- str_sub(analysisLists[i], 1, -10)
+      
+      # ohio
+      # examName <- str_sub(examName, 1, -2)
+      
+      # thisCaseNumber <- str_sub(scoreSheetFiles[i], 2, 4)
+      # 
+      # thisDFRow <- which(seriesTotalsDF$examName == thisCaseNumber)
+      
+      # thisCSV <- read.csv(seriesTotalFiles[i], header=TRUE, stringsAsFactors=FALSE)
+      
+    }
     
     # iterate on the series
     j=1
@@ -842,6 +857,10 @@ if(isTRUE(summarizeResults)) {
         # test format
         seriesTotalsDF[i,'testFormat'] <- testFormat
         
+        # View(seriesTotalsDF)
+      }
+       
+      {
         # subtotal scores
         # using the seriesTotals
         # seriesTotalsDF[i,4:(4+ncol(thisCSV)-3)] <- thisCSV[1,3:(3+ncol(thisCSV)-3)] 
@@ -850,11 +869,14 @@ if(isTRUE(summarizeResults)) {
         # using the score sheets
         
         nRQs <- ncol(thisCSV)-4
-        seriesTotalsDF[i,4:(4+nRQs-1)] <- colSums(thisCSV[5:(5+nRQs-1)], na.rm=TRUE)
+        seriesTotalsDF[i,5:(5+nRQs-1)] <- colSums(thisCSV[5:(5+nRQs-1)], na.rm=TRUE)
         
         # add the criterion state
         seriesTotalsDF[i,'criterionState'] <-
           criterionStateDF$criterionState[which(criterionStateDF$examName %in% examName)]
+        
+        # add the computed ESS result without PLE
+        seriesTotalsDF[i,'testResult'] <- testResult
         
       }
 
@@ -872,31 +894,32 @@ if(isTRUE(summarizeResults)) {
     
     # calculate the grand total
     seriesTotalsDF$grandTotal <- 
-      apply(seriesTotalsDF[,4:(4+length(RQNames)-1)], 1, sum, na.rm=TRUE)
+      apply(seriesTotalsDF[,5:(5+length(RQNames)-1)], 1, sum, na.rm=TRUE)
     
     # calculate the subtotal means
     # commented out JaN 23, 2025 to work with the Axciton mixed format sample
     # seriesTotalsDF$sTotalMean <- 
-    #   # apply(cbind(seriesTotalsDF['criterionState'], seriesTotalsDF[,c(4:(4+length(RQNames)-1))]), 1, subtotalMeanFn)
+    #   # apply(cbind(seriesTotalsDF['criterionState'], seriesTotalsDF[,c(5:(5+length(RQNames)-1))]), 1, subtotalMeanFn)
     #   seriesTotalsDF[,'grandTotal'] / nRQs
     seriesTotalsDF$sTotalMean <- NA
     
     # compute the min subtotal score
     seriesTotalsDF$minSubtotalScore <- 
-      apply(seriesTotalsDF[,c(4:(4+length(RQNames)-1))], 1, min, na.rm=TRUE)
+      apply(seriesTotalsDF[,c(5:(5+length(RQNames)-1))], 1, min, na.rm=TRUE)
     
     # compute the max subtotal score
     seriesTotalsDF$maxSubtotalScore <- 
-      apply(seriesTotalsDF[,c(4:(4+length(RQNames)-1))], 1, max, na.rm=TRUE)
+      apply(seriesTotalsDF[,c(5:(5+length(RQNames)-1))], 1, max, na.rm=TRUE)
     
   }
   
+  # select the decision rule
   thisRule <- ifelse(ESSMDecisionRule=="SSR", sSSRFn, sTSRFn)
   
   
-  # call the decision rule to get the result
+  # call the decision rule to get the result coded as -1, 0, +1
   # seriesTotalsDF$Result <- apply(seriesTotalsDF[,4:(4+length(RQNames)-1)], 1, sTSRFn)
-  seriesTotalsDF$Result <- apply(seriesTotalsDF[,4:(4+length(RQNames)-1)], 1, thisRule)
+  seriesTotalsDF$recodeResult <- apply(seriesTotalsDF[,5:(5+length(RQNames)-1)], 1, thisRule)
   
   # sSSRFn(seriesTotalsDF[1,4:7])
   
@@ -905,7 +928,7 @@ if(isTRUE(summarizeResults)) {
   # View(seriesTotalsDF)
   
   # apply the correctCodesFn function to the seriesTotalsDF
-  seriesTotalsDF$correctCode <- apply(cbind(seriesTotalsDF['criterionState'],seriesTotalsDF['Result']),
+  seriesTotalsDF$correctCode <- apply(cbind(seriesTotalsDF['criterionState'],seriesTotalsDF['recodeResult']),
                                       1, correctCodesFN)
   
   # write the CSV
@@ -915,6 +938,7 @@ if(isTRUE(summarizeResults)) {
   ESSMSummaryDF <- seriesTotalsDF
   
   # View(seriesTotalsDF)
+  
 } 
 
 
@@ -927,17 +951,17 @@ summarizeResults <- TRUE
 
 if(isTRUE(summarizeResults)) {
   
-  library(stringr)
+  # library(stringr)
   
   # get the criterion state for all exams
-  if(!exists("criterionStateDF")) {
-    criterionStateDF <- read.csv(list.files(pattern="criterionState.csv"), 
-                                 header=TRUE,
-                                 stringsAsFactors=FALSE)
-  }
+  # if(!exists("criterionStateDF")) {
+  #   criterionStateDF <- read.csv(list.files(pattern="criterionState.csv"), 
+  #                                header=TRUE,
+  #                                stringsAsFactors=FALSE)
+  # }
   
   # set the column name
-  names(criterionStateDF)[1] <- c("examName")
+  # names(criterionStateDF)[1] <- c("examName")
   # criterionStateDF$examName
   
   # get the ESS-M series totals for all 
@@ -951,15 +975,15 @@ if(isTRUE(summarizeResults)) {
   
   # numbCases <- length(seriesTotalFiles)
   
-  numbCases <- length(analysisLists)
+  # numbCases <- length(analysisLists)
   # numbCases <- length(scoreSheetFiles)
   
   # initialize a data frame for the criterion state
-  if(!exists("criterionStateDF")) {
-    criterionStateDF <- 
-      cbind.data.frame(examName=examNames, 
-                       criterionState=rep(NA, length(analysisLists)))
-  }
+  # if(!exists("criterionStateDF")) {
+  #   criterionStateDF <- 
+  #     cbind.data.frame(examName=examNames, 
+  #                      criterionState=rep(NA, length(analysisLists)))
+  # }
   
   # View(criterionStateDF)
   
@@ -979,10 +1003,10 @@ if(isTRUE(summarizeResults)) {
   #                                        nrow=length(seriesTotalFiles)))
   
   # initialize a data frame for the series totals using the score sheet
-  seriesTotalsPDF <- as.data.frame(matrix(ncol=(5+(1*length(RQNames))), 
+  seriesTotalsPDF <- as.data.frame(matrix(ncol=(6+(1*length(RQNames))), 
                                          nrow=length(analysisLists)))
   # paste0(RQNames, "_sTot"), 
-  names(seriesTotalsPDF) <- c("examName", "series", "testFormat", RQNames, "grandTotal", "criterionState")
+  names(seriesTotalsPDF) <- c("examName", "series", "testFormat", "testResult", RQNames, "grandTotal", "criterionState")
   # View(seriesTotalsPDF)
   
   # iterate over the series totals to aggregate the totals for all exams
@@ -1071,6 +1095,12 @@ if(isTRUE(summarizeResults)) {
         # test format
         seriesTotalsPDF[i,'testFormat'] <- testFormat
         
+        # View(seriesTotalsPDF)
+        
+      }
+      
+      {
+        
         # subtotal scores
         # using the seriesTotals
         # seriesTotalsPDF[i,4:(4+ncol(thisCSV)-3)] <- thisCSV[1,3:(3+ncol(thisCSV)-3)] 
@@ -1079,11 +1109,16 @@ if(isTRUE(summarizeResults)) {
         # using the score sheets
         
         nRQs <- ncol(thisCSV)-4
-        seriesTotalsPDF[i,4:(4+nRQs-1)] <- colSums(thisCSV[5:(5+nRQs-1)], na.rm=TRUE)
+        seriesTotalsPDF[i,5:(5+nRQs-1)] <- colSums(thisCSV[5:(5+nRQs-1)], na.rm=TRUE)
         
         # add the criterion state
         seriesTotalsPDF[i,'criterionState'] <-
           criterionStateDF$criterionState[which(criterionStateDF$examName %in% examName)]
+        
+        # add the computed ESS result without PLE
+        seriesTotalsPDF[i,'testResult'] <- testResult
+        
+        # View(seriesTotalsDF)
         
       }
       
@@ -1101,7 +1136,7 @@ if(isTRUE(summarizeResults)) {
     
     # calculate the grand total
     seriesTotalsPDF$grandTotal <- 
-      apply(seriesTotalsPDF[,4:(4+length(RQNames)-1)], 1, sum, na.rm=TRUE)
+      apply(seriesTotalsPDF[,5:(5+length(RQNames)-1)], 1, sum, na.rm=TRUE)
     
     # calculate the subtotal means
     # commented out Jan 23, 2025 to work with the Axciton mixed case sample
@@ -1112,11 +1147,11 @@ if(isTRUE(summarizeResults)) {
     
     # compute the min subtotal score
     seriesTotalsPDF$minSubtotalScore <- 
-      apply(seriesTotalsPDF[,c(4:(4+length(RQNames)-1))], 1, min, na.rm=TRUE)
+      apply(seriesTotalsPDF[,c(5:(5+length(RQNames)-1))], 1, min, na.rm=TRUE)
     
     # compute the max subtotal score
     seriesTotalsPDF$maxSubtotalScore <- 
-      apply(seriesTotalsPDF[,c(4:(4+length(RQNames)-1))], 1, max, na.rm=TRUE)
+      apply(seriesTotalsPDF[,c(5:(5+length(RQNames)-1))], 1, max, na.rm=TRUE)
     
   }
   
@@ -1124,7 +1159,7 @@ if(isTRUE(summarizeResults)) {
   
   
   # call the decision rule to get the result
-  seriesTotalsPDF$Result <- apply(seriesTotalsPDF[,4:(4+length(RQNames)-1)], 1, thisRule)
+  seriesTotalsPDF$recodeResult <- apply(seriesTotalsPDF[,5:(5+length(RQNames)-1)], 1, thisRule)
   
   # sSSRFn(seriesTotalsPDF[1,4:7])
   
@@ -1133,7 +1168,7 @@ if(isTRUE(summarizeResults)) {
   # View(seriesTotalsPDF)
   
   # apply the correctCodesFn function to the seriesTotalsPDF
-  seriesTotalsPDF$correctCode <- apply(cbind(seriesTotalsPDF['criterionState'],seriesTotalsPDF['Result']),
+  seriesTotalsPDF$correctCode <- apply(cbind(seriesTotalsPDF['criterionState'],seriesTotalsPDF['recodeResult']),
                                       1, correctCodesFN)
   
   # write the CSV
@@ -1194,20 +1229,20 @@ if(isTRUE(summarizeSensorInfo)) {
   # # testFormat <- str_sub(sensorTotalsFiles[], 9, -24)
   
   # initialize a data frame 
-  sensorTotalsDF <- as.data.frame(matrix(ncol=7, nrow=length(analysisLists)))
+  sensorTotalsDF <- as.data.frame(matrix(ncol=8, nrow=length(analysisLists)))
   sensorNames <- c("Pneumo", "EDA", "Cardio", "PLE")
   # RQNames <- c("R1", "R2", "R3", "R4")
-  names(sensorTotalsDF) <- c("examName", "series", "testFormat", sensorNames)
+  names(sensorTotalsDF) <- c("examName", "series", "testFormat", "testResult", sensorNames)
   sensorTotalsDF$testFormat <- testFormat
   # View(sensorTotalsDF)
   
   
   
-  if(!exists("criterionStateDF")) {
-    criterionStateDF <- 
-      cbind.data.frame(examName=str_sub(sensorTotalsFiles, 2, -24), 
-                       criterionState=rep(NA, length(analysisLists)))
-  }
+  # if(!exists("criterionStateDF")) {
+  #   criterionStateDF <- 
+  #     cbind.data.frame(examName=str_sub(sensorTotalsFiles, 2, -24), 
+  #                      criterionState=rep(NA, length(analysisLists)))
+  # }
   
   
   # calculate the grand total
@@ -1225,26 +1260,32 @@ if(isTRUE(summarizeSensorInfo)) {
   sensorTotalsDF$minSubtotal <- NA
   sensorTotalsDF$maxSubtotal <- NA
   
+  sensorTotalsDF$recodeResult <- NA
+  
   # iterate over the sensorTotalsFiles
   i=1
   for(i in 1:length(analysisLists)) {
-  
-    if(i > length(analysisLists)) break()
-    # if(i > length(scoreSheetFiles)) break()
     
-    thisAnalysis <-  get(analysisLists[i], pos=1)
-    # View(thisAnalysis)
-    
-    examName <- str_sub(analysisLists[i], 1, -10)
-    
-    # ohio
-    # examName <- str_sub(examName, 1, -2)
-    
-    # thisCaseNumber <- str_sub(scoreSheetFiles[i], 2, 4)
-    # 
-    # thisDFRow <- which(seriesTotalsDF$examName == thisCaseNumber)
-    
-    # thisCSV <- read.csv(seriesTotalFiles[i], header=TRUE, stringsAsFactors=FALSE)
+    {
+      
+      if(i > length(analysisLists)) break()
+      # if(i > length(scoreSheetFiles)) break()
+      
+      thisAnalysis <-  get(analysisLists[i], pos=1)
+      # View(thisAnalysis)
+      
+      examName <- str_sub(analysisLists[i], 1, -10)
+      
+      # ohio
+      # examName <- str_sub(examName, 1, -2)
+      
+      # thisCaseNumber <- str_sub(scoreSheetFiles[i], 2, 4)
+      # 
+      # thisDFRow <- which(seriesTotalsDF$examName == thisCaseNumber)
+      
+      # thisCSV <- read.csv(seriesTotalFiles[i], header=TRUE, stringsAsFactors=FALSE)
+      
+    }
     
     # iterate on the series
     j=1
@@ -1260,15 +1301,15 @@ if(isTRUE(summarizeSensorInfo)) {
         # length(thisAnalysis[[seriesName]])
         
         # names(thisAnalysis[[seriesName]])
+        
+        # View(thisAnalysis)
+        
+        # get the ESS-M analysis result
+        ESSMAnalysis <- 
+          thisAnalysis[[seriesName]][["ESSMOutput"]]
+        
+        # View(ESSMAnalysis)
       }
-      
-      # View(thisAnalysis)
-      
-      # get the ESS-M analysis result
-      ESSMAnalysis <- 
-        thisAnalysis[[seriesName]][["ESSMOutput"]]
-      
-      # View(ESSMAnalysis)
       
       if(is.null(ESSMAnalysis)) next()
       
@@ -1292,8 +1333,8 @@ if(isTRUE(summarizeSensorInfo)) {
         theseSensorTotals$PLE <- NA
       }
       # View(thisID)
-      sensorTotalsDF[i,'examName'] <- examName
       
+      sensorTotalsDF[i,'examName'] <- examName
       
       # thisSeries <- str_sub(sensorTotalsFiles[i], -22, -22)
       sensorTotalsDF[i,'series'] <- seriesName
@@ -1303,7 +1344,7 @@ if(isTRUE(summarizeSensorInfo)) {
         criterionStateDF$criterionState[which(criterionStateDF$examName == examName)]
       
       # calculate the sensor subtotals
-      sensorTotalsDF[i,c(4:(4+length(sensorNames)-1))] <- 
+      sensorTotalsDF[i,c(5:(5+length(sensorNames)-1))] <- 
         colSums(theseSensorTotals[,c(4:(4+length(sensorNames)-1))], na.rm=TRUE)
       
     } # end j loop over series
@@ -1312,11 +1353,14 @@ if(isTRUE(summarizeSensorInfo)) {
   
   # View(sensorTotalsDF)
   
+  # sort in ascending order
   sensorTotalsDF <- sensorTotalsDF[order(sensorTotalsDF$examName),]
+  
+  # View(sensorTotalsDF)
   
   # calculate the grand total
   sensorTotalsDF$grandTotal <-
-    apply(sensorTotalsDF[,c(4:(4+length(sensorNames)-1))], 1, sum, na.rm=TRUE)
+    apply(sensorTotalsDF[,c(5:(5+length(sensorNames)-1))], 1, sum, na.rm=TRUE)
   
   # call the decision rule to get the result
   # sensorTotalsDF$Result <- apply(seriesTotalsDF[,4:7], 1, sSSRFn)
@@ -1326,9 +1370,17 @@ if(isTRUE(summarizeSensorInfo)) {
   j=1
   for(j in 1:nrow(sensorTotalsDF)) {
     thisExamName <- sensorTotalsDF$examName[j]
-    sensorTotalsDF$Result[j] <-
-      seriesTotalsPDF$Result[which(seriesTotalsPDF$examName %in% thisExamName)]
+    sensorTotalsDF$testResult[j] <-
+      seriesTotalsPDF$testResult[which(seriesTotalsPDF$examName %in% thisExamName)]
   }
+  
+  # recode the test result
+  sensorTotalsDF$recodeResult <- 
+    ifelse(sensorTotalsDF$testResult == "DI/SR", 
+           recodeResult <- -1,
+           ifelse(sensorTotalsDF$testResult == "NDI/NSR",
+                  1,
+                  0))
   
   # get the subtotal mean from the seriesTotalsDF
   j=1
@@ -1356,7 +1408,7 @@ if(isTRUE(summarizeSensorInfo)) {
       seriesTotalsPDF[which(seriesTotalsPDF$examName %in% thisExamName),c(11:12)]
   }
   
-  # add the correct code the sensorTotalsDF
+  # add the correct code to the sensorTotalsDF
   m=1
   for(m in 1:nrow(sensorTotalsDF)) {
     thisExamName <- sensorTotalsDF$examName[m]
@@ -1743,18 +1795,18 @@ if(isTRUE(summarizePA)) {
   
   print("summarize the PA results")
   
-  library(stringr)
+  # library(stringr)
   
   # analysisLists <- ls(pattern =".ANALYSIS$")
   
   # analysisLists <- analysisLists[!grepl("ACQT", analysisLists)]
   
   # get the criterion state for all exams
-  if(!exists("criterionStateDF")) {
-    criterionStateDF <- read.csv(list.files(pattern="criterionState.csv"),
-                                 header=TRUE,
-                                 stringsAsFactors=FALSE)
-  }
+  # if(!exists("criterionStateDF")) {
+  #   criterionStateDF <- read.csv(list.files(pattern="criterionState.csv"),
+  #                                header=TRUE,
+  #                                stringsAsFactors=FALSE)
+  # }
   
   # View(criterionStateDF)
   
@@ -1772,16 +1824,18 @@ if(isTRUE(summarizePA)) {
   # RQNames <- c("R1", "R2", "R3", "R4")
   # names(seriesTotalsDF) <- c("ID", "series", "testFormat", RQNames, "grandTotal", "criterionState")
   
-  PASummaryDF <- as.data.frame(matrix(ncol=(7+length(RQNames)), 
+  PASummaryDF <- as.data.frame(matrix(ncol=(9+length(RQNames)), 
                                         nrow=length(analysisLists)))
   names(PASummaryDF) <- c("examName", 
-                            "testFormat",
-                            "testResult",
-                            RQNames,
-                            "PAScore",
-                            "PAPostProbT",
-                            "PAPostProbD",
-                            "criterionState" )
+                          "testFormat",
+                          "testResult",
+                          RQNames,
+                          "PAScore",
+                          "PAPostProbT",
+                          "PAPostProbD",
+                          "PAPostProbRQSubTotT",
+                          "PAPostProbRQSubTotD",
+                          "criterionState" )
   
   # View(PASummaryDF)
   
@@ -1841,6 +1895,11 @@ if(isTRUE(summarizePA)) {
         PAPostProbT <- PAAnalysis[['PAPostProbT']]
         PAPostProbD <- PAAnalysis[['PAPostProbD']]
         
+        PAPostProbRQSubTotT <- PAAnalysis[['PAPostProbRQSubTotT']]
+        PAPostProbRQSubTotD <- PAAnalysis[['PAPostProbRQSubTotD']]
+        
+        PAPostProbRQSubTotT <- PAPostProbRQSubTotT[which.min(PAPostProbRQSubTotT)]
+        PAPostProbRQSubTotD <- PAPostProbRQSubTotD[which.min(PAPostProbRQSubTotD)]
         
         criterionState <- 
           criterionStateDF$criterionState[which(criterionStateDF$examName == examName)]
@@ -1856,6 +1915,8 @@ if(isTRUE(summarizePA)) {
           PAScore,
           PAPostProbT,
           PAPostProbD,
+          PAPostProbRQSubTotT,
+          PAPostProbRQSubTotD,
           criterionState )
       
     } # end j loop over series
@@ -1939,13 +2000,14 @@ if(isTRUE(summarizeOSS2)) {
   
   # OSS2SummaryDF <- as.data.frame(matrix(ncol=(5+length(RQNames)), 
   #                                       nrow=length(analysisLists)))
-  OSS2SummaryDF <- as.data.frame(matrix(ncol=5, 
+  OSS2SummaryDF <- as.data.frame(matrix(ncol=6, 
                                         nrow=length(analysisLists)))
   names(OSS2SummaryDF) <- c("examName", 
                             "testFormat",
                             "testResult",
                             # RQNames,
                             "OSS2Score",
+                            "OSS2MinSubtotalScore",
                             # "PAPostProbT",
                             # "PAPostProbD",
                             "criterionState" )
@@ -2004,8 +2066,11 @@ if(isTRUE(summarizeOSS2)) {
         # PAPostProbT <- PAAnalysis[['PAPostProbT']]
         # PAPostProbD <- PAAnalysis[['PAPostProbD']]
         
+        OSS2MinSubtotalScore <- colSums(OSS2Analysis[['OSS2coreSheetDF']][c(5:(4+nRQs))], na.rm=TRUE)
+        OSS2MinSubtotalScore <- OSS2MinSubtotalScore[which.min(OSS2MinSubtotalScore)]
+        
         criterionState <- 
-          criterionStateDF$criterionState[which(criterionStateDF$examName == examName)]
+          criterionStateDF$criterionState[which(criterionStateDF$examName == examName)] 
         
       }
       
@@ -2016,6 +2081,7 @@ if(isTRUE(summarizeOSS2)) {
           testResult,
           # RQNames,
           OSS2Score,
+          OSS2MinSubtotalScore,
           criterionState )
       
     } # end j loop over series
@@ -3221,8 +3287,8 @@ if(isTRUE(summarizeScoresProp)) {
   
   # print(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)])) / 
   #         sum(colSums(abs(sensorTotalsDF[,4:ncol(sensorTotalsDF)])), na.rm=TRUE) )
-  print(colSums(abs(sensorTotalsDF[,4:7])) / 
-          sum(colSums(abs(sensorTotalsDF[,4:7])), na.rm=TRUE) )
+  print(colSums(abs(sensorTotalsDF[,5:8])) / 
+          sum(colSums(abs(sensorTotalsDF[,5:8])), na.rm=TRUE) )
   
   
   ### use the score sheet data frames to summarize the frequency of scores
@@ -3365,7 +3431,7 @@ totalCases <- nrow(criterionStateDF)
 truthfulCases <- length(which(criterionStateDF$criterionState == 1))
 deceptiveCases <- length(which(criterionStateDF$criterionState == -1))
 
-if(all(getCorrelations, truthfulCases != totalCases, deceptiveCases != totalCases)) {
+if( all(getCorrelations, truthfulCases != totalCases, deceptiveCases != totalCases) ) {
   
   # numbCases <- nrow(criterionStateDF)
   numbCases <- nrow(scoreSheetFreqDF)
@@ -3386,8 +3452,8 @@ if(all(getCorrelations, truthfulCases != totalCases, deceptiveCases != totalCase
                    ALL_CASES_sensorTotals$criterionState)
   
   if(sum(ALL_CASES_sensorTotals$PLE) != 0) {
-  PLECor <- cor(ALL_CASES_sensorTotals$PLE, 
-                ALL_CASES_sensorTotals$criterionState)
+    PLECor <- cor(ALL_CASES_sensorTotals$PLE, 
+                  ALL_CASES_sensorTotals$criterionState)
   } else {
     PLECor <- PLECor <- 0
   }
@@ -3395,7 +3461,7 @@ if(all(getCorrelations, truthfulCases != totalCases, deceptiveCases != totalCase
   totalCor <- cor(ALL_CASES_sensorTotals$grandTotal,
                   ALL_CASES_sensorTotals$criterionState)
   
-  DEC <- cor(ALL_CASES_sensorTotals$Result, 
+  DEC <- cor(ALL_CASES_sensorTotals$recodeResult, 
              ALL_CASES_sensorTotals$criterionState)
   
   print(paste0("Pneumo r: ", pneumoCor))
@@ -4014,6 +4080,7 @@ if(aggregateOutputSummaries) {
   
   # View(aggSummaryDF)
   
+  # uniform results for all scoring methods
   aggSummaryDF$unifResult <- apply(aggSummaryDF[,c(3,7,11,13,15,17,19,21,23)], 1, sum, na.rm=TRUE)
   # aggSummaryDF$unifResult <- apply(aggSummaryDF[,c(3,7,11,13,15,17,19,21,23,25)], 1, sum, na.rm=TRUE)
   
