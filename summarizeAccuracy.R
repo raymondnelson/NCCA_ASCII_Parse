@@ -2334,15 +2334,13 @@ if(isTRUE(summarizePermutation)) {
   
   # names(seriesTotalsDF) <- c("ID", "series", "testFormat", RQNames, "grandTotal", "criterionState")
   
-  PSSSummaryDF <- as.data.frame(matrix(ncol=(4+length(RQNames)), 
+  PSSSummaryDF <- as.data.frame(matrix(ncol=(5+length(RQNames)), 
                                       nrow=length(analysisLists)))
   names(PSSSummaryDF) <- c("examName", 
                           "testFormat",
                           "testResult",
+                          "postProbD",
                           RQNames,
-                          # "PAScore",
-                          # "PAPostProbT",
-                          # "PAPostProbD",
                           "criterionState" )
   # View(PSSSummaryDF)
   
@@ -2390,6 +2388,8 @@ if(isTRUE(summarizePermutation)) {
         # slice the result info for the case
         testResult <- PSSAnalysis[['PSSResult']]
         
+        PSSPostProbD <- PSSAnalysis[['PSSPostProb']]
+        
         # RQNames <- PSSAnalysis[['PSSRQNames']]
         # RQNames <- c(RQNames, rep(NA, length=4-length(RQNames)))
         
@@ -2408,10 +2408,8 @@ if(isTRUE(summarizePermutation)) {
         c(examName, 
           testFormat,
           testResult,
+          PSSPostProbD,
           RQNames,
-          # PAScore,
-          # PAPostProbT,
-          # PAPostProbD,
           criterionState )
       
     } # end j loop over series
@@ -4055,26 +4053,29 @@ if(aggregateOutputSummaries) {
   # colnames(aggSummaryDF) <- c("examName", "criterionState")
   # View(aggSummaryDF)
   
-  colnames(ESSMSummaryDF)
+  # colnames(ESSMSummaryDF)
                         
-  aggSummaryDF <- cbind(aggSummaryDF, ESSMSummaryDF[,c(13,14,8,11)])
+  aggSummaryDF <- cbind(aggSummaryDF, ESSMSummaryDF[,c(14,15,9,12)])
   
+  aggSummaryDF <- cbind(aggSummaryDF, ESSMPSummaryDF[,c(14,15,9,12)])
   
-  aggSummaryDF <- cbind(aggSummaryDF, ESSMPSummaryDF[,c(13,14,8,11)])
+  aggSummaryDF <- cbind(aggSummaryDF, OSS3SummaryDF[,c(16,17,9,10)])
+  # aggSummaryDF <- cbind(aggSummaryDF, OSS3SummaryDF[,c(16,17)])
   
-  aggSummaryDF <- cbind(aggSummaryDF, OSS3SummaryDF[,c(16,17)])
+  aggSummaryDF <- cbind(aggSummaryDF, PASummaryDF[,c(14,15,9,11)])
+  # aggSummaryDF <- cbind(aggSummaryDF, PASummaryDF[,c(14,15)])
   
-  aggSummaryDF <- cbind(aggSummaryDF, PASummaryDF[,c(12,13)])
+  aggSummaryDF <- cbind(aggSummaryDF, OSS2SummaryDF[,c(7,8,4,5)])
+  # aggSummaryDF <- cbind(aggSummaryDF, OSS2SummaryDF[,c(7,8)])
   
-  aggSummaryDF <- cbind(aggSummaryDF, OSS2SummaryDF[,c(6,7)])
+  aggSummaryDF <- cbind(aggSummaryDF, ROSSSummaryDF[,c(12,13,8,10)])
+  # aggSummaryDF <- cbind(aggSummaryDF, ROSSSummaryDF[,c(12,13)])
   
-  aggSummaryDF <- cbind(aggSummaryDF, ROSSSummaryDF[,c(12,13)])
+  aggSummaryDF <- cbind(aggSummaryDF, bootstrapSummaryDF[,c(11,12,8)])
   
-  aggSummaryDF <- cbind(aggSummaryDF, bootstrapSummaryDF[,c(11,12)])
+  aggSummaryDF <- cbind(aggSummaryDF, PSSSummaryDF[,c(10,11,4)])
   
-  aggSummaryDF <- cbind(aggSummaryDF, PSSSummaryDF[,c(9,10)])
-  
-  aggSummaryDF <- cbind(aggSummaryDF, ipsativeZSummaryDF[,c(7,8)])
+  aggSummaryDF <- cbind(aggSummaryDF, ipsativeZSummaryDF[,c(7,8,5)])
   
   aggSummaryDF <- cbind(aggSummaryDF, PCATSummaryDF[,c(21,22,13,14)])
   
@@ -4103,18 +4104,29 @@ if(aggregateOutputSummaries) {
                            "minSubTotal",
                            "OSS-3",	
                            "correctCode",	
-                           "PA",	
+                           "grandMeanPVal",
+                           "minRQPVal",
+                           "PA",
                            "correctCode",	
+                           "PAPostProbT",
+                           "PAPostProbRQSubTotT",
                            "OSS2",	
-                           "correctCode",	
+                           "correctCode",
+                           "OSS2Score",
+                           "OSS2MinSubtotalScore",
                            "ROSS", 
                            "correctCode",	
+                           "grandTotal",
+                           "lowestSubtotal",
                            "BOOT",	
-                           "correctCode",	
+                           "correctCode",
+                           "bootstrapPostProb",
                            "PSS",	
                            "correctCode",	
+                           "postProbD",
                            "ipZ",	
                            "correctCode",	
+                           "maxMeanIpZ",
                            "LXCAT",	
                            "correctCode",	
                            "grandTotal",
