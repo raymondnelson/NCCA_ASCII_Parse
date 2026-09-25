@@ -736,6 +736,9 @@ PermutationTestScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                        cutScores=cutScores,
                        flip=TRUE )
     
+    # this permutation algorithm does not translate conveniently to multiple issue
+    # test formats because all RQs and CQs are permuted from the same data bin
+    
     PSSCategoricalResult <- GTRResult$testResult
     
     PSSQuestionResults <- GTRResult$subtotalResults
