@@ -4082,7 +4082,7 @@ if(aggregateOutputSummaries) {
   # View(aggSummaryDF)
   
   # uniform results for all scoring methods
-  aggSummaryDF$unifResult <- apply(aggSummaryDF[,c(3,7,11,13,15,17,19,21,23)], 1, sum, na.rm=TRUE)
+  aggSummaryDF$unifResult <- apply(aggSummaryDF[,c(3,7,11,15,19,23,27,30,33)], 1, sum, na.rm=TRUE)
   # aggSummaryDF$unifResult <- apply(aggSummaryDF[,c(3,7,11,13,15,17,19,21,23,25)], 1, sum, na.rm=TRUE)
   
   # aggSummaryDF$unifResult <- ifelse(aggSummaryDF$unifResult==10, "TRUE",
