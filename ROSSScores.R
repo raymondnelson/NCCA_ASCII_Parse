@@ -252,7 +252,7 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
     # sum(as.numeric(RqCqDFSeries$ROSSScore), na.rm=TRUE) 
     
     # calculate the difference
-    CRDiffScore <- round(CQTotal - RQTotal, 1)
+    CRDiffScore <- round(CQTotal - RQTotal, 2)
     
   }
   
@@ -344,9 +344,9 @@ ROSSScoresFn <- function(RqCqDFSeries=RqCqDFSeries,
                        flip=FALSE )
     
     # 2026Sep24 added the two-stage rule to increase sensitivity with single issue exams
-    TRSResult <- eTSRFn(totalScore=CRDiffScore,
+    TSRResult <- eTSRFn(totalScore=CRDiffScore,
                         subtotalScores=RQDiffScores,
-                        cutScores=ROSSCutScores[1:2], 
+                        cutScores=ROSSCutScores[1:4], 
                         flip=FALSE )
     
     SSRResult <- SSRFn(subtotalScores=RQDiffScores, 
