@@ -229,9 +229,10 @@ eTSRFn <- function(totalScore=6,
   }
   # get the values needed to parse the result
   if(is.null(names(cutScores))) {
-    names(cutScores) <- c("GTDI", "GTNDI", "STDIc")
+    names(cutScores) <- c("GTDI", "GTNDI", "STDIc")[c(1:length(cutScores))]
   }
   # fix cutscore issue, coerce use of the uncorrected subtotal cutscore
+  if(!("STDI" %in% names(cutScores))) cutScores['STDI'] <- cutScores['GTDI']
   if(!("STDIc" %in% names(cutScores))) cutScores['STDIc'] <- cutScores['STDI']
   nRQ <- length(subtotalScores)
   if(is.integer(totalScore) && totalScore != sum(subtotalScores)) { 
