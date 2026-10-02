@@ -302,7 +302,7 @@ extractMeasurementsFn<- function(x=uniqueExams,
             if(answerRow > (offsetRow + 5*cps)) answerRow <- offsetRow + 1
             # Aug 5 2023 treat this as a missing answer instead
             
-            # August 4, 2006
+            # August 4, 2026
             # get the ROWAnchorROW
             # ROWAnchor is initialized in the NCCAASCII_init.R script
             ROWAnchorRow <- switch(ROWAnchor,
