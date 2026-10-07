@@ -485,17 +485,23 @@ print("init parameters for parsing and processing NCCA ASCII data")
   # can be "answer" "onset" "offset" "latency" or "EWEnd"
   # ROWStop <- "answer"
   # ROWStop <- "onset"
+  # replaced by ROWAnchor
   
   # ROWEnd is the end offset for the Response Onset Window (ROW) 
   # set as number of seconds after the ROWStop
   ROWEnd <- 5
+  # ROWEnd <- 10
   # 2026Aug04 cannot separate these yet because of the extractMeasurement.R script
   # EDAROWEnd <- 5 # canno
   # cardioROWEnd <- 5
   # ROWEnd <- 14.9
   
   # ROWAnchor can be "verbalAnswer" "stimulusEnd" "stimulusBegin" "latency" or "EWEnd"
+  # this replaces ROWStop, 
+  # but is still called ROWStop in the envir.params list that is passed to 
+  # the feature extraction functions
   ROWAnchor <- "verbalAnswer"
+  # ROWAnchor <- "stimulusBegin"
   # 2026Aug04 cannot separate these yet because of the extractMeasurement.R script
   # EDAROWAnchor <- "verbalAnswer"
   # cardioROWAnchor <- "verbalAnswer"
