@@ -357,6 +357,8 @@ artifactProcFn<- function(x=uniqueExams) {
               # which(chartDF$Move1_a == "Artifact")
               # commented out April 12, 2025
               
+              # source(file.path(RPath, "newActivityCheck.R"), echo=FALSE)
+              
               # April 12, 2025 new function is more efficient
               chartDF <- newActivityCheckFn(chartDF=chartDF)
               
