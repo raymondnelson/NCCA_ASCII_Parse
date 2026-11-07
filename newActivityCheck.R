@@ -19,13 +19,13 @@
 
 
 activityRestrictionFn <- function(DAT=chartDF$c_Move1Proc, w=3.75, y=(scaleVals['activity']/3), seg=10) {
-
   # R function to extract artifact from seat activity sensor data
   # activity restriction artifacts occur when an examinee remains unusually still 
-  # such as when holding one's breath
+  # such as when holding one's breath (apnea)
   # April 8, 2025
+  # October 22, 2026
   # Raymond Nelson
-  ###
+  ####
   # DAT is the smoothed time series data for the seat activity sensor
   # w is the width in seconds for a moving window 
   # a respiration rate of 16 (median) will have 3.75 sec cycles
@@ -53,16 +53,17 @@ activityRestrictionFn <- function(DAT=chartDF$c_Move1Proc, w=3.75, y=(scaleVals[
     }
   }
   which(outVc != "0")
-  # end activityRestrictionFn()
-}
+} # end activityRestrictionFn()
 
 
 
-activityDBFn <- function(DAT=chartDF$c_Move1Proc, inF=1.5, outF=3, fences="both", side="both") {
+activityTukeyFn <- function(DAT=chartDF$c_Move1Proc, inF=1.5, outF=3, fences="both", side="both") {
   # R function to extract deep breaths from the seat activity sensor data
   # using a Tukey fence method
   # by extracting the inhalation peaks and comparing them to the median and the interquartile range
+  # this function can also extract downward activity due to physical movement
   # April 8, 2025
+  # October 27, 2026
   # Raymond Nelson
   ####
   # DAT input is a time series vector for a chart (X to XX)
@@ -124,8 +125,7 @@ activityDBFn <- function(DAT=chartDF$c_Move1Proc, inF=1.5, outF=3, fences="both"
   } 
   ## output
   return(pkVc)
-  # end activityDBFn()
-}
+} # end activityTukeyFn()
 
 
 
@@ -134,6 +134,7 @@ activityPatternFn <- function(DAT=chartDF$c_Move1Max, limit=q50, side="lower") {
   # using the quartile values and peak-to-peak lines
   # by extracting the inhalation peaks and comparing them to the median and the interquartile range
   # March 8, 2025
+  # October 25, 2026
   # Raymond Nelson
   ####
   #
@@ -159,8 +160,7 @@ activityPatternFn <- function(DAT=chartDF$c_Move1Max, limit=q50, side="lower") {
   } else {
     print("side must be either upper or lower")
   }
-  # end activityPatternFn()
-}
+} # end activityPatternFn()
 
 
 
@@ -169,6 +169,7 @@ tonicActivityFn <- function(DAT=chartDF$c_Move1ProcMA, q25, q75) {
   # using the median value and interquartile range
   # by extracting the inhalation peaks and comparing them to the median and the interquartile range
   # April 10, 2025
+  # October 29, 206
   # Raymond Nelson
   ####
   # DAT is the tonic activity line, obtained by smoothing the seat activity sensor data
@@ -188,8 +189,7 @@ tonicActivityFn <- function(DAT=chartDF$c_Move1ProcMA, q25, q75) {
   tncVal[(which(tncVal[1:(length(tncVal)-1)] == tncVal[2:length(tncVal)]) + 1)] <- 0
   # output
   return( which(tncVal != 0) )
-  # end tonicActivityFn()
-}
+} # end tonicActivityFn()
 
 
 
@@ -197,6 +197,7 @@ activityAmplitudeFn <- function(x, y) {
   # R function to extract changes in sea actitvity data using min-peak and max-peak lines
   # by comparing the difference to the interquartile range
   # April 22, 2025
+  # October 20, 2026
   # Raymond Nelson
   ####
   # x is a time series vector
@@ -212,8 +213,7 @@ activityAmplitudeFn <- function(x, y) {
   # significant reduction of amplitude is defined using the IQR
   ####
   return( which(x < y) )
-  # end activityAmplitudeFn()
-}
+} # end activityAmplitudeFn()
 
 
 
@@ -224,7 +224,8 @@ activityAmplitudeFn <- function(x, y) {
 newActivityCheckFn <- function(chartDF=chartDF) {
   # R function to extract phyiscal activity artifacts from seat activity sensor data
   # Raymond Nelson
-  # April 20225
+  # April 2025
+  # October 18, 2026
   ####
   # main function to check for significant physical activity 
   # input is the chartDF
@@ -334,10 +335,10 @@ newActivityCheckFn <- function(chartDF=chartDF) {
     DBVc2 <- NULL
     DBVc3 <- NULL
     
-    #s inhalation peaks only
-    # call a function to locate deep breaths that influence the activity sensor data
+    # call a function to locate deep breaths (inhalation) that influence the activity sensor data
     # DBVc1 <- activityDBFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="both")
     
+    # inhalation peaks only
     DBVc2 <- activityDBFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="upper")
     
     # 2025Apr21 use the exhalation peaks to improve sensitivity to movement artifacts
@@ -352,7 +353,7 @@ newActivityCheckFn <- function(chartDF=chartDF) {
     # DBVc <- NULL
   }
   
-  #### 2. activity restriction events #### 
+  #### 2. activity restriction (apnea) events #### 
   
   {
     ## cessation of normal movement activity during respiration apnea and other unusual behavior ##
@@ -392,11 +393,11 @@ newActivityCheckFn <- function(chartDF=chartDF) {
   {
     ## compare a slow moving average to the interquartile range
     
-    # 2025Apr26 not effective at locating activity artifacts
+    # 2025Apr26 minimally effective at locating activity artifacts
     
     tncVc <- NULL
     
-    # tncVc <- tonicActivityFn(DAT=chartDF$c_Move1ProcMA, q25=q25, q75=q75)
+    tncVc <- tonicActivityFn(DAT=chartDF$c_Move1ProcMA, q25=q25, q75=q75)
   }
   
   #### 5. compare the activity amplitude to the IQR ####
@@ -404,9 +405,9 @@ newActivityCheckFn <- function(chartDF=chartDF) {
   {
     ampVc <- NULL
     
-    # 2025Apr26 not effective at 
+    # 2025Apr26 minimally effective at 
       
-    # ampVc <- activityAmplitudeFn(x=(chartDF$c_Move1Max - chartDF$c_Move1Min), y=iqr/3)
+    ampVc <- activityAmplitudeFn(x=(chartDF$c_Move1Max - chartDF$c_Move1Min), y=iqr/3)
     
     # remove artifacts associated with the verbal answer
     # ampVc <- ampVc[which(!(ampVc %in% answerBuffer))]
