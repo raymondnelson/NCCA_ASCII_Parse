@@ -78,7 +78,7 @@ lowPass2hz.2ndFn <- function(x, GAIN = 2.97868961737845e+001, zplane0 = -0.55326
   # 2nd order Butterworth low-pass filter
   # May 11, 2025
   # Raymond Nelson
-  # used to remove high
+  # used to remove high frequency noise
   # and improve the initial calculation/estimation of the cardio and respiration rate
   # the cyclic rate estimate is used to set the buffer length 
   # that is used for accurate peak extraction
