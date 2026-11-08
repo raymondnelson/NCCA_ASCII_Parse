@@ -56,10 +56,9 @@ respTonicInstabilityFn <- function(q25, q75, mid) {
   q25 <- q25[1]
   q75 <- q75[1]
   iqr <- q75 - q25
-  
+  # set the upper and lower fences
   ifU <- q75 # + (.5 * iqr) 
   ifL <- q25 # - (.5 * iqr)
-  
   # locate rows where the midline exceeds the 25th percentile
   upLimit <- which(mid >= ifU)
   # locate rows where the midline exceeds the 75th percentile
@@ -119,42 +118,33 @@ respDesyncFn <- function(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="b
   # plot.ts(diffVc)
   # plot.ts(tsUP)
   # plot.ts(tsLP)  
-  
-  # artifa
-  
-  # adjust the data vector by removing the 1st and last sample rows
+  ## adjust the data vector by removing the 1st and last sample rows
   diffVc <- diffVc[2:(length(diffVc)-1)]
   # diffVc must be the same length as the time series data
   names(diffVc) <- NULL
-  # compute the quantiles
-  
-  # compute the quantiles
+  ## compute the quantiles
   q1 <- quantile(diffVc, .25)
   qm <- quantile(diffVc, .5)
   q3 <- quantile(diffVc, .75)
-  # compute the interquartile range of absolute mean differences.
+  ## compute the interquartile range of absolute mean differences.
   iqr <- abs(q3 - q1)
-  
-  # diffVc must be the same length as the time series data
+  ## diffVc must be the same length as the time series data
   diffVc <- c(qm, diffVc, qm)
-  
-  # adjust the min and max IQR to stabilize sensitivity
+  ## adjust the min and max IQR to stabilize sensitivity
   # the IQR will get very small, leading to increased sensitivity with stable data
   # the IQR will get large with unstable data, leading to reduced sensitivity
   minIQR <- scaleVals['uPneumo'] * .33
   if(iqr <= minIQR) iqr <- minIQR
   maxIQR <- scaleVals['uPneumo'] * .67
   if(iqr >= maxIQR) iqr <- maxIQR
-  
-  # set the Tukey fences
+  ## set the Tukey fences
   # inner fences
   lfI <- q1 - (inF * iqr)
   ufI <- q3 + (inF * iqr)
-  # outer fences
+  ## outer fences
   lfO <- q1 - (outF * iqr)
   ufO <- q3 + (outF * iqr)
-  
-  # compare the diffVc to the tukey fences 
+  ## compare the diffVc to the tukey fences 
   if(fences=="inner") {
     # inner fences
     if(side=="upper") {
@@ -248,10 +238,9 @@ respActivityArtifactFn2 <- function(tsData=tsDataUp, tsMid=tsMid, offset=0) {
   # exclude the first and last indices
   maxPeaks <- maxPeaks[!(maxPeaks %in% c(1, length(tsData)))]
   minPeaks <- minPeaks[!(minPeaks %in% c(1, length(tsData)))]
-  
+  ### check for very small changes in slope at the inhalation or exhalation lines
   {
     # Oct 15, 2024
-    # check for very small changes in slope at the inhalation or exhalation lines
     minMaxPeaks <- sort(unique(c(maxPeaks, minPeaks)))
     minMaxPeaks2 <- minMaxPeaks
     minMaxVals <- tsData[minMaxPeaks2]
@@ -263,7 +252,6 @@ respActivityArtifactFn2 <- function(tsData=tsDataUp, tsMid=tsMid, offset=0) {
     maxPeaks <- maxPeaks[maxPeaks %in% minMaxPeaks2]
     minPeaks <- minPeaks[minPeaks %in% minMaxPeaks2]
   }
-  
   ### max peaks below the mid line
   sigMax <- which((tsData[maxPeaks] - offset) <= tsMid[maxPeaks])
   ### min peaks above the mid line
@@ -311,7 +299,7 @@ respApneaFn <- function(x=segmentDF$c_UPneumoSm, w=3.75, y=20, seg=4) {
   # an artifact is marked if the abs sum y distance is less than y for each w segment
   # seg is the number of measurements to check for each 3.75 sec segment
   # artifacts are indicated when the segmented excursion length is less than y
-  ##
+  ###
   # initialize an output vector
   outVc <- rep(0, length(x))
   # initialize the length of an apnea segment
@@ -442,24 +430,21 @@ respDBFn2 <- function(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3,
   # q25 is the 25th quantile for the time series data
   # q50 is the 50th quantile
   # q75 is the 75th quantile 
-  # inF is the inner Tukey fence
-  # outF is the outer Tukey fence
+  # inF is the distance to the inner Tukey fence, in multiples of the iqr
+  # outF is the distance to the outer Tukey fence, in multiples of the iqr
   # fences can be "inner" "outer" or "both"
   # side can be "upper" "lower" or "both"
   # output is a vector of 0's with significant points indicated by the value 1
   ###
   # plot.ts(x)
-  ### initialize the output vector
+  ## initialize the output vector
   outVc <- NULL
-  
   ### calculate the interquartile range
   q3 <- q75[1]
   q2 <- q50[1]
   q1 <- q25[1]
   iqr <- abs(q3 - q1)
-  
-  ### fix the iqr for very stable or very unstable data
-  
+  ## fix the iqr for very stable or very unstable data
   {
     # sensitivity to DBs increases when the respiration data are very stable
     # this occurs because the iqr becomes restricted as a result of little variation
@@ -475,26 +460,23 @@ respDBFn2 <- function(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3,
     # commented out 2026Mar01
     # if(iqr >= maxIQR) iqr <- maxIQR
   }
-  
-  ### call a function to get the inhalation peaks peaks
+  ## call a function to get the inhalation peaks peaks
   maxPeaks <- maxPeak(x)
-  # remove the first and last peaks
+  ## remove the first and last peaks
   maxPeaks <- maxPeaks[!(maxPeaks %in% c(1,length(x)))]
-  # remove peaks that are below the median
+  ## remove peaks that are below the median
   maxPeaks <- maxPeaks[x[maxPeaks] >= rep(q2, times=length(maxPeaks))]
-  ### get the peak values
-  # DAT <- (x[maxPeaks] - rep(2, times=length(maxPeaks)))
+  ## get the peak values
+  ## DAT <- (x[maxPeaks] - rep(2, times=length(maxPeaks)))
   DAT <- x[maxPeaks]
-  
-  ### 
+  ## set the Tukey fences
   # inner fences
   lfI <- q1 - (inF * iqr)
   ufI <- q3 + (inF * iqr)
   # outer fences
   lfO <- q1 - (outF * iqr)
   ufO <- q3 + (outF * iqr)
-  
-  ### compare the data values to the tukey fences
+  ## compare the data values to the tukey fences
   if(fences=="inner") {
     # inner fences
     if(side=="upper") {
@@ -526,8 +508,7 @@ respDBFn2 <- function(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3,
       pkVc <- sort(unique(c(which(DAT<=lfI), which(DAT>=ufI), which(DAT<=lfO), which(DAT>=ufO))))
     }
   }
-  ### output ###
-  # ouput only the peak rows that exceed the tukey fences
+  ## ouput only the peak rows that exceed the tukey fences
   outVc <- maxPeaks[pkVc]
   return(outVc)
   # end respDBFn2()
@@ -654,20 +635,16 @@ baselineInstablityFn2 <- function(x=tsDataLp, q25=q25U, q50=q50U, q75=q75U, inF=
   # output is a vector of 0's with significant points indicated by the value 1
   ###
   # plot.ts(x)
-  ### initialize the output vector
+  ## initialize the output vector
   outVc <- NULL
-  
-  ### calculate the quartiles
+  ## calculate the quartiles
   q1 <- q25[1]
   qm <- q50[1]
   q3 <- q75[1]
   # compute the interquartile range of absolute mean differences.
   iqr <- (q3 - q1)
-  
-  ### fix the iqr for very stable or very unstable data
-  
+  ## fix the iqr for very stable or very unstable data
   {
-    ###
     # sensitivity to baseline changes increases when the respiration data are very stable
     # this occurs because the iqr becomes restricted as a result of little variation
     # to reduce hypersensitivity a min iqr value 
@@ -680,25 +657,23 @@ baselineInstablityFn2 <- function(x=tsDataLp, q25=q25U, q50=q50U, q75=q75U, inF=
     maxIQR <- scaleVals['uPneumo'] * .67
     if(iqr >= maxIQR) iqr <- maxIQR
   }
-  
-  ### call a function to get exhalation peaks
+  ## call a function to get exhalation peaks
   # minPeak function is in the sigProcHelper.R script
   minPeaks <- minPeak(x)
-  # remove the first and last peaks
+  ## remove the first and last peaks
   minPeaks <- minPeaks[!(minPeaks %in% c(1,length(x)))]
-  # remove peaks that are above the mid line
+  ## remove peaks that are above the mid line
   minPeaks <- minPeaks[x[minPeaks] <= rep(qm, times=length(minPeaks))]
-  # calculate the difference in peak values
+  ## calculate the difference in peak values
   DAT <- x[minPeaks]
-  
-  ### initialize the Tukey fences
-  # inner fences
+  ## initialize the Tukey fences
+  ## inner fences
   lfI <- q1 - (inF * iqr)
   ufI <- q3 + (inF * iqr)
-  # outer fences
+  ## outer fences
   lfO <- q1 - (outF * iqr)
   ufO <- q3 + (outF * iqr)
-  ### compare the data to the Tukey fences
+  ## compare the data to the Tukey fences
   # if(!exists("fences")) fences <- "outer"
   # if(!exists("side")) side <- "both"
   if(fences=="inner") {
@@ -732,8 +707,7 @@ baselineInstablityFn2 <- function(x=tsDataLp, q25=q25U, q50=q50U, q75=q75U, inF=
       pkVc <- sort(unique(c(which(DAT<=lfI), which(DAT>=ufI), which(DAT<=lfO), which(DAT>=ufO))))
     }
   }
-  ### output ###
-  # ouput only the peak rows that exceed the tukey fences
+  ## ouput only the peak rows that exceed the tukey fences
   outVc <- minPeaks[pkVc]
   return(outVc)
   # end baselineInstablityFn2()
@@ -754,9 +728,7 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
   # R Function to check for respiration artifacts during feature extraction
   # August 28, 2023 
   # Raymond Nelson 
-  # 
   #### 
-  # 
   # segmentDF is a data frame with the time series data and event markers for a stimulus segment
   # input time series data includes 10sec prestim, 15 sec stimulus segment, and 10sec poststim
   #
@@ -766,7 +738,6 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
   # artifacted indices are are indicated with the "Artifact" message
   # 
   # this function is called by the pneumoExtractFn() in the PneumoExtract.R script
-  #
   ####
   
   {
@@ -1188,8 +1159,6 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
     outVcDF$outVcL[baselineArtifactsLp] <- "ArtifactBL"
 
   }
-  
-  
   
   #### exclude respiration artifacts in the poststimulus segment 
   
