@@ -5,16 +5,16 @@
 # 
 # activityRestrictionFn() # ceasation of activity due to breath holding
 # 
-# activityDBFn() # deep breath activity that influences the activity sensor data
+# activityTukeyFn() # deep breath activity that influences the activity sensor data
 # 
 # activityPatternFn() # significant changes in normal activity pattern
-#
+# 
 # tonicActivityFn() # significant changes in tonic activity level
-#
+# 
 # activityAmplitudeFn() # signficant reduction in activity amplitude
-#
+# 
 # newActivityCheckFn() # main function
-#
+# 
 ####
 
 
@@ -336,13 +336,13 @@ newActivityCheckFn <- function(chartDF=chartDF) {
     DBVc3 <- NULL
     
     # call a function to locate deep breaths (inhalation) that influence the activity sensor data
-    # DBVc1 <- activityDBFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="both")
+    # DBVc1 <- activityTukeyFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="both")
     
     # inhalation peaks only
-    DBVc2 <- activityDBFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="upper")
+    DBVc2 <- activityTukeyFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="upper")
     
     # 2025Apr21 use the exhalation peaks to improve sensitivity to movement artifacts
-    DBVc3 <- activityDBFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="lower")
+    DBVc3 <- activityTukeyFn(DAT=chartDF$c_Move1Proc, inF=inF, outF=outF, fences="outer", side="lower")
     
     # combine them
     DBVc <- sort(unique(c(DBVc1, DBVc2, DBVc3))) 
