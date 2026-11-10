@@ -176,7 +176,7 @@ respDesyncFn <- function(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="b
       sigVc <- sort(unique(c(which(diffVc<=lfI), which(diffVc>=ufI), which(diffVc<=lfO), which(diffVc>=ufO))))
     }
   }
-  ## output ##
+  ## output
   # remove artifacts at the first or last data row
   sigVc <- sigVc[!(sigVc %in% c(1, length(diffVc)))]
   return(sigVc)
