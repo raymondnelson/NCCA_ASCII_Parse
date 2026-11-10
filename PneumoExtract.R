@@ -290,10 +290,10 @@ pneumoExtractFn <- function(segmentDF=segmentDF,
     # source("~/Dropbox/R/NCCA_ASCII_Parse/checkPneumoArtifacts.R", echo=FALSE)
     
     # call a function to check for artifacts  
-    artifactResultDF <- checkPneumoArtifactsFn(responseOnsetRow=responseOnsetRow,
+    artifactResultDF <- checkPneumoArtifactsFn(DAT=segmentDF,
                                                responseEndRow=responseEndRow,
                                                answerRow=answerRow,
-                                               segmentDF=segmentDF ) 
+                                               responseOnsetRow=responseOnsetRow ) 
     
     # View(artifactResultDF)
     
