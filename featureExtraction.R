@@ -659,7 +659,7 @@ featureExtraction <- function(x=uniqueExams,
             segmentDF <- pneumoExtractFn(segmentDF=segmentDF,
                                          extract.params=extract.params,
                                          tRate=UPMeasurement,
-                                         aRate=LPMeasurement)
+                                         aRate=LPMeasurement )
             # pneumoExtractFn is called once to measure both the thoracic and abdominal respiration
             
             # # these are the measurement values
