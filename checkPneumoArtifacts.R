@@ -419,7 +419,7 @@ respApneaFn <- function(x=segmentDF$c_UPneumoSm, w=3.75, y=20, seg=4) {
 
 
 
-respDBFn2 <- function(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3, fences="inner", side="upper") {
+respDBFn2 <- function(x=tsData, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3, fences="inner", side="upper") {
   # R function to extract deep breaths from the respiration data 
   # using a Tukey fence method
   # by extracting the inhalation peaks and comparing them to the median and the interquartile range
@@ -720,59 +720,76 @@ baselineInstablityFn2 <- function(x=tsDataLp, q25=q25U, q50=q50U, q75=q75U, inF=
 
 
 
-checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
+checkPneumoArtifactsFn <- function(DAT=segmentDF,
+                                   responseOnsetRow=NULL,
                                    responseEndRow=NULL,
-                                   answerRow=NULL,
-                                   segmentDF=segmentDF 
-                                   ) { 
+                                   answerRow=NULL ) { 
   # R Function to check for respiration artifacts during feature extraction
   # August 28, 2023 
   # Raymond Nelson 
   #### 
-  # segmentDF is a data frame with the time series data and event markers for a stimulus segment
-  # input time series data includes 10sec prestim, 15 sec stimulus segment, and 10sec poststim
+  # DAT is a data frame with the time series data and event markers
+  # DAT needs to include the centered and smoothed columns
+  # for thoracic and abdominal respiration data,
+  # and other sensors,
+  # in addition to the time scale, sample index column and events a stimulus segment
+  #
+  # DAT can be the segmentDF, 
+  # with 10sec prestim, 15 sec stimulus segment, and 10sec poststim
+  # 
+  # DAT can also be the chartDF,
+  # with all events, instructions, and annotations
   #
   # this function makes use of both thoracic and abdominal sensor data
+  # c_UPneumoSm
+  # c_LPneumoSm
   #
-  # output is a vector of 0s the same length as the segmentDF
+  # output is a vector of 0s the same length as the DAT
   # artifacted indices are are indicated with the "Artifact" message
   # 
-  # this function is called by the pneumoExtractFn() in the PneumoExtract.R script
+  # this function is called by the pneumoExtractFn() in the PneumoExtract.R script,
+  # during feature extraction
+  #
+  # November 9, 2026
+  # modified to work with the chartDF,
+  # so it can be called prior to feature extraction,
+  # in this way, artifacts can be extracted from all events, 
+  # not limited to RQs and CQs
   ####
   
   {
-    examName <- segmentDF$examName[1]
-    seriesName <- segmentDF$seriesName[1]
-    chartName <- segmentDF$chartName[1]
+    examName <- DAT$examName[1]
+    seriesName <- DAT$seriesName[1]
+    chartName <- DAT$chartName[1]
     sensorName <- "pneumo"
   }
   
   {
     # get the respiration data
-    tsDataUp <- segmentDF$c_UPneumoSm
-    tsDataLp <- segmentDF$c_LPneumoSm
+    tsDataUp <- DAT$c_UPneumoSm
+    tsDataLp <- DAT$c_LPneumoSm
     
 	# compute the distance between the thoracic and abdominal data
     diffVc <- (tsDataUp - tsDataLp)
     
     # get the mid lines
-    tsMidU <- segmentDF$c_UPneumoMid
-    tsMidL <- segmentDF$c_LPneumoMid
+    tsMidU <- DAT$c_UPneumoMid
+    tsMidL <- DAT$c_LPneumoMid
     
     # get the quantile lines
-    q25U <- segmentDF$c_UPneumo_Q25
-    q50U <- segmentDF$c_UPneumo_Q50
-    q75U <- segmentDF$c_UPneumo_Q75
+    q25U <- DAT$c_UPneumo_Q25
+    q50U <- DAT$c_UPneumo_Q50
+    q75U <- DAT$c_UPneumo_Q75
     
-    q25L <- segmentDF$c_LPneumo_Q25
-    q50L <- segmentDF$c_LPneumo_Q50
-    q75L <- segmentDF$c_LPneumo_Q75
+    q25L <- DAT$c_LPneumo_Q25
+    q50L <- DAT$c_LPneumo_Q50
+    q75L <- DAT$c_LPneumo_Q75
     
     # get the inhalation and exhalation lines
-    tsInhU <- segmentDF$c_UPneumoInh
-    tsInhL <- segmentDF$c_LPneumoInh
-    tsExhU <- segmentDF$c_UPneumoExh
-    tsExhL <- segmentDF$c_LPneumoExh
+    tsInhU <- DAT$c_UPneumoInh
+    tsInhL <- DAT$c_LPneumoInh
+    tsExhU <- DAT$c_UPneumoExh
+    tsExhL <- DAT$c_LPneumoExh
     
     # plot.ts(tsInhU)
     # plot.ts(tsMidU)
@@ -798,7 +815,7 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
     assign("responseOnsetRow", responseOnsetRow, envir=.GlobalEnv)
     assign("responseEndRow", responseEndRow, envir=.GlobalEnv)
     assign("answerRow", answerRow, envir=.GlobalEnv)
-    assign("segmentDF", segmentDF, envir=.GlobalEnv)
+    assign("segmentDF", DAT, envir=.GlobalEnv)
     assign("chartName", chartName, envir=.GlobalEnv)
     assign("seriesName", seriesName, envir=.GlobalEnv)
     assign("examName", examName, envir=.GlobalEnv)
@@ -857,6 +874,8 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
       # make sure the answer buffer does not exceed the segment data frame
       if(ansBuffOn < 1) ansBuffOn <- 1
       if(ansBuffOff > nrow(segmentDF)) ansBuffOff <- nrow(segmentDF)
+      # if(any(ansBuffOn < 1)) ansBuffOn[which(ansBuffOn < 1)] <- 1
+      # if(any(ansBuffOff > nrow(DAT))) ansBuffOff[which(ansBuffOff > nrow(DAT))] <- nrow(DAT)
       ansBuffRows <- c(ansBuffOn:ansBuffOff)
     } else {
       ansBuffRows <- NULL
@@ -918,7 +937,7 @@ checkPneumoArtifactsFn <- function(responseOnsetRow=NULL,
     artifactRowsDesync <- respDesyncFn(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="both")
 
     # if(length(artifactRowsDesync) > 0) {
-    #   assign("segmentDF", segmentDF, envir=.GlobalEnv)
+    #   assign("segmentDF", DAT, envir=.GlobalEnv)
     #   stop()
     # }
 
