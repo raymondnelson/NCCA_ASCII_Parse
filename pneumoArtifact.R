@@ -14,6 +14,9 @@
 
 pneumoArtifactFn <- function(x=chartDF) {
   # R function to identify respiration artifacts 
+  # 2-28-2017
+  # 2025
+  # Raymond Nelson
   
   chartDF <- x
   
