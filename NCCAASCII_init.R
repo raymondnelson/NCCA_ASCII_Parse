@@ -286,7 +286,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
     ## these are used by the feature extraction functions 
     
     artifactPneumo <- TRUE
-    # artifactPneumo <- FALSE
+    artifactPneumo <- FALSE
     
     artifactCardio <- TRUE
     # artifactCardio <- FALSE
@@ -305,7 +305,7 @@ print("init parameters for parsing and processing NCCA ASCII data")
     ## these parameters (below) are used by the artifactProc function 
     ## in the artifactProc.R script
     
-    pneumoArtifacts <- FALSE
+    pneumoArtifacts <- TRUE
     
     cardioArtifacts <- FALSE
    
