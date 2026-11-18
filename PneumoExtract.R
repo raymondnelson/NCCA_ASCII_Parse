@@ -103,9 +103,9 @@ pneumoExtractFn <- function(segmentDF=segmentDF,
     segmentDF$UPneumoMeasure <- 0
     segmentDF$LPneumoMeasure <- 0
     
-    segmentDF$UPneumo_a <- "0"
-    segmentDF$LPneumo_a <- "0"
-    segmentDF$Artifacts_a <- "0"
+    # segmentDF$UPneumo_a <- "0"
+    # segmentDF$LPneumo_a <- "0"
+    # segmentDF$Artifacts_a <- "0"
   }
   
   {
@@ -289,32 +289,52 @@ pneumoExtractFn <- function(segmentDF=segmentDF,
     
     # source("~/Dropbox/R/NCCA_ASCII_Parse/checkPneumoArtifacts.R", echo=FALSE)
     
+    # segmentDF$UPneumo_a <- "0"
+    # segmentDF$LPneumo_a <- "0"
+    # segmentDF$Artifacts_a <- "0"
+    
     # call a function to check for artifacts  
-    artifactResultDF <- checkPneumoArtifactsFn(DAT=segmentDF,
-                                               responseEndRow=responseEndRow,
-                                               answerRow=answerRow,
-                                               responseOnsetRow=responseOnsetRow ) 
+    artifactResultDF <- checkPneumoArtifactsFn(DAT=segmentDF ) 
+    # artifactResultDF is a data frame with 2 columns,
+    # for artifacts in the thoracic and abdominal sensor
     
     # View(artifactResultDF)
     
-    # exclude the first sample and last sample
+    # exclude the first sample and last sample for both columns
     artifactResultDF[c(1,nrow(artifactResultDF)),] <- "0"
     
+    # get the artifact indices for the upper and lower pneumo sensors
     artifactRowsUp <- which(artifactResultDF$outVcU != "0")
     artifactRowsLp <- which(artifactResultDF$outVcL != "0")
-    
-    # select which artifacts to share with other sensors
-    # shareArtifacts <- c("ArtifactDB", "ArtifactAP")
-    shareArtifacts <- c("ArtifactBDB", "ArtifactAP")
     
     # combine the artifacts for upper and lower
     artifactRows2 <- sort(unique(c(artifactRowsUp, artifactRowsLp)))
     
-    # combine sharedartifacts from thoracic and abdominal sensors
-    # retain only deep breath and apnea artifacts to share with other sensors
-    artifactRowsUpS <- which(artifactResultDF$outVcU %in% shareArtifacts)
-    artifactRowsLpS <- which(artifactResultDF$outVcL %in% shareArtifacts)
-    artifactRowsS <- sort(unique(c(artifactRowsUpS, artifactRowsLpS)))
+    artifactResultDF$outVcU[artifactRowsUp]
+    
+    {
+      # select which artifacts to share with other sensors
+      # shareArtifacts <- c("ArtifactDB", "ArtifactAP")
+      shareArtifacts <- c("ArtifactBDB", "ArtifactAP")
+      # not shared 
+      # ArtifactDS - desynchronization
+      # ArtifactTonicity - tonicity (midline)
+      # ArtifactInst - instability (peak points)
+      # ArtifactBU ArtifactBL - biting and other activity, upper and lower
+      # ArtifactDBU ArtifactDBL - deep breaths, upper and lower (inner fence)
+      # ArtifactBDB - big deep breaths (outer fence), combined upper and lower
+      # ArtifactAP - apnea, combined upper and lower
+      # ArtifactBLU ArtifactBLU - baseline artifact (answer), upper and lower
+      
+      
+      
+      # combine sharedartifacts from thoracic and abdominal sensors
+      # retain only deep breath and apnea artifacts to share with other sensors
+      artifactRowsUpS <- which(artifactResultDF$outVcU %in% shareArtifacts)
+      artifactRowsLpS <- which(artifactResultDF$outVcL %in% shareArtifacts)
+      # combine the shared artifacts
+      artifactRowsS <- sort(unique(c(artifactRowsUpS, artifactRowsLpS)))
+    }
     
     # exclude artifact marks during the normal answer distortion artifacts
     # before sharing the artifacts with other sensors
