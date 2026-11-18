@@ -142,13 +142,13 @@
     # to work with the auto EDA output from LXSoftware
     showEA <- FALSE
     
-    # show tracing baselines
+    # show tracing baselines (y-axis offset values)
     showBaselines <- TRUE
     showBaselines <- FALSE
     
     # show peak to peak lines
     showPeakLines <- TRUE
-    showPeakLines <- FALSE
+    # showPeakLines <- FALSE
     
     showQuartileLines <- TRUE
     # showQuartileLines <- FALSE
@@ -1241,6 +1241,8 @@ for(i in 1:length(uniqueExams)) {
         
         {
           
+          ## cardio artifacts can sometimes exceed the max or min y-axis limits
+          
           # upper limit
           fixThese <- which(chartDF$c_Cardio1 >= yMax)
           chartDF$c_Cardio1[fixThese] <- yMax
@@ -1263,7 +1265,7 @@ for(i in 1:length(uniqueExams)) {
           # upper pneumo data
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoSm), color="blue3", linewidth=.4) # + coord_cartesian(ylim=c(yMin, yMax))
           # mid line
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoMid), color="blue3", linewidth=.15, alpha=.5) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoMid), color="blue3", linewidth=.15, alpha=.8) # + coord_cartesian(ylim=c(yMin, yMax))
           if(showPeakLines) {
             # inhalation exhalation lines
             g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_UPneumoInh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
@@ -1283,8 +1285,8 @@ for(i in 1:length(uniqueExams)) {
             uPnInnerFenceLower <- uPnQ1 - (1 * uPnIQR)
             uPnOuterFenceUpper <- uPnQ3 + (2 * uPnIQR)
             uPnOuterFenceLower <- uPnQ1 - (2 * uPnIQR)
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceUpper), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceLower), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceUpper), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnInnerFenceLower), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnOuterFenceUpper), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=uPnOuterFenceLower), color="red", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           }
@@ -1296,7 +1298,7 @@ for(i in 1:length(uniqueExams)) {
           # lower pneumo data
           g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoSm), color="blue4", linewidth=.4) # + coord_cartesian(ylim=c(yMin, yMax))
           # mid line
-          # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoMid), color="blue4", linewidth=.15, alpha=.5) # + coord_cartesian(ylim=c(yMin, yMax))
+          g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoMid), color="blue4", linewidth=.15, alpha=.8) # + coord_cartesian(ylim=c(yMin, yMax))
           if(showPeakLines) {
             # inhalation exhalation lines
             g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=c_LPneumoInh), color="grey60", linewidth=.1, alpha=.75) # + coord_cartesian(ylim=c(yMin, yMax))
@@ -1316,8 +1318,8 @@ for(i in 1:length(uniqueExams)) {
             lPnInnerFenceLower <- lPnQ1 - (1 * lPnIQR)
             lPnOuterFenceUpper <- lPnQ3 + (2 * lPnIQR)
             lPnOuterFenceLower <- lPnQ1 - (2 * lPnIQR)
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceUpper), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
-            g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceLower), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceUpper), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
+            # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnInnerFenceLower), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnOuterFenceUpper), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
             # g <- g + geom_line(data=chartDF, aes(x=(1:nrow(chartDF)), y=lPnOuterFenceLower), color="orange", linewidth=.125, alpha=.6) # + coord_cartesian(ylim=c(yMin, yMax))
           }
