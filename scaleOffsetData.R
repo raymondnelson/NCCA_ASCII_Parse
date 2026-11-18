@@ -284,10 +284,15 @@ ScaleOffsetDataFn <- function(x=uniqueExams,
             # compute the additional pneumo channels
             # chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumoSm, y=round(7.5*cps,0), times=4) # was y=40, times=8 11/19/2015
             # chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumoSm, y=round(9*cps,0), times=12) # was y=40, times=8 11/19/2015
-            chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumoSm, y=round(25*cps), times=4) # was y=40, times=8 11/19/2015
+            # chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumoSm, y=round(25*cps, 0), times=4) # was y=25, times=4 11/6/2026
+            chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumoSm, y=round(7.5*cps, 0), times=1)
+            # remove more of the remaining inhalation/exhalation signal
+            chartDF$c_UPneumoMid <- MASmooth(x=chartDF$c_UPneumoMid, y=round(2*cps, 0), times=1)
             
-            # chartDF$c_LPneumoMid <- MASmooth(x=chartDF$c_LPneumoSm, y=round(7.5*cps,0), times=4)
-            chartDF$c_LPneumoMid <- MASmooth(x=chartDF$c_LPneumoSm, y=round(25*cps), times=4)
+            # chartDF$c_LPneumoMid <- MASmooth(x=chartDF$c_LPneumoSm, y=round(25*cps,0), times=4) # was y=25, times=4 11/6/2026
+            chartDF$c_LPneumoMid <- MASmooth(x=chartDF$c_LPneumoSm, y=round(7.5*cps, 0), times=1)
+            # remove more of the remaining inhalation/exhalation signal
+            chartDF$c_LPneumoMid <- MASmooth(x=chartDF$c_LPneumoMid, y=round(2*cps, 0), times=1)
             
             # calculate the inhalation and exhalation lines by calling the maxPeak() and mixPeak() functions
             # from the sigProcHelper.R script
