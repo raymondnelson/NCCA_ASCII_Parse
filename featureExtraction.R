@@ -65,7 +65,8 @@
   
   source(file.path(RPath, "checkCardioArtifacts.R"), echo=FALSE)
   
-  source(file.path(RPath, "checkPneumoArtifacts.R"), echo=FALSE)
+  # source(file.path(RPath, "checkPneumoArtifacts.R"), echo=FALSE)
+  source(file.path(RPath, "newPneumoCheck.R"), echo=FALSE)
   
   # source(file.path(RPath, "checkRespirationArtifacts.R"), echo=FALSE)
   
@@ -317,14 +318,17 @@ featureExtraction <- function(x=uniqueExams,
           
           # Aug 31, 2023
           chartDF$AutoEDA_a <- 0
-          chartDF$Artifacts_a <- 0
-          chartDF$UPneumo_a <- 0
-          chartDF$LPneumo_a <- 0
-          chartDF$Pneumo_a <- 0
           chartDF$Cardio1_a <- 0
           if(sum(pmatch(names(chartDF), "c_PPG1", nomatch=0))!=0) {
             chartDF$PPG1_a <- 0
           }
+          
+          # commented out November 17, 2026
+          # to allow extraction of artifacts using the artfactProcFn in the artifactProc.R script
+          # chartDF$Artifacts_a <- 0
+          # chartDF$UPneumo_a <- 0
+          # chartDF$LPneumo_a <- 0
+          # chartDF$Pneumo_a <- 0
           
           # Aug 29, 2023
           chartDF$UPneumoExtract <- ""
