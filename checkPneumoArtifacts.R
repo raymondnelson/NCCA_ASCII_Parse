@@ -7,6 +7,7 @@
 ## Helper Functions
 # # respRateFn - to compute the respiration rate
 # # respBufferLenFn to compute the buffer length when computing the respiration rate 
+#
 # respTonicInstabilityFn - tonic instability
 # respInstabilityFn2 - inhalation and exhalation instability 
 # respDesyncFn - to determine badly descynchronized thoracic and abdominal data 
@@ -41,28 +42,30 @@
 
 
 
-respTonicInstabilityFn <- function(q25, q75, mid) {
+respTonicInstabilityFn <- function(lf, uf, mid) {
   # R function to evaluate respiration instability artifacts using the interquartile range
   # October 12, 2024
   # Raymond Nelson
   ###
-  # q25 is the 25th quartile for the entire chart or from X to XX
-  # q75 is the 75th quartile for the entire chart or from X to XX
+  # lf is the 25th or 10th percentile for the entire chart or from X to XX
+  # uf is the 75th or 90th percentile  for the entire chart or from X to XX
   # mid is the respiration mid line - computed via a smoothing function
   # these lines are computed at the time of signal processing and scaling
-  # by a function called from the in the scaleOffse.R script
+  # by a function called MASmooth() from the in the scaleOffse.R script
+  # instability artifacts are identified when the midline exceeds the IQR
   # output is a vector of row indices where the mid line exceeded the interquartile range
   ###
-  q25 <- q25[1]
-  q75 <- q75[1]
-  iqr <- q75 - q25
-  # set the upper and lower fences
-  ifU <- q75 # + (.5 * iqr) 
-  ifL <- q25 # - (.5 * iqr)
-  # locate rows where the midline exceeds the 25th percentile
-  upLimit <- which(mid >= ifU)
-  # locate rows where the midline exceeds the 75th percentile
-  lwLimit <- which(mid <= q25)
+  # q25 <- q25[1]
+  # q75 <- q75[1]
+  # iqr <- q75 - q25
+  # # set the inner upper and lower fences
+  # ifU <- q75 # + (.5 * iqr) 
+  # ifL <- q25 # - (.5 * iqr)
+  
+  # locate rows where the midline exceeds the upper fence
+  upLimit <- which(mid >= uf)
+  # locate rows where the midline exceeds the lower fence
+  lwLimit <- which(mid <= lf)
   # combine them
   unstableRows <- sort(unique(c(upLimit, lwLimit)))
   # output
@@ -72,28 +75,29 @@ respTonicInstabilityFn <- function(q25, q75, mid) {
 
 
 
-respInstabilityFn2 <- function(med, q25, q75, Inh, Exh) {
+respInstabilityFn2 <- function(uf, lf, Inh, Exh) {
   # R function to evaluate respiration instability artifacts using the interquartile range
   # October 13, 2024
   # Raymond Nelson
   ###
-  # med is the 50th quartile or median for the entire chart or from X to XX
+  # uf is the upper fence, can be the 50th, 75th or 90th percentile
+  # lf is the lower fence, such as the 50th, 25th or 10th percentile
   # Inh is the interpolated inhalation line
   # Exh is the interpolated exhalation line 
   # these lines are computed at the time of signal processing and scaling
-  # by a function called from the in the scaleOffse.R script
+  # by a function called interpolatePeaks() in the scaleOffse.R script
   ###
   # the inhalation line is expected to remain above the median
-  # the exhalation line is expected to reamin below the median
+  # the exhalation line is expected to remain below the median
   # inhalation or exhalation values on the unexpected side of the 50th, 25th or 75th quantile may indicate instability
   ###
   # output is a vector of row indices 
   # where the inhalation or exhalation points exceeded the median
   ###
   # locate rows where the inhalation line exceeds the 25th percentile
-  inhLimit <- which(Inh <= q25)
+  inhLimit <- which(Inh <= lf)
   # locate rows where the exhalation line exceeds the 75th percentile
-  exhLimit <- which(Exh >= q75)
+  exhLimit <- which(Exh >= uf)
   # combine them
   unstableRows <- sort(unique(c(inhLimit, exhLimit)))
   # output
@@ -103,40 +107,39 @@ respInstabilityFn2 <- function(med, q25, q75, Inh, Exh) {
 
 
 
-respDesyncFn <- function(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="both") {
+respDesyncFn <- function(diffVc=diffVc, q1=q25diffVc, q2=q50diffVc, q3=q75diffVc, inF=1.5, outF=3, fences="inner", side="both") {
   # R function to identify badly desynchronized thoracic and abdominal respiration
   # using a Tukey fence
   ###
   # diffVc is the distance between thoracic and abdominal time series data
-  # inF is the inner fence
-  # inF is the outer fence
+  # inF is the inner fence, in multiples of the IQR
+  # inF is the outer fence, in multiples of the IQR
   # fences can be "inner" "outer" or "both"
   # side can be "upper" "lower" or "both"
-  # output is a vector of row number where the thoracic - abdominal distance exceeded the Tukey fence
   # artifacts are marked when the difference exceeds the Tukey fences for the diff (upper - lower)
+  # output is a vector of row number where the thoracic - abdominal distance exceeded the Tukey fence limits
   ###
   # plot.ts(diffVc)
   # plot.ts(tsUP)
   # plot.ts(tsLP)  
-  ## adjust the data vector by removing the 1st and last sample rows
-  diffVc <- diffVc[2:(length(diffVc)-1)]
-  # diffVc must be the same length as the time series data
   names(diffVc) <- NULL
+  ## adjust the data vector by removing the 1st and last sample rows to avoid extreme values
+  diffVc <- diffVc[2:(length(diffVc)-1)]
   ## compute the quantiles
-  q1 <- quantile(diffVc, .25)
-  qm <- quantile(diffVc, .5)
-  q3 <- quantile(diffVc, .75)
+  # q1 <- quantile(diffVc, .25)
+  # q2 <- quantile(diffVc, .5)
+  # q3 <- quantile(diffVc, .75)
+  # diffVc must be the same length as the time series data
+  diffVc <- c(q2, diffVc, q2)
   ## compute the interquartile range of absolute mean differences.
   iqr <- abs(q3 - q1)
-  ## diffVc must be the same length as the time series data
-  diffVc <- c(qm, diffVc, qm)
   ## adjust the min and max IQR to stabilize sensitivity
   # the IQR will get very small, leading to increased sensitivity with stable data
   # the IQR will get large with unstable data, leading to reduced sensitivity
-  minIQR <- scaleVals['uPneumo'] * .33
-  if(iqr <= minIQR) iqr <- minIQR
-  maxIQR <- scaleVals['uPneumo'] * .67
-  if(iqr >= maxIQR) iqr <- maxIQR
+  # minIQR <- scaleVals['uPneumo'] * .33
+  # if(iqr <= minIQR) iqr <- minIQR
+  # maxIQR <- scaleVals['uPneumo'] * .67
+  # if(iqr >= maxIQR) iqr <- maxIQR
   ## set the Tukey fences
   # inner fences
   lfI <- q1 - (inF * iqr)
@@ -219,7 +222,7 @@ respDesyncFn <- function(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="b
 
 
 
-respActivityArtifactFn2 <- function(tsData=tsDataUp, tsMid=tsMid, offset=0) {
+respActivityArtifactFn2 <- function(tsData=tsDataUp, tsMid=q50U, offset=0) {
   # R function to extract unstable segments of respiration data
   # compare min and max peaks to a mid line
   # extract biting, swallowing, coughing, and strange respiration cycles
@@ -232,13 +235,15 @@ respActivityArtifactFn2 <- function(tsData=tsDataUp, tsMid=tsMid, offset=0) {
   # artifacts are marked where upper or lower peaks are on an unexpected side of the mid line
   ###
   # plot.ts(tsData)
-  ### call two functions to obtain the inhalation and exhalation peaks
+  ## make sure tsMid is a vector
+  if(length(tsMid) < length(tsData)) tsMid <- rep(tsMid[1], times = length(tsData))
+  ## call two functions to obtain the inhalation and exhalation peaks
   maxPeaks <- maxPeak(x=tsData, y=round(.25*cps,0))
   minPeaks <- minPeak(x=tsData, y=round(.25*cps,0))
-  # exclude the first and last indices
+  ## exclude the first and last indices
   maxPeaks <- maxPeaks[!(maxPeaks %in% c(1, length(tsData)))]
   minPeaks <- minPeaks[!(minPeaks %in% c(1, length(tsData)))]
-  ### check for very small changes in slope at the inhalation or exhalation lines
+  ## check for very small changes in slope at the inhalation or exhalation lines
   {
     # Oct 15, 2024
     minMaxPeaks <- sort(unique(c(maxPeaks, minPeaks)))
@@ -252,14 +257,14 @@ respActivityArtifactFn2 <- function(tsData=tsDataUp, tsMid=tsMid, offset=0) {
     maxPeaks <- maxPeaks[maxPeaks %in% minMaxPeaks2]
     minPeaks <- minPeaks[minPeaks %in% minMaxPeaks2]
   }
-  ### max peaks below the mid line
+  ## max peaks below the mid line
   sigMax <- which((tsData[maxPeaks] - offset) <= tsMid[maxPeaks])
-  ### min peaks above the mid line
+  ## min peaks above the mid line
   sigMin <- which((tsData[minPeaks] + offset) >= tsMid[minPeaks])
-  ###  aggregate the artifact rows
+  ##  aggregate the artifact rows
   artifactRows <-
     unique(sort(c(maxPeaks[sigMax], minPeaks[sigMin])))
-  ###
+  ##
   return(artifactRows)
   # end respActivityArtifactFn2()
 }
@@ -523,7 +528,7 @@ respDBFn2 <- function(x=tsData, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3, f
 #   # by extracting the exhalation peaks
 #   # Oct 10, 2024
 #   # Raymond Nelson
-#   ####
+#   ###
 #   # x input is a time series vector
 #   # mid is the respiration mid line
 #   # inF is the inner Tukey fence
@@ -720,10 +725,12 @@ baselineInstablityFn2 <- function(x=tsDataLp, q25=q25U, q50=q50U, q75=q75U, inF=
 
 
 
-checkPneumoArtifactsFn <- function(DAT=segmentDF,
-                                   responseOnsetRow=NULL,
-                                   responseEndRow=NULL,
-                                   answerRow=NULL ) { 
+# DAT=segmentDF
+# DAT=chartDF
+
+
+
+checkPneumoArtifactsFn <- function(DAT=segmentDF) { 
   # R Function to check for respiration artifacts during feature extraction
   # August 28, 2023 
   # Raymond Nelson 
@@ -765,31 +772,89 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
   }
   
   {
-    # get the respiration data
+    ## get the respiration data
     tsDataUp <- DAT$c_UPneumoSm
     tsDataLp <- DAT$c_LPneumoSm
     
-	# compute the distance between the thoracic and abdominal data
-    diffVc <- (tsDataUp - tsDataLp)
-    
-    # get the mid lines
+    # get the mid lines (slow moving average)
     tsMidU <- DAT$c_UPneumoMid
     tsMidL <- DAT$c_LPneumoMid
     
-    # get the quantile lines
-    q25U <- DAT$c_UPneumo_Q25
-    q50U <- DAT$c_UPneumo_Q50
-    q75U <- DAT$c_UPneumo_Q75
+    # tsMidU <- MASmooth(x=DAT$c_UPneumoSm, y=round(12.5*cps,0), times=4)
+    # tsMidL <- MASmooth(x=DAT$c_LPneumoSm, y=round(12.5*cps,0), times=4)
     
-    q25L <- DAT$c_LPneumo_Q25
-    q50L <- DAT$c_LPneumo_Q50
-    q75L <- DAT$c_LPneumo_Q75
+    # compute the distance between the thoracic and abdominal data
+    # diffVc <- (tsDataUp - tsDataLp)
+    
+    # use the pneumo scale value for the distance
+    pnDist <- scaleVals[1] * 2
+    
+    # offset the upper pneumo mid line 
+    tsMidUa <- tsMidU - quantile(tsMidU, .5)
+    # offset the lower pneumo mid line
+    tsMidLa <- tsMidL - quantile(tsMidL, .5)
+    
+    diffVc <- tsMidUa - tsMidLa
+    diffVc <- diffVc - min(diffVc) + 1
+    # max(diffVc)
+  }
+  
+  {
+    ## 2026Nov09
+    ## get the answer indices
+    answerRows <- which(DAT$Label %in% c("no", "yes", "No", "Yes", "NO", "YES", "Ans", "ans", "ANS"))
+    
+    # # response onset end and answer indices
+    # # responseOnsetRow <- which(DAT$Events == "onsetRow")
+    # responseOnsetRow <- 301
+    # # responseEndRow <- which(DAT$Events == "offsetRow")
+    # responseEndRow <- responseOnsetRow + (15*cps) - 1
+    
+    # answerRow <- which(DAT$Events == "answerRow")
+    # do it this way so that we don't inadvertently make answer rows for annotations
+    answerRow <- which(DAT$Label %in% c("no", "yes", "No", "Yes", "NO", "YES", "Ans", "ans", "ANS"))
+  }
+  
+  {  
+    ## lines/values needed for analysis
+    ## these are computed during scaling and offseting
+    
+    # get the quantile values - upper pneumo
+    q025U <- quantile(DAT$c_UPneumoSm, .025)
+    q05U <- quantile(DAT$c_UPneumoSm, .05)
+    q10U <- quantile(DAT$c_UPneumoSm, .10)
+    q25U <- DAT$c_UPneumo_Q25[1]
+    q40U <- quantile(DAT$c_UPneumoSm, .40)
+    q50U <- DAT$c_UPneumo_Q50[1]
+    q60U <- quantile(DAT$c_UPneumoSm, .60)
+    q75U <- DAT$c_UPneumo_Q75[1]
+    q90U <- quantile(DAT$c_UPneumoSm, .90)
+    q95U <- quantile(DAT$c_UPneumoSm, .95)
+    q975U <- quantile(DAT$c_UPneumoSm, .975)
+    
+    # quantile values - lower pneumo
+    q025L <- quantile(DAT$c_LPneumoSm, .025)
+    q05L <- quantile(DAT$c_LPneumoSm, .05)
+    q10L <- quantile(DAT$c_LPneumoSm, .10)
+    q25L <- DAT$c_LPneumo_Q25[1]
+    q40L <- quantile(DAT$c_LPneumoSm, .40)
+    q50L <- DAT$c_LPneumo_Q50[1]
+    q60L <- quantile(DAT$c_LPneumoSm, .60)
+    q75L <- DAT$c_LPneumo_Q75[1]
+    q90L <- quantile(DAT$c_LPneumoSm, .90)
+    q95L <- quantile(DAT$c_LPneumoSm, .95)
+    q975L <- quantile(DAT$c_LPneumoSm, .975)
     
     # get the inhalation and exhalation lines
     tsInhU <- DAT$c_UPneumoInh
     tsInhL <- DAT$c_LPneumoInh
     tsExhU <- DAT$c_UPneumoExh
     tsExhL <- DAT$c_LPneumoExh
+    
+    # compute the quantiles for the difference vector
+    q25diffVc <- quantile(diffVc, .25)
+    q50diffVc <- quantile(diffVc, .50)
+    q75diffVc <- quantile(diffVc, .75)
     
     # plot.ts(tsInhU)
     # plot.ts(tsMidU)
@@ -802,16 +867,27 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     assign("diffVc", diffVc, envir=.GlobalEnv)
     assign("tsMidU", tsMidU, envir=.GlobalEnv)
     assign("tsMidL", tsMidL, envir=.GlobalEnv)
+    assign("q10U", q10U, envir=.GlobalEnv)
     assign("q25U", q25U, envir=.GlobalEnv)
+    assign("q40U", q40U, envir=.GlobalEnv)
     assign("q50U", q50U, envir=.GlobalEnv)
+    assign("q60U", q60U, envir=.GlobalEnv)
     assign("q75U", q75U, envir=.GlobalEnv)
+    assign("q90U", q90U, envir=.GlobalEnv)
+    assign("q10L", q10L, envir=.GlobalEnv)
     assign("q25L", q25L, envir=.GlobalEnv)
+    assign("q40L", q40L, envir=.GlobalEnv)
     assign("q50L", q50L, envir=.GlobalEnv)
+    assign("q60L", q60L, envir=.GlobalEnv)
     assign("q75L", q75L, envir=.GlobalEnv)
+    assign("q90L", q90L, envir=.GlobalEnv)
     assign("tsInhU", tsInhU, envir=.GlobalEnv)
     assign("tsInhL", tsInhL, envir=.GlobalEnv)
     assign("tsExhU", tsExhU, envir=.GlobalEnv)
     assign("tsExhL", tsExhL, envir=.GlobalEnv)
+    assign("q25diffVc", q25diffVc, envir=.GlobalEnv)
+    assign("q50diffVc", q50diffVc, envir=.GlobalEnv)
+    assign("q75diffVc", q75diffVc, envir=.GlobalEnv)
     assign("responseOnsetRow", responseOnsetRow, envir=.GlobalEnv)
     assign("responseEndRow", responseEndRow, envir=.GlobalEnv)
     assign("answerRow", answerRow, envir=.GlobalEnv)
@@ -843,40 +919,46 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     # initialize the output vectors
     outVcU <- rep(0, times=length(tsDataUp))
     outVcL <- rep(0, times=length(tsDataLp))
+    
     # and an output data frame
     outVcDF <- cbind.data.frame(outVcU, outVcL)
   }
   
   {
-    # fix some missing parameters
-    if(is.null(responseOnsetRow)) responseOnsetRow <- length(tsDataUp)
-    if(is.null(responseEndRow)) responseEndRow <- length(tsDataUp)
-    if(responseEndRow > length(tsDataUp)) responseEndRow <- length(tsDataUp)
-    # check for missing answer
-    answerRow <- answerRow[which((answerRow <= responseEndRow) & (answerRow >= responseOnsetRow))]
-    if(length(answerRow) == 0) answerRow <- NULL
-    # check for very late answer
-    if(!is.null(answerRow) && answerRow >= length(tsDataUp)) answerRow <- NULL
+    # # fix some missing parameters
+    # if(is.null(responseOnsetRow)) responseOnsetRow <- length(tsDataUp)
+    # if(is.null(responseEndRow)) responseEndRow <- length(tsDataUp)
+    # if(responseEndRow > length(tsDataUp)) responseEndRow <- length(tsDataUp)
+    # # check for missing answer
+    # answerRow <- answerRow[which((answerRow <= responseEndRow) & (answerRow >= responseOnsetRow))]
+    # if(length(answerRow) == 0) answerRow <- NULL
+    # # check for very late answer
+    # if(!is.null(answerRow) && answerRow >= length(tsDataUp)) answerRow <- NULL
   }
   
-  {
-    # compute some vectors for the prestim, stim, and poststim rows
-    preStimRows <- c(1:(responseOnsetRow-1))
-    stimSegRows <- c(responseOnsetRow:(responseOnsetRow+round(measuredSeg*cps)-1))
-    postStimRows <- c((responseOnsetRow+round(measuredSeg*cps)-1):length(tsDataUp))
-  }
+  # assign("segmentDF", DAT, envir = .GlobalEnv)
+  # stop()
+  
+  #### initialize a vector for the verbal answer buffer rows ####
+  
+  ansBuffRows <- NULL
   
   {
     # compute the answer distortion buffer
-    if(!is.null(answerRow)) {
-      ansBuffOn <- answerRow - round((pneumoAnsBuff * cps)) - 0
-      ansBuffOff <- answerRow + round((pneumoAnsBuff * cps)) + 0
-      # make sure the answer buffer does not exceed the segment data frame
-      if(ansBuffOn < 1) ansBuffOn <- 1
-      if(ansBuffOff > nrow(segmentDF)) ansBuffOff <- nrow(segmentDF)
-      # if(any(ansBuffOn < 1)) ansBuffOn[which(ansBuffOn < 1)] <- 1
-      # if(any(ansBuffOff > nrow(DAT))) ansBuffOff[which(ansBuffOff > nrow(DAT))] <- nrow(DAT)
-      ansBuffRows <- c(ansBuffOn:ansBuffOff)
+    if(!is.null(answerRow) && length(answerRow) != 0) {
+      # a loop is necesary when using the chartDF, not for the segmentDF
+      for(i in 1:length(answerRow)) {
+        ansBuffOn <- answerRow[i] - round((pneumoAnsBuff * cps)) - 0
+        ansBuffOff <- answerRow[i] + round((pneumoAnsBuff * cps)) + 0
+        # make sure the answer buffer does not exceed the segment data frame
+        if(ansBuffOn < 1) ansBuffOn <- 1
+        if(ansBuffOff > nrow(DAT)) ansBuffOff <- nrow(DAT)
+        # if(ansBuffOn[1] < 1) ansBuffOn[1] <- 1
+        # if(ansBuffOff[length(ansBuffOff)] > nrow(DAT)) ansBuffOff[length(ansBuffOff)] <- nrow(DAT)
+        # if(any(ansBuffOn < 1)) ansBuffOn[which(ansBuffOn < 1)] <- 1
+        # if(any(ansBuffOff > nrow(DAT))) ansBuffOff[which(ansBuffOff > nrow(DAT))] <- nrow(DAT)
+        ansBuffRows <- c(ansBuffRows, c(ansBuffOn:ansBuffOff))
+      }
     } else {
       ansBuffRows <- NULL
     }
@@ -889,13 +971,20 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
   }
     
   {
-    # initialize the segments indices
-    prestimSegUp <- tsDataUp[preStimRows]
-    prestimSegLp <- tsDataLp[preStimRows]
-    stimSegUp <- tsDataUp[stimSegRows]
-    stimSegLp <- tsDataLp[stimSegRows]
-    poststimSegUp <- tsDataUp[postStimRows]
-    poststimSegLp <- tsDataLp[postStimRows]
+    # ## compute some vectors for the prestim, stim, and poststim rows
+    # preStimRows <- c(1:(responseOnsetRow-1))
+    # stimSegRows <- c(responseOnsetRow:(responseOnsetRow+round(measuredSeg*cps)-1))
+    # postStimRows <- c((responseOnsetRow+round(measuredSeg*cps)-1):length(tsDataUp))
+  }
+  
+  {
+    ## initialize the segments indices
+    # prestimSegUp <- tsDataUp[preStimRows]
+    # prestimSegLp <- tsDataLp[preStimRows]
+    # stimSegUp <- tsDataUp[stimSegRows]
+    # stimSegLp <- tsDataLp[stimSegRows]
+    # poststimSegUp <- tsDataUp[postStimRows]
+    # poststimSegLp <- tsDataLp[postStimRows]
     
     # prestimDiffUp <- diffUp[preStimRows]
     # prestimDiffLp <- diffLp[preStimRows]
@@ -903,22 +992,26 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     # stimDiffLp <- diffLp[stimSegRows]
     # poststimDiffUp <- diffUp[postStimRows]
     # poststimDiffLp <- diffLp[postStimRows]
+    
+    ## these are used for ratio comparison of RLE measurments
   } 
   
   #### get the measurements without excluding the answer distortion  ####
   
   {
-    prestimMeasureUp <- pneumoMeasurementFn(prestimSegUp, verbalAnswer=NULL)
-    prestimMeasureLp <- pneumoMeasurementFn(prestimSegLp, verbalAnswer=NULL)
+    # prestimMeasureUp <- pneumoMeasurementFn(prestimSegUp, verbalAnswer=NULL)
+    # prestimMeasureLp <- pneumoMeasurementFn(prestimSegLp, verbalAnswer=NULL)
+    # 
+    # stimSegMeasureUp <- pneumoMeasurementFn(stimSegUp, verbalAnswer=NULL)
+    # stimSegMeasureLp <- pneumoMeasurementFn(stimSegLp, verbalAnswer=NULL)
+    # 
+    # poststimMeasureUp <- pneumoMeasurementFn(poststimSegUp, verbalAnswer=NULL)
+    # poststimMeasureLp <- pneumoMeasurementFn(poststimSegLp, verbalAnswer=NULL)
     
-    stimSegMeasureUp <- pneumoMeasurementFn(stimSegUp, verbalAnswer=NULL)
-    stimSegMeasureLp <- pneumoMeasurementFn(stimSegLp, verbalAnswer=NULL)
-    
-    poststimMeasureUp <- pneumoMeasurementFn(poststimSegUp, verbalAnswer=NULL)
-    poststimMeasureLp <- pneumoMeasurementFn(poststimSegLp, verbalAnswer=NULL)
+    ## these are used for ratio comparison of RLE measurments
   }
   
-  #### evaluate the desynchronization and distance between the respiration data ####
+  #### 1. evaluate the desynchronization and distance between the respiration data ####
   
   {
     
@@ -934,7 +1027,7 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     
     # artifacts are marked when the difference exceeds the Tukey fences
 
-    artifactRowsDesync <- respDesyncFn(diffVc=diffVc, inF=1.5, outF=3, fences="inner", side="both")
+    artifactRowsDesync <- respDesyncFn(diffVc=diffVc, q1=q25diffVc, q2=q50diffVc, q3=q75diffVc, inF=1.5, outF=3, fences="outer", side="both")
 
     # if(length(artifactRowsDesync) > 0) {
     #   assign("segmentDF", DAT, envir=.GlobalEnv)
@@ -950,48 +1043,52 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     
   }
   
-  #### evaluate the tonic stability of the respiration data using the mid line ####
+  #### 2. evaluate the tonic stability of the respiration data using the mid line ####
   
   {
     
-    # using the midline, 25th percenttile and 75th percentiule, computed during signal procesing
-    # artifacts are marked where the midline exceeds the 25th or 75th percentile 
+    # using the midline, computed during signal processing, along with upper and lower fences
+    # artifacts are marked where the midline equals or exceeds the limits
     
-    tonicInstabilityRowsUP <- respTonicInstabilityFn(q25=q25U, q75=q75U, mid=tsMidU)
-    tonicInstabilityRowsLP <- respTonicInstabilityFn(q25=q25L, q75=q75L, mid=tsMidL)
+    tonicInstabilityRowsUP <- respTonicInstabilityFn(lf=q05U, uf=q95U, mid=tsMidU)
+    tonicInstabilityRowsLP <- respTonicInstabilityFn(lf=q05L, uf=q95L, mid=tsMidL)
     
     # combine the upper and lower artifact vectors
     tonicInstabilityRowsUL <- sort(unique(c(tonicInstabilityRowsUP, tonicInstabilityRowsLP)))
+    
+    # remove tonic instability artifacts from the answer buffer
+    # tonicInstabilityRowsUL <- tonicInstabilityRowsUL[!(tonicInstabilityRowsUL %in% ansBuffRows)]
     
     outVcDF$outVcU[as.numeric(tonicInstabilityRowsUP)] <- "ArtifactTonicity"
     outVcDF$outVcL[as.numeric(tonicInstabilityRowsLP)] <- "ArtifactTonicity"
     
   }
   
-  #### evaluate respiration instability using the inhalation and exhalation lines ####
+  #### 3. evaluate respiration instability using the inhalation and exhalation lines ####
   
   {
     
     # artifacts are marked when the inhalation line is less than the 25th quantile
     # or when the exhalation line is greater than the 75th quantile
     
-    instabilityRowsUP <- respInstabilityFn2(med=q50U, q25=q25U, q75=q75U, Inh=tsInhU, Exh=tsExhU)
-    instabilityRowsLP <- respInstabilityFn2(med=q50L, q25=q25L, q75=q75L, Inh=tsInhL, Exh=tsExhL)
+    instabilityRowsUP <- respInstabilityFn2(uf=q75U, lf=q25U, Inh=tsInhU, Exh=tsExhU)
+    instabilityRowsLP <- respInstabilityFn2(uf=q75L, lf=q25L, Inh=tsInhL, Exh=tsExhL)
     
     # combine the upper and lower artifact vectors
     instabilityRowsUL <- sort(unique(c(instabilityRowsUP, instabilityRowsLP)))
     
-    # remove activity instability artifacts from the answer buffer
     {
+      # remove activity instability artifacts from the answer buffer
       instabilityRowsUP <- instabilityRowsUP[!(instabilityRowsUP %in% ansBuffRows)]
       instabilityRowsLP <- instabilityRowsLP[!(instabilityRowsLP %in% ansBuffRows)]
       
+      # remove tonic instability artifacts from the answer buffer
       instabilityRowsUL <- instabilityRowsUL[!(instabilityRowsUL %in% ansBuffRows)]
     }
 
     # submit the instability artifacts to the output buffer
-    # outVcDF$outVcU[as.numeric(instabilityRowsUP)] <- "ArtifactInst"
-    # outVcDF$outVcL[as.numeric(instabilityRowsLP)] <- "ArtifactInst"
+    outVcDF$outVcU[as.numeric(instabilityRowsUP)] <- "ArtifactInst"
+    outVcDF$outVcL[as.numeric(instabilityRowsLP)] <- "ArtifactInst"
     
   }
   
@@ -1013,7 +1110,7 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     # outVcDF$outVcL[as.numeric(artifactRows45)] <- "Artifact"
   } 
   
-  #### compare the ratio of prestimulus and stimulus segments ####
+  #### compare the ratio of prestimulus and stimulus measurements ####
    
   {
     # artifactRowsA <- respPreStimFn(measurement=stimSegMeasureUp, prestimMeasurement=prestimMeasureUp)
@@ -1027,7 +1124,7 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     # outVcDF$outVcL[as.numeric(artifactRowsB)] <- "Artifact"
   }
   
-  #### check for activity artifact - upper and lower peaks with unexpected values ####
+  #### 4. check for activity artifact - upper and lower peaks with unexpected values ####
   
   {
     ## biting, swallowing, tussis, other distortions ##
@@ -1035,8 +1132,8 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     # artifacts are marked where upper or lower peaks are on an unexpected side of the mid line
 
     # Call a function to separately compare the upper and lower peaks to a mid line
-    artifactRowsUp <- respActivityArtifactFn2(tsData=tsDataUp, tsMid=tsMidU)
-    artifactRowsLp <- respActivityArtifactFn2(tsData=tsDataLp, tsMid=tsMidL)
+    artifactRowsUp <- respActivityArtifactFn2(tsData=tsDataUp, tsMid=q50U)
+    artifactRowsLp <- respActivityArtifactFn2(tsData=tsDataLp, tsMid=q50L)
 
     # plot.ts(tsDataUP)
     # plot.ts(tsDataMidU)
@@ -1045,14 +1142,15 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     artifactRowsUp <- artifactRowsUp[!(artifactRowsUp %in% ansBuffRows)]
     artifactRowsLp <- artifactRowsLp[!(artifactRowsLp %in% ansBuffRows)]
 
-    artifactRowsUL <- sort(unique(c(artifactRowsUp, artifactRowsLp)))
+    # combine the upper and lower artifact vectors
+    # artifactRowsUL <- sort(unique(c(artifactRowsUp, artifactRowsLp)))
 
     # outVcDF[artifactRows] <- "Artifact"
     outVcDF$outVcU[artifactRowsUp] <- "ArtifactBU"
     outVcDF$outVcL[artifactRowsLp] <- "ArtifactBL"
   } 
   
-  #### evaluate the data for deep breaths ####
+  #### 5. evaluate the data for deep breaths ####
   
   {
     # call a function to locate deep breath artifacts
@@ -1073,14 +1171,14 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     artifactRows7 <- artifactRows7[!(artifactRows7 %in% ansBuffRows)]
     artifactRows8 <- artifactRows8[!(artifactRows8 %in% ansBuffRows)]
     
-    artifactRowsDB <- sort(unique(c(artifactRows7, artifactRows8)))
+    # artifactRowsDB <- sort(unique(c(artifactRows7, artifactRows8)))
     
-    # keep the thoracic and abdominal separate sto avoid excess data loss 
-    outVcDF$outVcU[artifactRows7] <- "ArtifactDB"
-    outVcDF$outVcL[artifactRows8] <- "ArtifactDB"
+    # keep the thoracic and abdominal separate to avoid excess data loss 
+    outVcDF$outVcU[artifactRows7] <- "ArtifactDBU"
+    outVcDF$outVcL[artifactRows8] <- "ArtifactDBL"
   } 
   
-  #### evaluate the data for BIG deep breaths ####
+  #### 6. evaluate the data for BIG deep breaths ####
   
   {
     # BIG deep breaths are not removed from the answering buffer
@@ -1092,22 +1190,22 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     
     # quantiles were initialized earlier in this function 
     
-    artifactRows7 <- respDBFn2(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3, fences="outer", side="upper")
-    artifactRows8 <- respDBFn2(x=tsDataLp, q25=q25L, q50=q50L, q75=q75L, inF=1.5, outF=3, fences="outer", side="upper")
+    artifactRows9 <- respDBFn2(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3, fences="outer", side="upper")
+    artifactRows10 <- respDBFn2(x=tsDataLp, q25=q25L, q50=q50L, q75=q75L, inF=1.5, outF=3, fences="outer", side="upper")
     # this function will return the row index where deep breath peaks are located
     
     # exclude artifacts surrounding the verbal answer
-    # artifactRows7 <- artifactRows7[!(artifactRows7 %in% ansBuffRows)]
-    # artifactRows8 <- artifactRows8[!(artifactRows8 %in% ansBuffRows)]
+    # artifactRows9 <- artifactRows7[!(artifactRows7 %in% ansBuffRows)]
+    # artifactRows10 <- artifactRows8[!(artifactRows8 %in% ansBuffRows)]
     
-    artifactRowsDB <- sort(unique(c(artifactRows7, artifactRows8)))
+    artifactRowsDB <- sort(unique(c(artifactRows9, artifactRows10)))
     
     # keep the thoracic and abdominal separate sto avoid excess data loss 
-    outVcDF$outVcU[artifactRows7] <- "ArtifactBDB"
-    outVcDF$outVcL[artifactRows8] <- "ArtifactBDB"
+    outVcDF$outVcU[artifactRowsDB] <- "ArtifactBDB"
+    outVcDF$outVcL[artifactRowsDB] <- "ArtifactBDB"
   } 
   
-  #### evaluate the data for apnea ####
+  #### 7. evaluate the data for apnea ####
   
   {
     UPApn <- respApneaFn(x=tsDataUp)
@@ -1127,11 +1225,11 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     # is not apnea if respiration acitivity is extant in one of the sensors
     # apneaArtifacts <- apneaArtifacts[which(apneaArtifacts %in% UPApn & apneaArtifacts %in% LPApn)]
     
-    outVcDF$outVcU[UPApn] <- "ArtifactAP"
-    outVcDF$outVcL[LPApn] <- "ArtifactAP"
+    outVcDF$outVcU[apneaArtifactsUL] <- "ArtifactAP"
+    outVcDF$outVcL[apneaArtifactsUL] <- "ArtifactAP"
   }
   
-  #### evaluate the baseline for artifacts ####
+  #### 8. evaluate the baseline for artifacts ####
   
   {
     
@@ -1143,19 +1241,19 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     baselineArtifactsLp <- baselineInstablityFn2(x=tsDataLp, q25=q25L, q50=q50L, q75=q75L, inF=1, outF=2, fences="inner", side="lower")
     
     # exclude artifacts surrounding the verbal answer
-    baselineArtifactsUp <- baselineArtifactsUp[!(baselineArtifactsUp %in% ansBuffRows)]
-    baselineArtifactsLp <- baselineArtifactsLp[!(baselineArtifactsLp %in% ansBuffRows)]
+    # baselineArtifactsUp <- baselineArtifactsUp[!(baselineArtifactsUp %in% ansBuffRows)]
+    # baselineArtifactsLp <- baselineArtifactsLp[!(baselineArtifactsLp %in% ansBuffRows)]
     
     # compbine the baseline artifacts for the thoracic and abdominal sensors
-    baselineArtifactsUL <- sort(unique(c(baselineArtifactsUp, baselineArtifactsLp)))
+    # baselineArtifactsUL <- sort(unique(c(baselineArtifactsUp, baselineArtifactsLp)))
     
     # keep the thoracic and abdominal separate to avoid excess data loss 
-    outVcDF$outVcU[baselineArtifactsUp] <- "ArtifactBL"
-    outVcDF$outVcL[baselineArtifactsLp] <- "ArtifactBL"
+    outVcDF$outVcU[baselineArtifactsUp] <- "ArtifactBLU"
+    outVcDF$outVcL[baselineArtifactsLp] <- "ArtifactBLL"
     
   }
   
-  #### evaluate the baseline for BIG artifacts ####
+  #### 9. evaluate the baseline for BIG artifacts ####
   
   {
 
@@ -1163,8 +1261,8 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     # baselineArtifactsUp <- baselineInstablityFn(x=tsDataUp, mid=tsMidU, inF=1.5, outF=3, fences="outer", side="both")
     # baselineArtifactsLp <- baselineInstablityFn(x=tsDataLp, mid=tsMidL, inF=1.5, outF=3, fences="outer", side="both")
 
-    baselineArtifactsUp <- baselineInstablityFn2(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1, outF=2, fences="outer", side="lower")
-    baselineArtifactsLp <- baselineInstablityFn2(x=tsDataLp, q25=q25L, q50=q50L, q75=q75L, inF=1, outF=2, fences="outer", side="lower")
+    baselineArtifactsUp <- baselineInstablityFn2(x=tsDataUp, q25=q25U, q50=q50U, q75=q75U, inF=1.5, outF=3, fences="outer", side="lower")
+    baselineArtifactsLp <- baselineInstablityFn2(x=tsDataLp, q25=q25L, q50=q50L, q75=q75L, inF=1.5, outF=3, fences="outer", side="lower")
 
     # exclude artifacts surrounding the verbal answer
     # baselineArtifactsUp <- baselineArtifactsUp[!(baselineArtifactsUp %in% ansBuffRows)]
@@ -1174,8 +1272,8 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     baselineArtifactsUL <- sort(unique(c(baselineArtifactsUp, baselineArtifactsLp)))
 
     # keep the thoracic and abdominal separate to avoid excess data loss
-    outVcDF$outVcU[baselineArtifactsUp] <- "ArtifactBL"
-    outVcDF$outVcL[baselineArtifactsLp] <- "ArtifactBL"
+    # outVcDF$outVcU[baselineArtifactsUL] <- "ArtifactBBLU"
+    # outVcDF$outVcL[baselineArtifactsUL] <- "ArtifactBBLL"
 
   }
   
@@ -1188,9 +1286,20 @@ checkPneumoArtifactsFn <- function(DAT=segmentDF,
     
   }
   
+  #### submit the artifacts to the input data frame and output the chartDF ####
+  
+  {
+    
+    # 2026Nov13
+    
+    
+  }
+  
   #### output ####
   
   # return(outVc)
+  # output is a vector of 0s the same length as the DAT
+  # artifacted indices are are indicated with the "Artifact" message
   return(outVcDF)
   
   # end checkPneumoArtifactsFn()
