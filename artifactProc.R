@@ -17,11 +17,16 @@
 {
 
   ## respiration ##
+  
   source(file.path(RPath, 'pneumoArtifact.R'), echo=FALSE)
   # check for unresponsive respiration data
   # source(file.path(RPath, 'sigProcHelper.R'), echo=FALSE)
   source(file.path(RPath, 'pneumoCheck.R'), echo=FALSE)
   source(file.path(RPath, 'tukeyFences.R'), echo=FALSE)
+  
+  # 2026Nov13 moving resp artifacts from the segmentDF to the chartDF
+  source(file.path(RPath, 'newPneumoCheck.R'), echo=FALSE)
+  
   
   sec <- .5
   cutProp <- .1
@@ -92,7 +97,7 @@
 # k=1
 
 
-artifactProcFn<- function(x=uniqueExams) {
+artifactProcFn <- function(x=uniqueExams) {
   # function to iterate over a vector of data frame names 
   # and locate data artifacts in the NCCA ASCII time series data
   # x is a vector of names of data frames that contain the
@@ -226,6 +231,8 @@ artifactProcFn<- function(x=uniqueExams) {
         
         if(isTRUE(pneumoArtifacts)) {
           
+          # pneumoArtifacts is initialized in
+          
           if(showNames==TRUE)  print("  pneumo artifacts")
 
           # check for unresponsive pneumo data
@@ -235,19 +242,30 @@ artifactProcFn<- function(x=uniqueExams) {
 
           # check for unresponsive pneumo sensors
           # 2020-06-03 seems to be a problems with adding NUL
-          pneumoCheckMsg <- pneumoCheckFn(x1=chartDF$c_UPneumoSm, x2=chartDF$c_LPneumoSm, sec=5, times=30, omit=10, firstRow=NULL, lastRow=NULL)
+          # pneumoCheckMsg <- pneumoCheckFn(x1=chartDF$c_UPneumoSm, x2=chartDF$c_LPneumoSm, sec=5, times=30, omit=10, firstRow=NULL, lastRow=NULL)
 
           # chartDF$LPneumoUnresponse_a <- pneumoCheckMsg
           # chartDF$UPneumoUnresponse_a <- pneumoCheckMsg
 
           # check for respiration artifacts
           # source(file.path(RPath, 'pneumoArtifact.R'), echo=FALSE)
-          chartDF <- pneumoArtifactFn(x=chartDF)
+          # commented out 2026Nov13
+          # chartDF <- pneumoArtifactFn(x=chartDF)
           # stop()
 
-          # which(chartDF$Pneumo_a == "Artifact")
-          # which(chartDF$UPneumo_a == "Artifact")
-          # which(chartDF$LPneumo_a == "Artifact")
+          # source(file.path(RPath, 'checkPneumoArtifacts.R'), echo=FALSE)
+          # artifactResultDF <- checkPneumoArtifactsFn(DAT=chartDF ) 
+          # assign("artifactResultDF", artifactResultDF, envir=.GlobalEnv)
+          # stop(artifactResultDF)
+          # View(artifactResultDF)
+          # artifactResultDF is a data frame of 2 colums with artifcts for UP and LP
+          # output needs to be the chartDF with artifacts
+          
+          chartDF <- newPneumoCheckFn(chartDF=chartDF)
+          
+          # which(chartDF$Pneumo_a != "0")
+          # which(chartDF$UPneumo_a != "0")
+          # which(chartDF$LPneumo_a != "0")
           
         } 
         
